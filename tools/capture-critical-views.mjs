@@ -122,7 +122,7 @@ function adminUrl(baseUrl, path) {
 }
 
 async function login(page, baseUrl, username, password) {
-    await page.goto(adminUrl(baseUrl, '/wp-login.php'), { waitUntil: 'domcontentloaded' });
+    await page.goto(adminUrl(baseUrl, '/wp-login.php'), { waitUntil: 'networkidle' });
     await page.fill('#user_login', username);
     await page.fill('#user_pass', password);
     await Promise.all([
@@ -151,8 +151,15 @@ async function injectHighlightStyles(page) {
                 box-shadow: 0 0 0 4px #111, 0 0 0 12px rgba(255, 212, 0, 0.45) !important;
                 box-sizing: border-box !important;
                 pointer-events: none !important;
-                position: absolute !important;
                 z-index: 2147483647 !important;
+            }
+
+            .__gwi_capture_overlay--document {
+                position: absolute !important;
+            }
+
+            .__gwi_capture_overlay--viewport {
+                position: fixed !important;
             }
 
             .__gwi_capture_label {
@@ -192,7 +199,7 @@ async function findFirstVisibleLocator(page, selector) {
     return null;
 }
 
-async function applyHighlight(page, highlight, language) {
+async function applyHighlight(page, highlight, language, captureMode) {
     const locator = await findFirstVisibleLocator(page, highlight.selector);
 
     if (!locator) {
@@ -206,31 +213,44 @@ async function applyHighlight(page, highlight, language) {
 
     const label = localized(highlight.label, language);
     await locator.scrollIntoViewIfNeeded();
-    await locator.evaluate((element, currentLabel) => {
+    await locator.evaluate((element, payload) => {
         element.classList.add('__gwi_capture_target');
 
         const rect = element.getBoundingClientRect();
         const overlay = document.createElement('div');
-        overlay.className = '__gwi_capture_overlay';
-        overlay.style.left = `${window.scrollX + rect.left - 8}px`;
-        overlay.style.top = `${window.scrollY + rect.top - 8}px`;
+
+        const isFullPage = payload.captureMode === 'fullPage';
+        overlay.className = '__gwi_capture_overlay ' + (isFullPage
+            ? '__gwi_capture_overlay--document'
+            : '__gwi_capture_overlay--viewport');
+
+        if (isFullPage) {
+            overlay.style.left = `${window.scrollX + rect.left - 8}px`;
+            overlay.style.top = `${window.scrollY + rect.top - 8}px`;
+        } else {
+            overlay.style.left = `${rect.left - 8}px`;
+            overlay.style.top = `${rect.top - 8}px`;
+        }
+
         overlay.style.width = `${rect.width + 16}px`;
         overlay.style.height = `${rect.height + 16}px`;
 
-        if (currentLabel) {
+        if (payload.label) {
             const labelElement = document.createElement('div');
             labelElement.className = '__gwi_capture_label';
-            labelElement.textContent = currentLabel;
+            labelElement.textContent = payload.label;
             overlay.appendChild(labelElement);
         }
 
         document.body.appendChild(overlay);
-    }, label);
+    }, { label, captureMode });
 }
 
 async function captureView(page, baseUrl, view, language, outputDir) {
     const title = localized(view.title, language) || view.id;
     console.log(`Capturing: ${title}`);
+
+    const captureMode = view.capture || 'viewport';
 
     await page.goto(adminUrl(baseUrl, view.url), { waitUntil: 'domcontentloaded' });
 
@@ -241,14 +261,24 @@ async function captureView(page, baseUrl, view, language, outputDir) {
     await injectHighlightStyles(page);
 
     for (const highlight of view.highlights || []) {
-        await applyHighlight(page, highlight, language);
+        await applyHighlight(page, highlight, language, captureMode);
     }
 
-    await page.waitForTimeout(250);
+    await page.waitForTimeout(400);
 
     const outputPath = resolve(outputDir, `${view.id}-${language}.png`);
-    await page.screenshot({ path: outputPath, fullPage: true });
-    console.log(`Saved: ${outputPath}`);
+
+    if (captureMode === 'element' && view.captureSelector) {
+        const el = page.locator(view.captureSelector).first();
+        await el.screenshot({ path: outputPath });
+    } else {
+        await page.screenshot({
+            path: outputPath,
+            fullPage: captureMode === 'fullPage',
+        });
+    }
+
+    console.log(`Saved: ${outputPath} (mode: ${captureMode})`);
 }
 
 async function main() {
@@ -272,7 +302,8 @@ async function main() {
     const browser = await chromium.launch({ headless: !args.headed });
     const context = await browser.newContext({
         ignoreHTTPSErrors: true,
-        viewport: { width: 1440, height: 1000 },
+        viewport: { width: 1920, height: 1080 },
+        deviceScaleFactor: 2,
     });
     const page = await context.newPage();
 
