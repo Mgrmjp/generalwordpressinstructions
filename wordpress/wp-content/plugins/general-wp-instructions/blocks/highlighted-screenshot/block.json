@@ -1,0 +1,57 @@
+{
+  "apiVersion": 2,
+  "name": "general-wp-instructions/highlighted-screenshot",
+  "title": "Highlighted Screenshot",
+  "category": "media",
+  "icon": "visibility",
+  "description": "A screenshot with a strong visual outline around the correct button or area.",
+  "textdomain": "general-wp-instructions",
+  "attributes": {
+    "imageId": {
+      "type": "number",
+      "default": 0
+    },
+    "imageUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "screenshotId": {
+      "type": "string",
+      "default": ""
+    },
+    "alt": {
+      "type": "string",
+      "default": ""
+    },
+    "caption": {
+      "type": "string",
+      "default": ""
+    },
+    "label": {
+      "type": "string",
+      "default": "Click here"
+    },
+    "highlightX": {
+      "type": "number",
+      "default": 62
+    },
+    "highlightY": {
+      "type": "number",
+      "default": 18
+    },
+    "highlightWidth": {
+      "type": "number",
+      "default": 20
+    },
+    "highlightHeight": {
+      "type": "number",
+      "default": 10
+    }
+  },
+  "supports": {
+    "align": ["wide", "full"],
+    "html": false
+  },
+  "editorScript": "file:./index.js",
+  "render": "file:./render.php"
+}

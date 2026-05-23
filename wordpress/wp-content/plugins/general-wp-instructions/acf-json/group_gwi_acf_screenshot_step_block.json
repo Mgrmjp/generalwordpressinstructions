@@ -1,0 +1,46 @@
+{
+  "key": "group_gwi_acf_screenshot_step_block",
+  "title": "ACF Block: Screenshot Step",
+  "fields": [
+    {
+      "key": "field_gwi_screenshot_image",
+      "label": "Screenshot",
+      "name": "image",
+      "type": "image",
+      "return_format": "array",
+      "preview_size": "medium",
+      "library": "all"
+    },
+    {
+      "key": "field_gwi_screenshot_highlight_label",
+      "label": "Highlighted control label",
+      "name": "highlight_label",
+      "type": "text",
+      "instructions": "Example: Publish button, Add New button, Update button."
+    },
+    {
+      "key": "field_gwi_screenshot_action",
+      "label": "Instruction text",
+      "name": "action",
+      "type": "textarea",
+      "rows": 3,
+      "new_lines": "wpautop"
+    }
+  ],
+  "location": [
+    [
+      {
+        "param": "block",
+        "operator": "==",
+        "value": "acf/gwi-screenshot-step"
+      }
+    ]
+  ],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "default",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "modified": 1716400000
+}

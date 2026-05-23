@@ -1,0 +1,149 @@
+{
+  "key": "group_gwi_instruction_flexible",
+  "title": "Instruction: Flexible Content",
+  "fields": [
+    {
+      "key": "field_gwi_instruction_sections",
+      "label": "Instruction Sections",
+      "name": "instruction_sections",
+      "type": "flexible_content",
+      "instructions": "Older-style ACF authoring model for sites that still use Flexible Content instead of blocks.",
+      "layouts": {
+        "layout_gwi_intro_text": {
+          "key": "layout_gwi_intro_text",
+          "name": "intro_text",
+          "label": "Intro text",
+          "display": "block",
+          "sub_fields": [
+            {
+              "key": "field_gwi_intro_heading",
+              "label": "Heading",
+              "name": "heading",
+              "type": "text"
+            },
+            {
+              "key": "field_gwi_intro_body",
+              "label": "Body",
+              "name": "body",
+              "type": "wysiwyg",
+              "tabs": "all",
+              "toolbar": "basic",
+              "media_upload": 0,
+              "delay": 0
+            }
+          ]
+        },
+        "layout_gwi_screenshot_step": {
+          "key": "layout_gwi_screenshot_step",
+          "name": "screenshot_step",
+          "label": "Screenshot step",
+          "display": "block",
+          "sub_fields": [
+            {
+              "key": "field_gwi_flexible_image",
+              "label": "Highlighted screenshot",
+              "name": "image",
+              "type": "image",
+              "return_format": "array",
+              "preview_size": "medium",
+              "library": "all"
+            },
+            {
+              "key": "field_gwi_flexible_highlight_label",
+              "label": "Highlighted control label",
+              "name": "highlight_label",
+              "type": "text"
+            },
+            {
+              "key": "field_gwi_flexible_action",
+              "label": "Instruction text",
+              "name": "action",
+              "type": "textarea",
+              "rows": 3,
+              "new_lines": "wpautop"
+            }
+          ]
+        },
+        "layout_gwi_checklist": {
+          "key": "layout_gwi_checklist",
+          "name": "checklist",
+          "label": "Checklist",
+          "display": "block",
+          "sub_fields": [
+            {
+              "key": "field_gwi_checklist_heading",
+              "label": "Heading",
+              "name": "heading",
+              "type": "text",
+              "default_value": "Steps"
+            },
+            {
+              "key": "field_gwi_checklist_items",
+              "label": "Items",
+              "name": "items",
+              "type": "repeater",
+              "layout": "table",
+              "button_label": "Add item",
+              "sub_fields": [
+                {
+                  "key": "field_gwi_checklist_text",
+                  "label": "Text",
+                  "name": "text",
+                  "type": "text"
+                }
+              ]
+            }
+          ]
+        },
+        "layout_gwi_callout": {
+          "key": "layout_gwi_callout",
+          "name": "callout",
+          "label": "Callout",
+          "display": "block",
+          "sub_fields": [
+            {
+              "key": "field_gwi_flexible_callout_variant",
+              "label": "Variant",
+              "name": "variant",
+              "type": "select",
+              "choices": {
+                "note": "Note",
+                "warning": "Warning",
+                "success": "Success"
+              },
+              "default_value": "note",
+              "return_format": "value"
+            },
+            {
+              "key": "field_gwi_flexible_callout_content",
+              "label": "Content",
+              "name": "content",
+              "type": "wysiwyg",
+              "tabs": "all",
+              "toolbar": "basic",
+              "media_upload": 0,
+              "delay": 0
+            }
+          ]
+        }
+      },
+      "button_label": "Add instruction section"
+    }
+  ],
+  "location": [
+    [
+      {
+        "param": "post_type",
+        "operator": "==",
+        "value": "wp_instruction"
+      }
+    ]
+  ],
+  "menu_order": 10,
+  "position": "normal",
+  "style": "default",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "active": true,
+  "modified": 1716400000
+}

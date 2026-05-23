@@ -1,0 +1,17 @@
+{
+  "name": "general-wordpress-instructions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "screenshots": "node tools/capture-critical-views.mjs",
+    "screenshots:fi": "WP_SCREENSHOT_LANGUAGE=fi node tools/capture-critical-views.mjs",
+    "screenshots:en": "WP_SCREENSHOT_LANGUAGE=en node tools/capture-critical-views.mjs",
+    "screenshots:import": "lando ssh -s appserver -c 'bash /app/tools/import-screenshots.sh'",
+    "screenshots:link": "lando wp eval-file /app/tools/link-screenshots.php --path=/app/wordpress",
+    "screenshots:all": "npm run screenshots:en && npm run screenshots:fi && npm run screenshots:import && npm run screenshots:link"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0"
+  }
+}

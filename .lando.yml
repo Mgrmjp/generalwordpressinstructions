@@ -1,0 +1,20 @@
+name: generalwordpressinstructions
+recipe: wordpress
+config:
+  webroot: wordpress
+  php: '8.2'
+  database: mariadb:10.6
+  xdebug: false
+services:
+  appserver:
+    overrides:
+      environment:
+        WP_ENVIRONMENT_TYPE: development
+tooling:
+  setup-wp:
+    service: appserver
+    cmd: /app/tools/setup-wordpress.sh
+  wp:
+    service: appserver
+  php:
+    service: appserver

@@ -1,0 +1,403 @@
+{
+  "views": [
+    {
+      "id": "pages-list-add-new",
+      "title": {
+        "en": "Pages list: Add New",
+        "fi": "Sivulista: Lisaa uusi"
+      },
+      "url": "/wp-admin/edit.php?post_type=page",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": ".page-title-action, a[href*=\"post-new.php?post_type=page\"]",
+          "label": {
+            "en": "Add New",
+            "fi": "Lisaa uusi"
+          }
+        }
+      ]
+    },
+    {
+      "id": "block-editor-add-block",
+      "title": {
+        "en": "Block Editor: Add block",
+        "fi": "Lohkoeditori: Lisaa lohko"
+      },
+      "url": "/wp-admin/post-new.php?post_type=page",
+      "waitFor": "body.block-editor-page, .block-editor-writing-flow",
+      "highlights": [
+        {
+          "selector": ".edit-post-header-toolbar__inserter-toggle, .block-editor-inserter__toggle, button[aria-label='Add block'], button[aria-label='Toggle block inserter']",
+          "label": {
+            "en": "Add block",
+            "fi": "Lisaa lohko"
+          },
+          "optional": true
+        }
+      ]
+    },
+    {
+      "id": "media-library-add-new",
+      "title": {
+        "en": "Media Library: Add New",
+        "fi": "Mediakirjasto: Lisaa uusi"
+      },
+      "url": "/wp-admin/upload.php",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": ".page-title-action, a[href*=\"media-new.php\"]",
+          "label": {
+            "en": "Add New media",
+            "fi": "Lisaa uusi mediatiedosto"
+          }
+        }
+      ]
+    },
+    {
+      "id": "instruction-list-add-new",
+      "title": {
+        "en": "Instructions: Add New",
+        "fi": "Ohjeet: Lisaa uusi"
+      },
+      "url": "/wp-admin/edit.php?post_type=wp_instruction",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": ".page-title-action, a[href*=\"post-new.php?post_type=wp_instruction\"]",
+          "label": {
+            "en": "Add New Instruction",
+            "fi": "Lisaa uusi ohje"
+          }
+        }
+      ]
+    },
+    {
+      "id": "classic-editor-publish",
+      "title": {
+        "en": "Classic Editor: Publish",
+        "fi": "Perinteinen editori: Julkaise"
+      },
+      "url": "/wp-admin/post-new.php?classic-editor",
+      "waitFor": "#submitdiv, body.wp-admin, #wpcontent",
+      "highlights": [
+        {
+          "selector": "#publish, #save-post, #submitpost",
+          "label": {
+            "en": "Publish or save",
+            "fi": "Julkaise tai tallenna"
+          },
+          "optional": true
+        }
+      ]
+    },
+    {
+      "id": "dashboard-home",
+      "title": {
+        "en": "Dashboard: Home",
+        "fi": "Hallintapaneeli: Koti"
+      },
+      "url": "/wp-admin/",
+      "waitFor": "#dashboard-widgets-wrap, #wpbody",
+      "highlights": [
+        {
+          "selector": "#dashboard-widgets-wrap, #wpbody",
+          "label": {
+            "en": "Dashboard widgets",
+            "fi": "Hallintapaneelin widgetit"
+          }
+        }
+      ]
+    },
+    {
+      "id": "posts-list",
+      "title": {
+        "en": "Posts: List",
+        "fi": "Artikkelit: Lista"
+      },
+      "url": "/wp-admin/edit.php",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": ".page-title-action, a[href*=\"post-new.php\"]",
+          "label": {
+            "en": "Add New Post",
+            "fi": "Lisaa uusi artikkeli"
+          }
+        }
+      ]
+    },
+    {
+      "id": "post-categories",
+      "title": {
+        "en": "Posts: Categories",
+        "fi": "Artikkelit: Kategoriat"
+      },
+      "url": "/wp-admin/edit-tags.php?taxonomy=category",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": "#wpbody, .wp-list-table, #the-list",
+          "label": {
+            "en": "Categories list",
+            "fi": "Kategorioiden lista"
+          }
+        }
+      ]
+    },
+    {
+      "id": "post-tags",
+      "title": {
+        "en": "Posts: Tags",
+        "fi": "Artikkelit: Asiasanat"
+      },
+      "url": "/wp-admin/edit-tags.php?taxonomy=post_tag",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": "#wpbody, .wp-list-table, #the-list",
+          "label": {
+            "en": "Tags list",
+            "fi": "Asiasanojen lista"
+          }
+        }
+      ]
+    },
+    {
+      "id": "media-library-grid",
+      "title": {
+        "en": "Media Library: Grid View",
+        "fi": "Mediakirjasto: Ruudukkonakyma"
+      },
+      "url": "/wp-admin/upload.php",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": ".view-switch, .media-grid",
+          "label": {
+            "en": "View switcher",
+            "fi": "Nakymän vaihtaja"
+          }
+        }
+      ]
+    },
+    {
+      "id": "comments-list",
+      "title": {
+        "en": "Comments: List",
+        "fi": "Kommentit: Lista"
+      },
+      "url": "/wp-admin/edit-comments.php",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": "#wpbody, .wp-list-table, .tablenav",
+          "label": {
+            "en": "Comments list",
+            "fi": "Kommenttilista"
+          }
+        }
+      ]
+    },
+    {
+      "id": "nav-menus",
+      "title": {
+        "en": "Menus: Editor",
+        "fi": "Valikot: Editori"
+      },
+      "url": "/wp-admin/nav-menus.php",
+      "waitFor": "#wpbody, #menu-management",
+      "highlights": [
+        {
+          "selector": "#menu-management, #wpbody",
+          "label": {
+            "en": "Menu editor",
+            "fi": "Valikkoeditori"
+          }
+        }
+      ]
+    },
+    {
+      "id": "users-list",
+      "title": {
+        "en": "Users: List",
+        "fi": "Kayttajat: Lista"
+      },
+      "url": "/wp-admin/users.php",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": ".page-title-action, a[href*=\"user-new.php\"]",
+          "label": {
+            "en": "Add New User",
+            "fi": "Lisaa uusi kayttaja"
+          }
+        }
+      ]
+    },
+    {
+      "id": "settings-general",
+      "title": {
+        "en": "Settings: General",
+        "fi": "Asetukset: Yleiset"
+      },
+      "url": "/wp-admin/options-general.php",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": "#wpbody, .form-table",
+          "label": {
+            "en": "General settings",
+            "fi": "Yleiset asetukset"
+          }
+        }
+      ]
+    },
+    {
+      "id": "settings-reading",
+      "title": {
+        "en": "Settings: Reading",
+        "fi": "Asetukset: Lukeminen"
+      },
+      "url": "/wp-admin/options-reading.php",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": "#wpbody, .form-table",
+          "label": {
+            "en": "Reading settings",
+            "fi": "Lukemisen asetukset"
+          }
+        }
+      ]
+    },
+    {
+      "id": "settings-permalinks",
+      "title": {
+        "en": "Settings: Permalinks",
+        "fi": "Asetukset: Osoiterakenteet"
+      },
+      "url": "/wp-admin/options-permalink.php",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": "#wpbody, .form-table",
+          "label": {
+            "en": "Permalink settings",
+            "fi": "Osoiterakenteen asetukset"
+          }
+        }
+      ]
+    },
+    {
+      "id": "customizer",
+      "title": {
+        "en": "Theme Customizer",
+        "fi": "Teeman mukauttaja"
+      },
+      "url": "/wp-admin/customize.php",
+      "waitFor": "#wpbody, .wp-full-overlay, #customize-controls",
+      "highlights": [
+        {
+          "selector": "#customize-controls, .wp-full-overlay, #wpbody",
+          "label": {
+            "en": "Customizer",
+            "fi": "Mukauttaja"
+          }
+        }
+      ]
+    },
+    {
+      "id": "block-editor-inserter",
+      "title": {
+        "en": "Block Editor: Inserter",
+        "fi": "Lohkoeditori: Lisaaja"
+      },
+      "url": "/wp-admin/post-new.php",
+      "waitFor": ".edit-post-header-toolbar, .block-editor-editor, #wpbody",
+      "highlights": [
+        {
+          "selector": ".edit-post-header-toolbar__inserter-toggle, .block-editor-inserter__toggle, button[aria-label='Add block'], button[aria-label='Toggle block inserter'], .edit-post-header-toolbar",
+          "label": {
+            "en": "Open inserter",
+            "fi": "Avaa lisaaja"
+          },
+          "optional": true
+        }
+      ]
+    },
+    {
+      "id": "block-editor-reusable-list",
+      "title": {
+        "en": "Reusable Blocks: List",
+        "fi": "Uudelleenkaytettavat lohkot: Lista"
+      },
+      "url": "/wp-admin/edit.php?post_type=wp_block",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": ".page-title-action, a[href*=\"post-new.php?post_type=wp_block\"]",
+          "label": {
+            "en": "Add New Pattern",
+            "fi": "Lisaa uusi malli"
+          }
+        }
+      ]
+    },
+    {
+      "id": "classic-editor-formatting",
+      "title": {
+        "en": "Classic Editor: Formatting",
+        "fi": "Perinteinen editori: Muotoilu"
+      },
+      "url": "/wp-admin/post-new.php?classic-editor",
+      "waitFor": "#wpcontent, #wp-content-editor-container",
+      "highlights": [
+        {
+          "selector": "#wp-content-editor-container, #wp-content-wrap, .mce-toolbar",
+          "label": {
+            "en": "Editor toolbar",
+            "fi": "Editorin tyokalurivi"
+          }
+        }
+      ]
+    },
+    {
+      "id": "acf-field-groups",
+      "title": {
+        "en": "ACF: Field Groups",
+        "fi": "ACF: Kenttaryhmat"
+      },
+      "url": "/wp-admin/edit.php?post_type=acf-field-group",
+      "waitFor": "#wpbody",
+      "highlights": [
+        {
+          "selector": "#wpbody, .page-title-action, a[href*=\"post-new.php?post_type=acf-field-group\"]",
+          "label": {
+            "en": "ACF Field Groups",
+            "fi": "ACF-kenttaryhmat"
+          }
+        }
+      ]
+    },
+    {
+      "id": "seo-dashboard",
+      "title": {
+        "en": "SEO: Dashboard",
+        "fi": "SEO: Hallintapaneeli"
+      },
+      "url": "/wp-admin/admin.php?page=wpseo_dashboard",
+      "waitFor": "#wpbody, #wpseo-dashboard",
+      "highlights": [
+        {
+          "selector": "#wpbody, #wpseo-dashboard, .wpseo-dashboard",
+          "label": {
+            "en": "SEO dashboard",
+            "fi": "SEO-hallintapaneeli"
+          }
+        }
+      ]
+    }
+  ]
+}

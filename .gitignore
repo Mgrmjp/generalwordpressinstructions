@@ -1,0 +1,24 @@
+.env
+.DS_Store
+node_modules/
+playwright-report/
+test-results/
+
+# WordPress core is downloaded into this directory by WP-CLI.
+wordpress/*
+!wordpress/wp-content/
+
+# Keep source-controlled plugins and themes, ignore runtime uploads/cache.
+wordpress/wp-content/*
+!wordpress/wp-content/plugins/
+!wordpress/wp-content/themes/
+wordpress/wp-content/plugins/*
+wordpress/wp-content/themes/*
+!wordpress/wp-content/plugins/general-wp-instructions/
+!wordpress/wp-content/plugins/general-wp-instructions/**
+!wordpress/wp-content/themes/instruction-manual/
+!wordpress/wp-content/themes/instruction-manual/**
+wordpress/wp-content/uploads/
+wordpress/wp-content/cache/
+wordpress/wp-content/upgrade/
+wordpress/wp-content/debug.log

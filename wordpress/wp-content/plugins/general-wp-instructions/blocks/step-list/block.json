@@ -1,0 +1,31 @@
+{
+  "apiVersion": 2,
+  "name": "general-wp-instructions/step-list",
+  "title": "Instruction Step List",
+  "category": "text",
+  "icon": "editor-ol",
+  "description": "A numbered list for WordPress instruction steps.",
+  "textdomain": "general-wp-instructions",
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "Steps"
+    },
+    "steps": {
+      "type": "array",
+      "default": [
+        {
+          "text": "Open the correct admin view."
+        },
+        {
+          "text": "Choose the highlighted button."
+        }
+      ]
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./index.js",
+  "render": "file:./render.php"
+}
