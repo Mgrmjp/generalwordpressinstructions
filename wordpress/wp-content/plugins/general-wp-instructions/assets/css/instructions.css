@@ -115,6 +115,16 @@
     border-radius: 8px;
     overflow: hidden;
     position: relative;
+    min-height: 20rem;
+}
+
+.gwi-highlighted-screenshot__frame img,
+.gwi-acf-screenshot-step__frame img,
+.gwi-flexible-screenshot__frame img {
+    object-fit: contain;
+    width: 100%;
+    height: auto;
+    min-height: 20rem;
 }
 
 .gwi-highlighted-screenshot__note + .gwi-highlighted-screenshot__frame {
