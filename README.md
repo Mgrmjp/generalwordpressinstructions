@@ -87,13 +87,13 @@ npx playwright install chromium
 Copy `.env.example` to `.env` or pass variables inline, then capture English screenshots:
 
 ```sh
-WP_BASE_URL=https://generalwordpressinstructions.lndo.site WP_USER=admin WP_PASSWORD=admin npm run screenshots:en
+WP_BASE_URL=https://generalwordpressinstructions.lndo.site WP_USER=maria.korhonen WP_PASSWORD=admin npm run screenshots:en
 ```
 
 Capture Finnish screenshots:
 
 ```sh
-WP_BASE_URL=https://generalwordpressinstructions.lndo.site WP_USER=admin WP_PASSWORD=admin npm run screenshots:fi
+WP_BASE_URL=https://generalwordpressinstructions.lndo.site WP_USER=maria.korhonen WP_PASSWORD=admin npm run screenshots:fi
 ```
 
 Critical views and selectors live in `config/critical-views.json`. The script applies thick yellow outlines, dark contrast shadows, and labels before each screenshot is captured.

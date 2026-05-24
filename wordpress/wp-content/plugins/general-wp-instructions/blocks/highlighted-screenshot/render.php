@@ -37,6 +37,25 @@ if ($screenshot_id !== '') {
     $context_url = gwi_get_instruction_screenshot_context_url($screenshot_id, $post_id, $language);
 }
 
+$environment_ready = $screenshot_id === ''
+    || gwi_instruction_screenshot_environment_ready($screenshot_id);
+
+if ($image_url === '' && !$environment_ready && $caption !== '') {
+    $missing_message = $language === 'fi'
+        ? __('Kuvakaappaus ei ole saatavilla: tarvittava lisäosa (esim. ACF tai SEO) ei ole käytössä tässä ympäristössä.', 'general-wp-instructions')
+        : __('Screenshot unavailable: the required plugin (e.g. ACF or SEO) is not active in this environment.', 'general-wp-instructions');
+    ?>
+    <figure <?php echo get_block_wrapper_attributes(['class' => 'gwi-highlighted-screenshot gwi-highlighted-screenshot--unavailable']); ?>>
+        <div class="gwi-highlighted-screenshot__note">
+            <strong><?php echo esc_html($language === 'fi' ? __('Kuvassa', 'general-wp-instructions') : __('Screenshot', 'general-wp-instructions')); ?></strong>
+            <span><?php echo esc_html(wp_strip_all_tags($caption)); ?></span>
+        </div>
+        <p class="gwi-highlighted-screenshot__unavailable"><?php echo esc_html($missing_message); ?></p>
+    </figure>
+    <?php
+    return;
+}
+
 if ($image_url === '') {
     return;
 }

@@ -54,7 +54,7 @@ function gwi_seed_classic_formatting_fi(): string
     return '<!-- wp:paragraph --><p>Perinteinen editori käyttää tekstinkäsittelyohjelman kaltaista työkaluriviä. Voit muotoilla tekstiä, luoda linkkejä ja rakentaa sisältöä ilman HTML-kirjoittamista.</p><!-- /wp:paragraph -->'
         . '<!-- wp:general-wp-instructions/step-list {"title":"Muotoile tekstiä perinteisessä editorissa","steps":[{"text":"Käytä työkalurivin painikkeita Lihavoitu, Kursivoitu ja Yliviivattu -muotoiluun."},{"text":"Luo listoja tai numeroituja listoja käyttämällä listapainikkeita."},{"text":"Käytä lainauspainiketta lisätäksesi lainauslohkon."},{"text":"Valitse teksti ja klikkaa linkkipainiketta lisätäksesi hyperlinkin. Käytä linkinpoistopainiketta poistaaksesi sen."},{"text":"Käytä Kappale-pudotusvalikkoa muuttaaksesi tekstiksi otsikoiksi (H2–H6)."},{"text":"Vaihda Visuaalinen ja Teksti -välilehtien välillä siirtyäksesi visuaalisen muokkauksen ja HTML:n välillä."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"classic-editor-formatting","caption":"Perinteisen editorin työkalurivi muotoiluvaihtoehdoilla"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: Käytä Teksti-välilehteä vain kun tarvitsee lisätä mukautettua HTML:ää. Visuaalinen-välilehti on turvallisempi useimmille muokkaustehtäville.</p><!-- /wp:paragraph -->';
+        . '<!-- wp:paragraph --><p>Vinkki: Käytä Teksti-välilehteä vain kun tarvitsee lisätä mukautettua HTML:ää. Visuaalinen välilehti on turvallisempi useimmille muokkaustehtäville.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_classic_media_en(): string

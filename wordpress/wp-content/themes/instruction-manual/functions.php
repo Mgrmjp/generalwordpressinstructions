@@ -16,7 +16,6 @@ add_filter('template_include', 'manual_static_template_include');
 add_filter('body_class', 'manual_static_body_classes');
 add_action('pre_get_posts', 'manual_filter_instruction_archive_by_language');
 add_filter('posts_search', 'manual_expand_instruction_search', 10, 2);
-add_filter('the_content', 'manual_cleanup_instruction_content_language', 18);
 add_filter('document_title_parts', 'manual_document_title_parts');
 
 function manual_static_routes_version(): string
@@ -246,7 +245,6 @@ function manual_app_config(): array
         'currentLanguage' => $current_language,
         'groups' => $groups,
         'labels' => $labels,
-        'linkArrowHtml' => manual_link_arrow(),
     ];
 }
 
@@ -440,6 +438,8 @@ function manual_design_icon(string $icon): string
         'plugin' => $svg('<path d="M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z"/>'),
         'field' => $svg('<path d="M13 5h8"/><path d="M13 12h8"/><path d="M13 19h8"/><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/>'),
         'arrow-right' => $svg('<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>'),
+        'moon' => $svg('<path d="M20.985 12.486a8.5 8.5 0 1 1-9.473-9.472 6.75 6.75 0 0 0 9.473 9.473z"/>'),
+        'sun' => $svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>'),
     ];
     $icons['edit'] = $icons['pen'];
     $icons['build'] = $icons['layout'];
@@ -485,7 +485,7 @@ function manual_instruction_single_text(int $post_id, string $key): string
             'all_guides' => __('Kaikki ohjeet', 'instruction-manual'),
             'on_this_page' => __('Tällä sivulla', 'instruction-manual'),
             'you_are_here' => __('Olet tässä', 'instruction-manual'),
-            'quick_checklist' => __('Pikachecklist ennen aloitusta', 'instruction-manual'),
+            'quick_checklist' => __('Pikatarkistuslista ennen aloitusta', 'instruction-manual'),
             'steps_intro' => __('Seuraa vaiheita järjestyksessä. Merkitse valmiiksi kun olet tehnyt kohdan.', 'instruction-manual'),
             'overview_intro' => __('Lyhyt kuvaus siitä, mitä tämä ohje auttaa sinua tekemään.', 'instruction-manual'),
             'dark_mode_on' => __('Tumma tila', 'instruction-manual'),
@@ -726,6 +726,58 @@ function manual_instruction_category_label(WP_Term $term): string
     }
 
     return $term->name;
+}
+
+/**
+ * Language code for instruction counts, or empty string when all languages are shown.
+ */
+function manual_instruction_count_language(): string
+{
+    $raw_language = get_query_var('instruction_language');
+
+    if (is_string($raw_language) && strtolower($raw_language) === 'all') {
+        return '';
+    }
+
+    return manual_instruction_current_language();
+}
+
+/**
+ * Published instruction count for a category, respecting the active language filter.
+ */
+function manual_instruction_category_count(WP_Term $term, string $language = ''): int
+{
+    if ($language === '') {
+        $language = manual_instruction_count_language();
+    }
+
+    $query_args = [
+        'post_type' => 'wp_instruction',
+        'post_status' => 'publish',
+        'posts_per_page' => 1,
+        'fields' => 'ids',
+        'tax_query' => [
+            [
+                'taxonomy' => 'instruction_category',
+                'field' => 'term_id',
+                'terms' => [(int) $term->term_id],
+            ],
+        ],
+    ];
+
+    if ($language !== '') {
+        $query_args['meta_query'] = [
+            [
+                'key' => '_gwi_language',
+                'value' => $language,
+                'compare' => '=',
+            ],
+        ];
+    }
+
+    $query = new WP_Query($query_args);
+
+    return (int) $query->found_posts;
 }
 
 function manual_instruction_card_excerpt(int $post_id, int $word_limit = 24): string
@@ -1487,89 +1539,6 @@ function manual_expand_instruction_search(string $search, WP_Query $query): stri
     return ' AND (' . implode(' OR ', $clauses) . ')';
 }
 
-function manual_cleanup_instruction_content_language(string $content): string
-{
-    if (!is_singular('wp_instruction') || !in_the_loop() || !is_main_query()) {
-        return $content;
-    }
-
-    if (manual_instruction_language_code(get_the_ID()) !== 'fi') {
-        return $content;
-    }
-
-    $replacements = [
-        'Language' => 'Kieli',
-        'Finnish' => 'Suomi',
-        'English' => 'Englanti',
-        'Tip:' => 'Vinkki:',
-        'kayttaytyvat' => 'käyttäytyvät',
-        'kayttaytyy' => 'käyttäytyy',
-        'kayttajatilin' => 'käyttäjätilin',
-        'kayttajan' => 'käyttäjän',
-        'kayttajat' => 'käyttäjät',
-        'kayttajia' => 'käyttäjiä',
-        'kayttaja' => 'käyttäjä',
-        'kayttaa' => 'käyttää',
-        'kayttoa' => 'käyttöä',
-        'kaytto' => 'käyttö',
-        'kayta' => 'käytä',
-        'Kayta' => 'Käytä',
-        'Kayttajat' => 'Käyttäjät',
-        'Paakayttaja' => 'Pääkäyttäjä',
-        'Paakayttajilla' => 'Pääkäyttäjillä',
-        'sisaltloosiot' => 'sisältöosiot',
-        'sisaltoosioiden' => 'sisältöosioiden',
-        'sisaltoon' => 'sisältöön',
-        'sisaltoosi' => 'sisältöösi',
-        'sisaltoa' => 'sisältöä',
-        'sisaltosi' => 'sisältösi',
-        'sisalto' => 'sisältö',
-        'Sisalto' => 'Sisältö',
-        'tyokalurivissa' => 'työkalurivissä',
-        'tyokalurivin' => 'työkalurivin',
-        'tyokalurivia' => 'työkaluriviä',
-        'tyokalurivi' => 'työkalurivi',
-        'tyokaluja' => 'työkaluja',
-        'työkaluja' => 'työkaluja',
-        'lisaajan' => 'lisääjän',
-        'lisaaja' => 'lisääjä',
-        'lisata' => 'lisätä',
-        'Lisaa' => 'Lisää',
-        'lisaa' => 'lisää',
-        'nähdaksesi' => 'nähdäksesi',
-        'nhdäksesi' => 'nähdäksesi',
-        'tehda' => 'tehdä',
-        'maarittaa' => 'määrittää',
-        'sahkoposti' => 'sähköposti',
-        'aanitiedostosi' => 'äänitiedostosi',
-        'aania' => 'ääntä',
-        'Aani' => 'Ääni',
-        'valilehtien valilla' => 'välilehtien välillä',
-        'valilyönnista' => 'välilyönnistä',
-        'valilyontielementeilla' => 'välielementeillä',
-        'Valilyönti' => 'Välilyönti',
-        'valilla' => 'välillä',
-        'jarjestetty' => 'järjestetty',
-        'jarjestamaton' => 'järjestämätön',
-        'riveilla' => 'riveillä',
-        'levealla' => 'leveällä',
-        'yhta esiintymaa itsenaisesti' => 'yhtä esiintymää itsenäisesti',
-        'esiintymat paivittyvat' => 'esiintymät päivittyvät',
-        'naytyy' => 'näkyy',
-        'niita' => 'niitä',
-        'kaytettavia' => 'käytettäviä',
-        'uudelleenkaytettava' => 'uudelleenkäytettävä',
-        'Uudelleenkaytettavat' => 'Uudelleenkäytettävät',
-        'Uudelleenkaytettavien' => 'Uudelleenkäytettävien',
-        'paasioihin' => 'pääosioihin',
-        'kirjoita ## seettuna valilyönnista' => 'kirjoita ## ja välilyönti',
-        'Mene Media-nähdäksesi kaikki ladatut tiedostot.' => 'Siirry Media-valikkoon nähdäksesi kaikki ladatut tiedostot.',
-        'Käytä asetteluohkoja' => 'Käytä asettelulohkoja',
-    ];
-
-    return strtr($content, $replacements);
-}
-
 function manual_instruction_before_start_items(int $post_id): array
 {
     $category = manual_instruction_primary_category($post_id);
@@ -1900,26 +1869,26 @@ function manual_intent_categories(): array
 
     return [
         [
-            'title' => __('Haluan muokata sisältöä', 'instruction-manual'),
-            'description' => __('Tekstit, kuvat, linkit ja painikkeet.', 'instruction-manual'),
+            'title' => __('Sisältö ja artikkelit', 'instruction-manual'),
+            'description' => __('Artikkelit, sivut, media ja kommentit.', 'instruction-manual'),
             'url' => manual_instruction_url_with_language($term_map['fundamentals'] ?? $fallback),
             'icon' => 'edit',
         ],
         [
-            'title' => __('Haluan rakentaa sivua', 'instruction-manual'),
-            'description' => __('Lohkot, ACF-osuudet ja sivupohjat.', 'instruction-manual'),
+            'title' => __('Sivut ja lohkot', 'instruction-manual'),
+            'description' => __('Lohkoeditori, asettelu ja uudelleenkäytettävät osiot.', 'instruction-manual'),
             'url' => manual_instruction_url_with_language($term_map['block-editor'] ?? $fallback),
             'icon' => 'build',
         ],
         [
-            'title' => __('Haluan korjata ongelman', 'instruction-manual'),
-            'description' => __('Välimuisti, puuttuvat muutokset ja näkymävirheet.', 'instruction-manual'),
+            'title' => __('Ongelmatilanteet', 'instruction-manual'),
+            'description' => __('Välimuisti, SEO ja suorituskyky.', 'instruction-manual'),
             'url' => manual_instruction_url_with_language($term_map['advanced'] ?? $fallback),
             'icon' => 'fix',
         ],
         [
-            'title' => __('Haluan muuttaa asetuksia', 'instruction-manual'),
-            'description' => __('Valikot, SEO, uudelleenohjaukset ja sivuston asetukset.', 'instruction-manual'),
+            'title' => __('Sivuston asetukset', 'instruction-manual'),
+            'description' => __('Valikot, käyttäjät ja WordPress-asetukset.', 'instruction-manual'),
             'url' => manual_instruction_url_with_language($term_map['site-config'] ?? $fallback),
             'icon' => 'settings',
         ],
@@ -2098,32 +2067,32 @@ function manual_intent_categories_with_popular(array $fi_tutorials): array
 
     return [
         [
-            'title' => __('Muokkaa sisältöä', 'instruction-manual'),
-            'description' => __('Tekstit, kuvat, linkit ja painikkeet.', 'instruction-manual'),
+            'title' => __('Sisältö ja artikkelit', 'instruction-manual'),
+            'description' => __('Artikkelit, sivut, media ja kommentit.', 'instruction-manual'),
             'url' => manual_instruction_url_with_language($term_map['fundamentals'] ?? $fallback),
             'icon' => 'content',
             'tone' => 'green',
             'popular' => array_slice($fi_by_category['fundamentals'] ?? [], 0, 3),
         ],
         [
-            'title' => __('Rakenna sivua', 'instruction-manual'),
-            'description' => __('Lohkot, osiot ja sivupohjat.', 'instruction-manual'),
+            'title' => __('Sivut ja lohkot', 'instruction-manual'),
+            'description' => __('Lohkoeditori, asettelu ja sivupohjat.', 'instruction-manual'),
             'url' => manual_instruction_url_with_language($term_map['block-editor'] ?? $fallback),
             'icon' => 'page',
             'tone' => 'blue',
             'popular' => array_slice($fi_by_category['block-editor'] ?? [], 0, 3),
         ],
         [
-            'title' => __('Korjaa ongelma', 'instruction-manual'),
-            'description' => __('Välimuisti, päivitykset ja näkymävirheet.', 'instruction-manual'),
+            'title' => __('Ongelmatilanteet', 'instruction-manual'),
+            'description' => __('Välimuisti, päivitykset ja näkymät.', 'instruction-manual'),
             'url' => manual_instruction_url_with_language($term_map['advanced'] ?? $fallback),
             'icon' => 'fix',
             'tone' => 'orange',
             'popular' => array_slice($fi_by_category['advanced'] ?? [], 0, 3),
         ],
         [
-            'title' => __('Hallitse asetuksia', 'instruction-manual'),
-            'description' => __('Valikot, käyttäjät, SEO ja sivuston asetukset.', 'instruction-manual'),
+            'title' => __('Sivuston asetukset', 'instruction-manual'),
+            'description' => __('Valikot, käyttäjät ja WordPress-asetukset.', 'instruction-manual'),
             'url' => manual_instruction_url_with_language($term_map['site-config'] ?? $fallback),
             'icon' => 'settings',
             'tone' => 'olive',

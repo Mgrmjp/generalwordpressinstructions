@@ -26,7 +26,7 @@ $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
         <p class="manual-eyebrow"><?php esc_html_e('WordPress-ohjeet', 'instruction-manual'); ?></p>
         <h1 class="manual-title"><?php esc_html_e('WordPress-ohjeet selkeästi', 'instruction-manual'); ?></h1>
         <p class="manual-lead">
-            <?php esc_html_e('Löydä oikea ohje nopeasti. Muokkaa sisältöä, luo sivuja, hallinnoi asetuksia ja ratkaise yleisimmät ongelmat.', 'instruction-manual'); ?>
+            <?php esc_html_e('Käytännön WordPress-ohjeet ylläpitoon, sisältöihin ja ongelmatilanteisiin.', 'instruction-manual'); ?>
         </p>
         <div class="manual-hero-search" aria-label="<?php esc_attr_e('Hae ohjeita', 'instruction-manual'); ?>">
             <form role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
@@ -60,8 +60,8 @@ $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
 <?php if (!empty($intent_categories)) : ?>
     <section class="manual-intent-section" aria-labelledby="manual-intent-title">
         <div class="manual-section-intro">
-            <h2 id="manual-intent-title" class="manual-section-title"><?php esc_html_e('Aloita tehtävästä', 'instruction-manual'); ?></h2>
-            <p class="manual-section-subtitle"><?php esc_html_e('Valitse mitä haluat tehdä.', 'instruction-manual'); ?></p>
+            <h2 id="manual-intent-title" class="manual-section-title"><?php esc_html_e('Ohjeet aiheittain', 'instruction-manual'); ?></h2>
+            <p class="manual-section-subtitle"><?php esc_html_e('Valitse tehtävää vastaava ohjealue.', 'instruction-manual'); ?></p>
         </div>
         <div class="manual-intent-grid">
             <?php foreach ($intent_categories as $intent) : ?>
@@ -73,7 +73,7 @@ $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
                     <span class="manual-icon manual-intent-card__icon" aria-hidden="true"><?php echo manual_design_icon($intent_icon); ?></span>
                     <h3><?php echo esc_html($intent['title']); ?></h3>
                     <p><?php echo esc_html($intent['description']); ?></p>
-                    <span class="manual-intent-card__action"><?php esc_html_e('Aloita', 'instruction-manual'); ?><?php echo manual_link_arrow(); ?></span>
+                    <span class="manual-intent-card__action"><?php esc_html_e('Avaa ohjeet', 'instruction-manual'); ?><?php echo manual_link_arrow(); ?></span>
                 </a>
             <?php endforeach; ?>
         </div>
@@ -130,8 +130,6 @@ $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
                 <?php
                 $t_id = $tutorial->ID;
                 $t_purpose = manual_instruction_purpose($t_id);
-                $t_difficulty = manual_tutorial_difficulty_label_fi($t_id);
-                $t_minutes = manual_instruction_estimated_minutes($t_id);
                 $t_reviewed = manual_reviewed_month_label_fi($t_id);
                 $featured_icon = $featured_icons[$featured_index] ?? 'content';
                 $featured_tone = $featured_tones[$featured_index] ?? 'green';
@@ -142,8 +140,6 @@ $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
                         <h3><?php echo esc_html(manual_instruction_task_title($t_id)); ?></h3>
                         <p><?php echo esc_html($t_purpose); ?></p>
                         <div class="manual-tutorial-card__meta">
-                            <span class="manual-badge manual-badge--difficulty"><?php echo esc_html($t_difficulty); ?></span>
-                            <span class="manual-badge"><?php echo esc_html(sprintf(__('%d min', 'instruction-manual'), $t_minutes)); ?></span>
                             <?php if ($t_reviewed) : ?>
                                 <span class="manual-badge manual-badge--review"><?php echo esc_html($t_reviewed); ?></span>
                             <?php endif; ?>

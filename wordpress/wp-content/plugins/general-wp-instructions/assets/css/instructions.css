@@ -161,6 +161,19 @@
     font-weight: 650;
 }
 
+.gwi-highlighted-screenshot--unavailable .gwi-highlighted-screenshot__note {
+    border-radius: 8px;
+}
+
+.gwi-highlighted-screenshot__unavailable {
+    border: 1px dashed rgba(23, 32, 51, 0.22);
+    border-radius: 8px;
+    color: var(--manual-muted, #625f5a);
+    font-size: 0.9rem;
+    margin: 0.75rem 0 0;
+    padding: 0.85rem 1rem;
+}
+
 .gwi-highlighted-screenshot__frame,
 .gwi-acf-screenshot-step__frame,
 .gwi-flexible-screenshot__frame {

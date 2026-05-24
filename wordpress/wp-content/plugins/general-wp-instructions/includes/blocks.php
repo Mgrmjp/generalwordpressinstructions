@@ -99,6 +99,24 @@ function gwi_get_instruction_post_id_from_block($block): int
     return $post_id ? (int) $post_id : 0;
 }
 
+/**
+ * Whether the current WordPress install can produce a meaningful admin screenshot for this id.
+ */
+function gwi_instruction_screenshot_environment_ready(string $screenshot_id): bool
+{
+    $screenshot_id = sanitize_file_name($screenshot_id);
+
+    if ($screenshot_id === 'acf-field-groups') {
+        return post_type_exists('acf-field-group');
+    }
+
+    if ($screenshot_id === 'seo-dashboard') {
+        return defined('WPSEO_VERSION') || class_exists('WPSEO_Admin');
+    }
+
+    return true;
+}
+
 function gwi_get_instruction_screenshot_url(
     string $screenshot_id,
     int $post_id = 0,
@@ -110,6 +128,10 @@ function gwi_get_instruction_screenshot_url(
 
     if ($screenshot_id === '') {
         return $fallback_url;
+    }
+
+    if (!gwi_instruction_screenshot_environment_ready($screenshot_id)) {
+        return $variant === 'context' ? '' : $fallback_url;
     }
 
     if ($language === '' && $post_id > 0 && function_exists('gwi_get_instruction_language')) {

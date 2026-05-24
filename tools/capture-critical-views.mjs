@@ -146,6 +146,88 @@ async function login(page, baseUrl, username, password) {
     }
 }
 
+function isBlockEditorUrl(url) {
+    return url.includes('post-new.php') || (url.includes('post.php') && !url.includes('classic-editor'));
+}
+
+async function suppressBlockEditorWelcomeInStorage(page) {
+    await page.evaluate(() => {
+        try {
+            for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+                const key = localStorage.key(index);
+
+                if (!key || !key.startsWith('WP_PREFERENCES_USER_')) {
+                    continue;
+                }
+
+                const preferences = JSON.parse(localStorage.getItem(key) || '{}');
+
+                preferences.core = {
+                    ...(preferences.core || {}),
+                    welcomeGuide: false,
+                };
+                preferences['core/edit-post'] = {
+                    ...(preferences['core/edit-post'] || {}),
+                    welcomeGuide: false,
+                };
+
+                localStorage.setItem(key, JSON.stringify(preferences));
+            }
+        } catch {
+            // Ignore storage write failures in headless capture.
+        }
+    });
+}
+
+async function dismissBlockEditorWelcome(page) {
+    await suppressBlockEditorWelcomeInStorage(page);
+
+    await page.evaluate(() => {
+        try {
+            if (window.wp?.data?.dispatch) {
+                window.wp.data.dispatch('core/preferences').set('core', 'welcomeGuide', false);
+                window.wp.data.dispatch('core/preferences').set('core/edit-post', 'welcomeGuide', false);
+            }
+        } catch {
+            // Editor scripts may not be ready yet.
+        }
+    }).catch(() => null);
+
+    const closeSelectors = [
+        '.edit-post-welcome-guide button[aria-label="Close"]',
+        '.edit-post-welcome-guide button[aria-label="Close dialog"]',
+        '.components-guide button[aria-label="Close"]',
+        '.components-guide button[aria-label="Close dialog"]',
+        '[role="dialog"] button[aria-label="Close"]',
+        '[role="dialog"] button[aria-label="Close dialog"]',
+        '.components-modal__header button[aria-label="Close"]',
+        '.components-modal__header button[aria-label="Close dialog"]',
+    ].join(', ');
+
+    const closeButton = page.locator(closeSelectors).first();
+
+    if (await closeButton.isVisible({ timeout: 1200 }).catch(() => false)) {
+        await closeButton.click();
+        await page.waitForTimeout(250);
+        return;
+    }
+
+    const welcomeDialog = page.locator('[role="dialog"]').filter({ hasText: /welcome to the editor/i });
+
+    if (await welcomeDialog.isVisible({ timeout: 800 }).catch(() => false)) {
+        await page.keyboard.press('Escape').catch(() => null);
+        await page.waitForTimeout(250);
+    }
+}
+
+async function prepareAdminPage(page, url) {
+    if (!isBlockEditorUrl(url)) {
+        return;
+    }
+
+    await dismissBlockEditorWelcome(page);
+}
+
 async function injectHighlightStyles(page) {
     await page.addStyleTag({
         content: `
@@ -382,6 +464,20 @@ async function captureView(page, baseUrl, view, language, outputDir, logger) {
         }
     }
 
+    await prepareAdminPage(page, view.url);
+
+    const invalidPostType = await page
+        .locator('#wpbody-content')
+        .getByText('Invalid post type.', { exact: true })
+        .isVisible()
+        .catch(() => false);
+
+    if (invalidPostType) {
+        throw new Error(
+            `Admin screen returned "Invalid post type." — is the plugin for ${view.id} installed and active?`,
+        );
+    }
+
     await injectHighlightStyles(page);
 
     const highlightRects = [];
@@ -493,6 +589,34 @@ async function main() {
         viewport: { width: 1920, height: 1080 },
         deviceScaleFactor: 2,
     });
+
+    await context.addInitScript(() => {
+        try {
+            for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+                const key = localStorage.key(index);
+
+                if (!key || !key.startsWith('WP_PREFERENCES_USER_')) {
+                    continue;
+                }
+
+                const preferences = JSON.parse(localStorage.getItem(key) || '{}');
+
+                preferences.core = {
+                    ...(preferences.core || {}),
+                    welcomeGuide: false,
+                };
+                preferences['core/edit-post'] = {
+                    ...(preferences['core/edit-post'] || {}),
+                    welcomeGuide: false,
+                };
+
+                localStorage.setItem(key, JSON.stringify(preferences));
+            }
+        } catch {
+            // Ignore storage write failures in headless capture.
+        }
+    });
+
     const page = await context.newPage();
 
     let failedViews = 0;

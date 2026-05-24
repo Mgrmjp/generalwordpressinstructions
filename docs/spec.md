@@ -29,7 +29,7 @@ Success means a developer can start the Lando site, activate the included plugin
 - Activate plugin: `lando wp plugin activate general-wp-instructions --path=/app/wordpress`
 - Activate theme: `lando wp theme activate instruction-manual --path=/app/wordpress`
 - Install screenshot tooling: `npm install`
-- Capture screenshots: `WP_BASE_URL=https://generalwordpressinstructions.lndo.site WP_USER=admin WP_PASSWORD=admin npm run screenshots`
+- Capture screenshots: `WP_BASE_URL=https://generalwordpressinstructions.lndo.site WP_USER=maria.korhonen WP_PASSWORD=admin npm run screenshots`
 - PHP syntax check: `find wordpress/wp-content -name '*.php' -print0 | xargs -0 -n1 php -l`
 
 ## Project Structure

@@ -70,24 +70,35 @@
         return count + ' ' + (count === 1 ? (labels.result || 'guide') : (labels.results || 'guides'));
     }
 
-    function renderGuideRow(item) {
+    function guideLinkArrow() {
+        return '<span class="manual-link-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>';
+    }
+
+    function renderGuideRow(item, options) {
+        var hideLanguageMeta = options && options.hideLanguageMeta;
+        var metaMarkup = hideLanguageMeta
+            ? ''
+            : '<span class="manual-doc-row__meta">' + escapeHtml(item.languageLabel) + '</span>';
+
         return [
             '<article class="manual-doc-row">',
-            '<div class="manual-doc-row__main">',
-            '<h3><a href="' + escapeHtml(item.url) + '">' + escapeHtml(item.title) + '</a></h3>',
-            '<p>' + escapeHtml(item.purpose) + '</p>',
-            '<div class="manual-doc-row__meta" aria-label="Guide details">',
-            '<span>' + escapeHtml(item.difficulty) + '</span>',
-            '<span>' + escapeHtml(item.minutes) + ' min</span>',
-            '<span>' + escapeHtml(item.languageLabel) + '</span>',
-            '</div>',
-            '</div>',
-            '<a class="manual-doc-row__link" href="' + escapeHtml(item.url) + '">' + escapeHtml(labels.start || 'Open guide') + (config.linkArrowHtml || '') + '</a>',
+            '<a class="manual-doc-row__card" href="' + escapeHtml(item.url) + '">',
+            '<span class="manual-doc-row__content">',
+            '<span class="manual-doc-row__title">' + escapeHtml(item.title) + '</span>',
+            '<span class="manual-doc-row__purpose">' + escapeHtml(item.purpose) + '</span>',
+            metaMarkup,
+            '</span>',
+            '<span class="manual-doc-row__cta">' + escapeHtml(labels.start || 'Open guide') + guideLinkArrow() + '</span>',
+            '</a>',
             '</article>',
         ].join('');
     }
 
     function renderLibrary(resultsNode, items) {
+        var libraryRoot = resultsNode.closest('[data-manual-library]');
+        var hideGroupHeaders = libraryRoot && libraryRoot.getAttribute('data-hide-group-headers') === '1';
+        var hideLanguageMeta = libraryRoot && libraryRoot.getAttribute('data-hide-language-meta') === '1';
+        var rowOptions = { hideLanguageMeta: hideLanguageMeta };
         var groups = config.groups || {};
         var grouped = {};
 
@@ -119,17 +130,25 @@
                 return '';
             }
 
+            var headerMarkup = hideGroupHeaders
+                ? ''
+                : [
+                    '<header class="manual-cabinet__header">',
+                    '<div>',
+                    '<h2 id="manual-group-live-' + escapeHtml(key) + '">' + escapeHtml(group.title) + '</h2>',
+                    '<p>' + escapeHtml(group.description) + '</p>',
+                    '</div>',
+                    '<span>' + resultCountText(groupItems.length) + '</span>',
+                    '</header>',
+                ].join('');
+
             return [
                 '<section class="manual-cabinet__group" aria-labelledby="manual-group-live-' + escapeHtml(key) + '">',
-                '<header class="manual-cabinet__header">',
-                '<div>',
-                '<h2 id="manual-group-live-' + escapeHtml(key) + '">' + escapeHtml(group.title) + '</h2>',
-                '<p>' + escapeHtml(group.description) + '</p>',
-                '</div>',
-                '<span>' + resultCountText(groupItems.length) + '</span>',
-                '</header>',
+                headerMarkup,
                 '<div class="manual-doc-list">',
-                groupItems.map(renderGuideRow).join(''),
+                groupItems.map(function (item) {
+                    return renderGuideRow(item, rowOptions);
+                }).join(''),
                 '</div>',
                 '</section>',
             ].join('');
@@ -215,6 +234,7 @@
                     renderLibrary(resultsNode, items);
                     if (countNode) {
                         countNode.textContent = resultCountText(items.length);
+                        countNode.hidden = state.search === '';
                     }
                 })
                 .catch(function (error) {
@@ -244,9 +264,27 @@
             }
         });
 
+        function syncSearchChrome() {
+            if (!searchInput) {
+                return;
+            }
+
+            var hasQuery = searchInput.value.trim() !== '';
+
+            if (clearButton) {
+                clearButton.hidden = !hasQuery;
+            }
+
+            if (countNode) {
+                countNode.hidden = !hasQuery;
+            }
+        }
+
         if (searchInput) {
+            syncSearchChrome();
             searchInput.addEventListener('input', debounce(function () {
                 state.search = searchInput.value.trim();
+                syncSearchChrome();
                 load(true);
             }, 180));
         }
@@ -257,6 +295,7 @@
                     searchInput.value = '';
                 }
                 state.search = '';
+                syncSearchChrome();
                 load(false);
             });
         }
@@ -273,6 +312,7 @@
             if (searchInput) {
                 searchInput.value = state.search;
             }
+            syncSearchChrome();
             load(true);
         });
     }
@@ -603,8 +643,24 @@
             toggles.forEach(function (toggle) {
                 var darkLabel = toggle.getAttribute('data-label-dark') || labels.darkModeOn || 'Dark mode';
                 var lightLabel = toggle.getAttribute('data-label-light') || labels.darkModeOff || 'Light mode';
-                toggle.textContent = isDark ? darkLabel : lightLabel;
+                var moonIcon = toggle.querySelector('.manual-theme-toggle__icon--moon');
+                var sunIcon = toggle.querySelector('.manual-theme-toggle__icon--sun');
+
                 toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+                toggle.setAttribute('aria-label', isDark ? lightLabel : darkLabel);
+
+                if (moonIcon || sunIcon) {
+                    if (moonIcon) {
+                        moonIcon.hidden = isDark;
+                    }
+
+                    if (sunIcon) {
+                        sunIcon.hidden = !isDark;
+                    }
+                } else {
+                    toggle.textContent = isDark ? lightLabel : darkLabel;
+                    toggle.setAttribute('aria-label', isDark ? lightLabel : darkLabel);
+                }
             });
         }
 

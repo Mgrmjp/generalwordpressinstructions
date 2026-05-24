@@ -128,7 +128,7 @@ function gwi_seed_creating_posts_en(): string
 function gwi_seed_creating_posts_fi(): string
 {
     return '<!-- wp:paragraph --><p>Artikkelit ovat aikaperusteisia sisältöjulkaisuja, joita käytetään tyypillisesti blogikirjoituksiin, uutisiin ja päivityksiin. Ne näkyvät sivustollasi uusimmasta vanhimpaan järjestettyinä.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Luo uusi artikkeli","steps":[{"text":"Mene Artikkelit-valikkoon ja klikkaa Lisää uusi."},{"text":"Kirjoita selkeä ja kuvaava otsikko otsikkokenttään."},{"text":"Lisää sisältöäsi käyttämällä lohkoja editorissa otsikon alla."},{"text":"Valitse kategoria Kategoriat-paneelista oikealla."},{"text":"Lisää relevantit asiasanat Asiasanat-paneelissa."},{"text":"Aseta artikkelikuva Artikkelikuva-paneelista."},{"text":"Klikkaa Julkaise kun artikkelisi on valmis."}]} /-->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Luo uusi artikkeli","steps":[{"text":"Mene Artikkelit-valikkoon ja klikkaa Lisää uusi."},{"text":"Kirjoita selkeä ja kuvaava otsikko otsikkokenttään."},{"text":"Lisää sisältöäsi käyttämällä lohkoja editorissa otsikon alla."},{"text":"Valitse kategoria Kategoriat-paneelista oikealla."},{"text":"Lisää sopivat asiasanat Asiasanat-paneelissa."},{"text":"Aseta artikkelikuva Artikkelikuva-paneelista."},{"text":"Klikkaa Julkaise kun artikkelisi on valmis."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"posts-list","caption":"Artikkelit-lista Lisää uusi -painike korostettuna"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
         . '<!-- wp:paragraph --><p>Vinkki: Käytä Esikatsele-painiketta tarkistaaksesi artikkelin ulkoasu ennen julkaisua.</p><!-- /wp:paragraph -->';
 }
@@ -160,7 +160,7 @@ function gwi_seed_creating_pages_en(): string
 function gwi_seed_creating_pages_fi(): string
 {
     return '<!-- wp:paragraph --><p>Sivut ovat staattista sisältöä, joka ei ole aikariippuvaista. Käytä niitä Tietoa, Yhteystiedot, Palvelut ja muihin sivustosi pysyviin osioihin.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Luo uusi sivu","steps":[{"text":"Mene Sivut-valikkoon ja klikkaa Lisää uusi."},{"text":"Kirjoita selkeä otsikko sivullesi."},{"text":"Lisää sisältöä käyttämällä lohkoja editorissa."},{"text":"Aseta yläsivu Sivun asetukset -paneelissa jos haluat hierarkian."},{"text":"Valitse malli tarjoaako teemasi sivumalleja."},{"text":"Klikkaa Julkaise kun sivusi on valmis."}]} /-->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Luo uusi sivu","steps":[{"text":"Mene Sivut-valikkoon ja klikkaa Lisää uusi."},{"text":"Kirjoita selkeä otsikko sivullesi."},{"text":"Lisää sisältöä käyttämällä lohkoja editorissa."},{"text":"Aseta yläsivu Sivun asetukset -paneelissa jos haluat hierarkian."},{"text":"Valitse sivupohja, jos teemasi tarjoaa sivupohjia."},{"text":"Klikkaa Julkaise kun sivusi on valmis."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"pages-list-add-new","caption":"Sivulista Lisää uusi -painike korostettuna"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
         . '<!-- wp:paragraph --><p>Vinkki: Sivut voivat käyttää eri malleja, joita teemasi tarjoaa, kuten täyslevyisiä tai sivupalkillisia asetteluja.</p><!-- /wp:paragraph -->';
 }
@@ -192,7 +192,7 @@ function gwi_seed_managing_comments_en(): string
 function gwi_seed_managing_comments_fi(): string
 {
     return '<!-- wp:paragraph --><p>Kommentit mahdollistavat kävijöiden vuorovaikutuksen sisältösi kanssa. Kommenttien hallintaan kuuluu hyväksyminen, vastaaminen, muokkaus ja roskapostisuodatus.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Hallinnoi kommentteja","steps":[{"text":"Mene Kommentit nähdäksesi kaikki kommentit sivustollasi."},{"text":"Käytä suodatinlinkkejä ylhäällä nähdäksesi Odottavat, Hyväksytyt, Roskapostit tai Roskakori-kommentit."},{"text":"Vie hiiri kommentin päälle nähdäksesi toimintolinkit: Hyväksy, Vastaa, Muokkaa, Roskaposti tai Roskakori."},{"text":"Klikkaa Vastaa vastataksesi suoraan kommenttiin."},{"text":"Tyhjennä Roskakori säännöllisesti pitääksesi tietokantasi siistinä."}]} /-->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Hallinnoi kommentteja","steps":[{"text":"Siirry Kommentit-valikkoon nähdäksesi kaikki kommentit sivustollasi."},{"text":"Käytä suodatinlinkkejä ylhäällä nähdäksesi Odottavat, Hyväksytyt, Roskapostit tai Roskakori-kommentit."},{"text":"Vie hiiri kommentin päälle nähdäksesi toimintolinkit: Hyväksy, Vastaa, Muokkaa, Roskaposti tai Roskakori."},{"text":"Klikkaa Vastaa vastataksesi suoraan kommenttiin."},{"text":"Tyhjennä Roskakori säännöllisesti pitääksesi tietokantasi siistinä."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"comments-list","caption":"Kommenttien hallintasivu suodatinvaihtoehdoilla"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
         . '<!-- wp:paragraph --><p>Vinkki: Ota kommenttien moderointi käyttöön Asetuksissa, jotta uudet kommentit pidätetään hyväksyntää varten ennen julkaisua.</p><!-- /wp:paragraph -->';
 }

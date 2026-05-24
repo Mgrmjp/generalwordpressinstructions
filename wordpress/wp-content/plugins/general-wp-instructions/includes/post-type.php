@@ -316,7 +316,7 @@ function gwi_instruction_template_content(string $template, string $language = '
         ],
         'fi' => [
             'basic-task' => '<!-- wp:heading --><h2>Mihin tämä on tarkoitettu</h2><!-- /wp:heading -->'
-                . '<!-- wp:paragraph --><p>Käytä tätä kun sinun täytyy suorittaa yksi selkeä WordPress-muokkaustehtävä.</p><!-- /wp:paragraph -->'
+                . '<!-- wp:paragraph --><p>Käytä tätä, kun sinun täytyy suorittaa yksi selkeä WordPress-muokkaustehtävä.</p><!-- /wp:paragraph -->'
                 . '<!-- wp:heading --><h2>Ennen kuin aloitat</h2><!-- /wp:heading -->'
                 . '<!-- wp:list --><ul><li>Tarvitset WordPress-muokkausoikeudet.</li><li>Sinun täytyy tietää mitä sivua tai artikkelia muokkaat.</li><li>Sinulla pitäisi olla valmis teksti tai kuvat valmiina.</li></ul><!-- /wp:list -->'
                 . '<!-- wp:general-wp-instructions/step-list {"title":"Vaiheet","steps":[{"text":"Avaa sivu tai artikkeli."},{"text":"Tee yksi selkeä muutos."},{"text":"Klikkaa Päivitä."},{"text":"Avaa sivu uudessa välilehdessä."}]} /-->'
@@ -329,7 +329,7 @@ function gwi_instruction_template_content(string $template, string $language = '
             'troubleshooting' => '<!-- wp:heading --><h2>Minkä ongelman tämä ratkaisee</h2><!-- /wp:heading -->'
                 . '<!-- wp:paragraph --><p>Käytä tätä kun jokin WordPressissä ei näytä tai toimi odotetusti.</p><!-- /wp:paragraph -->'
                 . '<!-- wp:heading --><h2>Ennen kuin aloitat</h2><!-- /wp:heading -->'
-                . '<!-- wp:list --><ul><i>Kirjoita ylös mitä muutit.</li><li>Avaa sivu uudessa välilehdessä.</li><li>Tarkista tapahtuuko ongelma työpöydällä, mobiilissa vai molemmissa.</li></ul><!-- /wp:list -->'
+                . '<!-- wp:list --><ul><li>Kirjoita ylös mitä muutit.</li><li>Avaa sivu uudessa välilehdessä.</li><li>Tarkista tapahtuuko ongelma työpöydällä, mobiilissa vai molemmissa.</li></ul><!-- /wp:list -->'
                 . '<!-- wp:heading --><h2>Tarkistukset</h2><!-- /wp:heading -->'
                 . '<!-- wp:list {"ordered":true} --><ol><li>Päivitä sivu.</li><li>Tyhjennä välimuisti jos vanha versio näkyy edelleen.</li><li>Tarkista että muokkasit oikeaa kieliversiota.</li><li>Pyydä tarkistajaa vahvistamaan tulos.</li></ol><!-- /wp:list -->'
                 . '<!-- wp:heading --><h2>Yleiset virheet</h2><!-- /wp:heading -->'
@@ -339,7 +339,7 @@ function gwi_instruction_template_content(string $template, string $language = '
             'concept' => '<!-- wp:heading --><h2>Mitä tämä tarkoittaa</h2><!-- /wp:heading -->'
                 . '<!-- wp:paragraph --><p>Selitä termi selkokielellä ennen vaiheita.</p><!-- /wp:paragraph -->'
                 . '<!-- wp:heading --><h2>Käytä tätä kun</h2><!-- /wp:heading -->'
-                . '<!-- wp:paragraph --><p>Käytä tätä kun käyttäjän täyty ymmärtää idea ennen turvallista muokkausta.</p><!-- /wp:paragraph -->'
+                . '<!-- wp:paragraph --><p>Käytä tätä, kun käyttäjän täytyy ymmärtää idea ennen turvallista muokkausta.</p><!-- /wp:paragraph -->'
                 . '<!-- wp:heading --><h2>Yksinkertainen esimerkki</h2><!-- /wp:heading -->'
                 . '<!-- wp:paragraph --><p>Anna yksi konkreettinen esimerkki tästä WordPress-sivustosta.</p><!-- /wp:paragraph -->'
                 . '<!-- wp:heading --><h2>Yleiset virheet</h2><!-- /wp:heading -->'
@@ -515,7 +515,10 @@ function gwi_register_instruction_taxonomy(): void
         'public' => true,
         'show_in_rest' => true,
         'show_admin_column' => true,
-        'rewrite' => ['slug' => 'instruction-category'],
+        'rewrite' => [
+            'slug' => 'ohje-aihe',
+            'with_front' => false,
+        ],
     ]);
 
     $categories = [

@@ -39,5 +39,7 @@ wp plugin activate general-wp-instructions --path="${WP_PATH}"
 wp theme activate instruction-manual --path="${WP_PATH}"
 wp rewrite structure '/%postname%/' --path="${WP_PATH}"
 wp rewrite flush --path="${WP_PATH}"
+wp gwi ensure-screenshot-users --password="${ADMIN_PASSWORD}" --path="${WP_PATH}"
 
 echo "WordPress instruction site is ready at ${SITE_URL}"
+echo "Screenshot capture login: WP_USER=maria.korhonen WP_PASSWORD=${ADMIN_PASSWORD}"

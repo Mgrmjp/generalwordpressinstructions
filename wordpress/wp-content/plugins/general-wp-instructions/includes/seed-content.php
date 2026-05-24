@@ -43,6 +43,11 @@ function gwi_resync_seed_instructions(): int
 
 function gwi_create_seed_instruction(string $slug, string $title, string $language, string $content): int
 {
+    if ($language === 'fi') {
+        $title = gwi_normalize_finnish_text($title);
+        $content = gwi_normalize_finnish_text($content);
+    }
+
     $existing = get_page_by_path($slug, OBJECT, 'wp_instruction');
 
     if ($existing instanceof WP_Post) {

@@ -7,9 +7,7 @@
     $purpose = manual_instruction_purpose($post_id);
     $category = manual_instruction_primary_category($post_id);
     $related_instructions = manual_related_instructions($post_id);
-    $difficulty_label = manual_instruction_difficulty_display_label($post_id);
     $language_label = manual_instruction_language_display_label($post_id);
-    $minutes = manual_instruction_estimated_minutes($post_id);
     $reviewed_month = manual_reviewed_month_label_fi($post_id);
     $instruction_language = manual_instruction_language_code($post_id);
     $is_english = $instruction_language === 'en';
@@ -60,8 +58,6 @@
                 <p class="manual-document__purpose"><?php echo esc_html($purpose); ?></p>
 
                 <div class="manual-document__meta-badges">
-                    <span class="manual-badge manual-badge--difficulty"><?php echo esc_html($difficulty_label); ?></span>
-                    <span class="manual-badge"><?php echo esc_html(sprintf(__('%d min', 'instruction-manual'), $minutes)); ?></span>
                     <span class="manual-badge manual-badge--language"><?php echo esc_html($language_label); ?></span>
                     <?php if ($reviewed_month) : ?>
                         <span class="manual-badge manual-badge--review <?php echo manual_instruction_review_status_is_current($post_id) ? '' : 'is-stale'; ?>"><?php echo esc_html($reviewed_month); ?></span>
@@ -176,6 +172,8 @@
                     data-manual-theme-toggle
                     data-label-dark="<?php echo esc_attr($text('dark_mode_off')); ?>"
                     data-label-light="<?php echo esc_attr($text('dark_mode_on')); ?>"
+                    aria-pressed="false"
+                    aria-label="<?php echo esc_attr($text('dark_mode_on')); ?>"
                 ><?php echo esc_html($text('dark_mode_on')); ?></button>
                 <button
                     type="button"

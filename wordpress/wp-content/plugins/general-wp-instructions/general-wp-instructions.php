@@ -21,7 +21,13 @@ require_once GWI_PLUGIN_DIR . 'includes/language-switcher.php';
 require_once GWI_PLUGIN_DIR . 'includes/callout.php';
 require_once GWI_PLUGIN_DIR . 'includes/blocks.php';
 require_once GWI_PLUGIN_DIR . 'includes/acf.php';
+require_once GWI_PLUGIN_DIR . 'includes/finnish-text.php';
+require_once GWI_PLUGIN_DIR . 'includes/screenshot-users.php';
 require_once GWI_PLUGIN_DIR . 'includes/seed-content.php';
+
+if (defined('WP_CLI') && WP_CLI) {
+    require_once GWI_PLUGIN_DIR . 'includes/cli.php';
+}
 
 register_activation_hook(__FILE__, 'gwi_activate');
 register_deactivation_hook(__FILE__, 'gwi_deactivate');
