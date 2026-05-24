@@ -20,10 +20,17 @@ function gwi_register_blocks(): void
 
 function gwi_enqueue_instruction_assets(): void
 {
+    $dependencies = [];
+
+    if (wp_style_is('instruction-manual-tokens', 'registered')) {
+        wp_enqueue_style('instruction-manual-tokens');
+        $dependencies[] = 'instruction-manual-tokens';
+    }
+
     wp_enqueue_style(
         'gwi-instructions',
         GWI_PLUGIN_URL . 'assets/css/instructions.css',
-        [],
+        $dependencies,
         GWI_VERSION
     );
 }

@@ -41,7 +41,7 @@ function gwi_render_language_switcher(?int $post_id = null): string
     if ($translation_id) {
         $translation_language = gwi_get_instruction_language($translation_id);
         $items[$translation_language] = [
-            'label' => gwi_languages()[$translation_language] ?? strtoupper($translation_language),
+            'label' => gwi_languages()[$translation_language] ?? $translation_language,
             'url' => get_permalink($translation_id),
             'active' => false,
             'available' => get_post_status($translation_id) === 'publish',

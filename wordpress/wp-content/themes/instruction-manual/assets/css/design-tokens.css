@@ -1,0 +1,166 @@
+/**
+ * Instruction Manual — design tokens
+ */
+
+:root {
+    --manual-color-black: #111418;
+    --manual-color-white: #ffffff;
+    --manual-color-canvas: #eef1f4;
+    --manual-color-paper: #f5f7f9;
+    --manual-color-spark: #12b48a;
+    --manual-color-spark-dim: #0a7c61;
+    --manual-color-spark-hover: #0f9a78;
+    --manual-color-muted: #5f6b76;
+    --manual-color-muted-light: #8b959f;
+    --manual-color-panel: #eef1f4;
+    --manual-color-blue: #2563eb;
+    --manual-color-blue-subtle: #eff6ff;
+    --manual-color-orange: #ea580c;
+    --manual-color-orange-subtle: #fff7ed;
+    --manual-color-olive: #4d7c0f;
+    --manual-color-olive-subtle: #f7fee7;
+    --manual-color-purple: #7c3aed;
+    --manual-color-purple-subtle: #f5f3ff;
+    --manual-color-warning: #c2410c;
+    --manual-color-warning-bg: #fff7ed;
+    --manual-color-success: #15803d;
+    --manual-color-success-bg: #f0fdf4;
+    --manual-color-before-bg: #fafbfc;
+
+    --manual-canvas: var(--manual-color-canvas);
+    --manual-paper: var(--manual-color-paper);
+    --manual-surface: var(--manual-color-white);
+    --manual-panel: var(--manual-color-panel);
+    --manual-ink: var(--manual-color-black);
+    --manual-muted: var(--manual-color-muted);
+    --manual-muted-light: var(--manual-color-muted-light);
+    --manual-line: #dde3e9;
+    --manual-line-strong: #c5ced6;
+    --manual-line-soft: #e8ecf0;
+    --manual-line-muted: #d0d8df;
+    --manual-spark: var(--manual-color-spark);
+    --manual-spark-dim: var(--manual-color-spark-dim);
+    --manual-accent: var(--manual-spark);
+    --manual-accent-strong: var(--manual-spark-dim);
+    --manual-accent-subtle: #e3f7f0;
+    --manual-accent-hover: var(--manual-color-spark-hover);
+    --manual-accent-2: var(--manual-spark);
+    --manual-blue: var(--manual-color-blue);
+    --manual-blue-subtle: var(--manual-color-blue-subtle);
+    --manual-orange: var(--manual-color-orange);
+    --manual-orange-subtle: var(--manual-color-orange-subtle);
+    --manual-olive: var(--manual-color-olive);
+    --manual-olive-subtle: var(--manual-color-olive-subtle);
+    --manual-purple: var(--manual-color-purple);
+    --manual-purple-subtle: var(--manual-color-purple-subtle);
+    --manual-warning: var(--manual-color-warning);
+    --manual-warning-bg: var(--manual-color-warning-bg);
+    --manual-check-bg: var(--manual-color-success-bg);
+    --manual-before-bg: var(--manual-color-before-bg);
+
+    --manual-body: "Mona Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --manual-font-size-xs: 0.75rem;
+    --manual-font-size-sm: 0.875rem;
+    --manual-font-size-md: 0.9375rem;
+    --manual-font-size-base: 1rem;
+    --manual-font-size-lg: 1.125rem;
+    --manual-font-size-xl: 1.375rem;
+    --manual-font-size-2xl: clamp(1.75rem, 3.5vw, 2.25rem);
+    --manual-font-size-3xl: clamp(2.25rem, 5vw, 2.75rem);
+    --manual-font-weight-medium: 500;
+    --manual-font-weight-semibold: 600;
+    --manual-font-weight-bold: 700;
+    --manual-font-weight-heavy: 700;
+    --manual-font-weight-black: 800;
+    --manual-line-height-tight: 1.15;
+    --manual-line-height-snug: 1.3;
+    --manual-line-height-normal: 1.6;
+    --manual-line-height-relaxed: 1.75;
+    --manual-letter-spacing-label: 0.01em;
+    --manual-letter-spacing-wide: 0.02em;
+    --manual-letter-spacing-caps: var(--manual-letter-spacing-wide);
+    --manual-letter-spacing-caps-wide: 0.03em;
+    --manual-letter-spacing-tight: -0.025em;
+
+    --manual-space-1: 0.25rem;
+    --manual-space-2: 0.5rem;
+    --manual-space-3: 0.75rem;
+    --manual-space-4: 1rem;
+    --manual-space-5: 1.25rem;
+    --manual-space-6: 1.5rem;
+    --manual-space-8: 2rem;
+    --manual-space-10: 2.5rem;
+    --manual-space-12: 3rem;
+    --manual-space-16: 4rem;
+
+    --manual-section-gap: var(--manual-space-10);
+    --manual-section-intro-gap: var(--manual-space-3);
+    --manual-section-content-gap: var(--manual-space-6);
+    --manual-block-gap: var(--manual-space-5);
+    --manual-card-padding: var(--manual-space-6);
+    --manual-card-gap: var(--manual-space-4);
+    --manual-inline-gap: var(--manual-space-3);
+    --manual-stack-sm: var(--manual-space-2);
+    --manual-stack-md: var(--manual-space-4);
+    --manual-stack-lg: var(--manual-space-8);
+    --manual-content-gap: var(--manual-space-6);
+
+    --manual-radius: 10px;
+    --manual-radius-sm: 8px;
+    --manual-radius-lg: 14px;
+    --manual-radius-edge: 8px;
+    --manual-radius-pill: 999px;
+
+    --manual-shadow-sm: 0 1px 2px rgba(17, 20, 24, 0.05);
+    --manual-shadow: 0 4px 16px rgba(17, 20, 24, 0.08);
+    --manual-shadow-lg: 0 12px 40px rgba(17, 20, 24, 0.1);
+    --manual-hard-shadow: var(--manual-shadow);
+    --manual-shadow-soft-sm: var(--manual-shadow-sm);
+    --manual-shadow-soft: var(--manual-shadow);
+
+    --manual-container: 1120px;
+    --manual-container-reader: 76rem;
+    --manual-container-narrow: 920px;
+
+    --manual-z-sticky: 30;
+    --manual-z-header: 50;
+    --manual-z-dropdown: 90;
+    --manual-z-lightbox: 100000;
+
+    --manual-duration-fast: 0.15s ease;
+    --manual-duration-normal: 0.2s ease;
+    --manual-ease-default: ease;
+    --manual-transition-fast: var(--manual-duration-fast);
+    --manual-transition-normal: var(--manual-duration-normal);
+
+    --manual-focus-ring: 0 0 0 3px rgba(18, 180, 138, 0.28);
+    --manual-focus-offset: 0;
+}
+
+body.single-wp_instruction {
+    --manual-canvas: #eef1f4;
+    --manual-paper: #eef1f4;
+}
+
+html.manual-theme-dark {
+    --manual-paper: #0f1318;
+    --manual-canvas: #0a0d11;
+    --manual-surface: #151a21;
+    --manual-panel: #1c232c;
+    --manual-ink: #f3f6f9;
+    --manual-muted: #a3adb8;
+    --manual-muted-light: #7f8a96;
+    --manual-line: #2a3340;
+    --manual-line-strong: #3a4654;
+    --manual-line-soft: #222a33;
+    --manual-line-muted: #323d4a;
+    --manual-accent-strong: var(--manual-spark);
+    --manual-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --manual-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --manual-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.45);
+}
+
+html.manual-theme-dark body.single-wp_instruction {
+    --manual-ink: #f3f6f9;
+    --manual-muted: #b0bac4;
+}

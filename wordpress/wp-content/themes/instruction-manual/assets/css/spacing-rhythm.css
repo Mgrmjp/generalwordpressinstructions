@@ -1,0 +1,477 @@
+/**
+ * Expanded layout rhythm — uses design-tokens spacing scale.
+ */
+
+body {
+    line-height: var(--manual-line-height-normal);
+}
+
+.manual-site-header__inner {
+    gap: var(--manual-space-4);
+    min-height: 5.25rem;
+    padding: var(--manual-space-4) 0;
+}
+
+.manual-nav {
+    gap: var(--manual-space-4);
+}
+
+.manual-nav__links {
+    gap: var(--manual-space-1);
+}
+
+.manual-nav__tools {
+    gap: var(--manual-space-2);
+}
+
+.manual-search {
+    gap: var(--manual-stack-sm);
+}
+
+.manual-main {
+    padding: 0 0 var(--manual-space-12);
+}
+
+.manual-eyebrow {
+    letter-spacing: var(--manual-letter-spacing-wide);
+    margin: 0 0 var(--manual-space-3);
+}
+
+.manual-title {
+    line-height: var(--manual-line-height-tight);
+    margin: 0 0 var(--manual-space-4);
+}
+
+.manual-lead {
+    line-height: var(--manual-line-height-relaxed);
+}
+
+.manual-article__title {
+    line-height: var(--manual-line-height-tight);
+    margin: 0 0 var(--manual-space-4);
+}
+
+.manual-section-title {
+    line-height: var(--manual-line-height-snug);
+}
+
+.manual-section-intro {
+    gap: var(--manual-section-intro-gap);
+}
+
+.manual-section-header {
+    gap: var(--manual-card-gap);
+    margin-bottom: 0;
+}
+
+.manual-intent-section,
+.manual-paths-section,
+.manual-featured-section,
+.manual-glossary-strip-section {
+    gap: var(--manual-section-content-gap);
+}
+
+.manual-hero {
+    margin-bottom: var(--manual-section-gap);
+    padding: var(--manual-space-12) clamp(1.5rem, 6vw, 4.75rem) var(--manual-space-10);
+}
+
+.manual-hero-search {
+    margin-top: var(--manual-space-8);
+    padding: var(--manual-space-5);
+}
+
+.manual-hero-search form {
+    gap: var(--manual-stack-sm);
+    margin-bottom: var(--manual-space-3);
+}
+
+.manual-recent-section,
+.manual-english-section,
+.manual-support-section {
+    margin-bottom: var(--manual-section-gap);
+}
+
+.manual-intent-grid,
+.manual-tutorial-grid,
+.manual-glossary-strip {
+    gap: var(--manual-block-gap);
+}
+
+.manual-intent-card,
+.manual-tutorial-card,
+.manual-path-single {
+    gap: var(--manual-card-gap);
+    padding: var(--manual-card-padding);
+}
+
+.manual-intent-card__action,
+.manual-tutorial-card__action {
+    margin-top: auto;
+    padding-top: var(--manual-space-4);
+}
+
+.manual-filterbar {
+    gap: var(--manual-space-4);
+    margin: 0 0 var(--manual-space-8);
+    padding: var(--manual-space-5);
+}
+
+.manual-filters {
+    gap: var(--manual-stack-sm);
+}
+
+.manual-filter {
+    padding: var(--manual-space-2) var(--manual-space-3);
+}
+
+.manual-cabinet {
+    gap: var(--manual-space-8);
+}
+
+.manual-cabinet__group {
+    gap: var(--manual-stack-sm);
+}
+
+.manual-cabinet__header {
+    gap: var(--manual-space-4);
+    padding-bottom: var(--manual-space-4);
+}
+
+.manual-doc-list {
+    gap: var(--manual-stack-md);
+}
+
+.manual-doc-row {
+    gap: var(--manual-space-4);
+    padding: var(--manual-space-5) var(--manual-space-6);
+}
+
+.manual-doc-row__main p {
+    margin: var(--manual-space-2) 0 var(--manual-stack-md);
+}
+
+.manual-doc-workspace {
+    gap: var(--manual-content-gap);
+}
+
+.manual-document {
+    padding: clamp(1.75rem, 3vw, 3rem);
+}
+
+.manual-document__header {
+    margin-bottom: var(--manual-space-5);
+    padding-bottom: var(--manual-space-5);
+}
+
+.manual-document__purpose {
+    line-height: var(--manual-line-height-relaxed);
+    margin: 0 0 var(--manual-space-4);
+}
+
+.manual-document__meta-badges {
+    gap: var(--manual-stack-sm);
+    margin-top: var(--manual-space-4);
+}
+
+.manual-document-section + .manual-document-section {
+    margin-top: var(--manual-space-10);
+    padding-top: var(--manual-space-8);
+}
+
+.manual-document-section > h2,
+.manual-content h2 {
+    margin-bottom: var(--manual-space-4);
+}
+
+.manual-content > * + * {
+    margin-top: var(--manual-content-gap);
+}
+
+.manual-content h2,
+.manual-content h3 {
+    margin-top: var(--manual-space-8);
+}
+
+.manual-before-box,
+.manual-check-box,
+.manual-mistakes-box {
+    margin-bottom: var(--manual-space-5);
+    padding: var(--manual-space-5) var(--manual-space-6);
+}
+
+.manual-check-list,
+.manual-related-list {
+    gap: var(--manual-stack-sm);
+}
+
+.manual-check-list li,
+.manual-related-list li {
+    padding: var(--manual-space-3) var(--manual-space-4) var(--manual-space-3) 2.25rem;
+}
+
+.manual-doc-aside {
+    gap: var(--manual-space-5);
+}
+
+.manual-doc-aside__panel {
+    padding: var(--manual-space-5);
+}
+
+.manual-doc-aside__panel h2,
+.manual-doc-contents__title {
+    letter-spacing: var(--manual-letter-spacing-label);
+    margin-bottom: var(--manual-space-3);
+}
+
+.manual-doc-contents,
+.manual-doc-aside__panel nav,
+.manual-on-page nav {
+    gap: var(--manual-space-2);
+}
+
+.manual-doc-contents a,
+.manual-on-page nav a,
+.manual-doc-aside__panel nav a {
+    padding: var(--manual-space-2) 0 var(--manual-space-2) var(--manual-space-4);
+}
+
+.manual-doc-aside__meta {
+    gap: var(--manual-stack-sm);
+}
+
+.manual-doc-aside__actions {
+    gap: var(--manual-stack-sm);
+}
+
+.manual-progress {
+    gap: var(--manual-stack-sm);
+    margin: 0 0 var(--manual-space-6);
+    padding: var(--manual-space-3);
+}
+
+.manual-progress a {
+    padding: var(--manual-space-2) var(--manual-space-3);
+}
+
+.manual-library-app {
+    gap: var(--manual-space-5);
+}
+
+.manual-library-search {
+    gap: var(--manual-stack-sm);
+}
+
+.manual-library-search__row {
+    gap: var(--manual-stack-sm);
+}
+
+.manual-search-suggestions {
+    padding: var(--manual-space-3);
+    top: calc(100% + var(--manual-space-2));
+}
+
+.manual-search-suggestions p {
+    letter-spacing: var(--manual-letter-spacing-label);
+    padding: var(--manual-space-2) var(--manual-space-3) var(--manual-space-3);
+}
+
+.manual-search-suggestions a {
+    gap: var(--manual-space-2);
+    padding: var(--manual-space-4) var(--manual-space-4);
+}
+
+.manual-glossary-page {
+    gap: var(--manual-space-8);
+}
+
+.manual-glossary-sidebar {
+    gap: var(--manual-space-4);
+    padding-top: var(--manual-space-4);
+}
+
+.manual-glossary-index {
+    gap: var(--manual-stack-sm);
+}
+
+.manual-glossary-toolbar {
+    gap: var(--manual-space-4);
+    padding: var(--manual-space-5) var(--manual-space-6);
+}
+
+.manual-glossary-group {
+    gap: var(--manual-space-4);
+    padding: var(--manual-space-6);
+}
+
+.manual-glossary-term {
+    gap: var(--manual-space-4);
+    padding: 0 0 var(--manual-space-4);
+}
+
+.manual-glossary-term + .manual-glossary-term {
+    padding-top: var(--manual-space-4);
+}
+
+.manual-section-title--small,
+.manual-filterbar__label,
+.manual-search-suggestions p {
+    letter-spacing: var(--manual-letter-spacing-label);
+}
+
+.manual-glossary-strip-section {
+    margin-bottom: 0;
+}
+
+.manual-site-footer {
+    margin-top: var(--manual-space-8);
+    padding: var(--manual-space-6) 0 var(--manual-space-8);
+}
+
+.gwi-step-list {
+    margin: var(--manual-space-10) 0;
+    padding: var(--manual-space-8) var(--manual-space-6) var(--manual-space-6);
+}
+
+.gwi-step-list__header {
+    margin-bottom: var(--manual-space-5);
+    padding-bottom: var(--manual-space-4);
+}
+
+.gwi-step-list__item {
+    gap: var(--manual-space-2) var(--manual-space-4);
+    padding: var(--manual-space-5) 0;
+}
+
+.gwi-highlighted-screenshot,
+.gwi-acf-screenshot-step,
+.gwi-flexible-screenshot {
+    margin: var(--manual-space-10) 0;
+}
+
+.gwi-highlighted-screenshot__note {
+    gap: var(--manual-space-2);
+    padding: var(--manual-space-4) var(--manual-space-5);
+}
+
+.gwi-callout {
+    margin: var(--manual-space-8) 0;
+}
+
+.gwi-callout__header {
+    gap: var(--manual-space-3);
+    padding: var(--manual-space-4) var(--manual-space-5) 0;
+}
+
+.gwi-callout__body {
+    padding: var(--manual-space-3) var(--manual-space-5) var(--manual-space-5);
+}
+
+.gwi-callout__body p {
+    margin: 0 0 var(--manual-space-4);
+}
+
+.gwi-language-switcher {
+    gap: var(--manual-stack-sm);
+    margin: 0 0 var(--manual-space-6);
+    padding: var(--manual-space-2);
+}
+
+.gwi-language-switcher__label {
+    letter-spacing: var(--manual-letter-spacing-label);
+    padding: 0 var(--manual-space-3);
+}
+
+.gwi-language-switcher__item {
+    padding: var(--manual-space-3) var(--manual-space-4);
+}
+
+.single-wp_instruction .manual-main {
+    padding-bottom: var(--manual-space-8);
+}
+
+body.single-wp_instruction .manual-site-footer {
+    margin-top: 0;
+}
+
+.single-wp_instruction .manual-doc-workspace {
+    gap: var(--manual-content-gap);
+}
+
+.single-wp_instruction .manual-document {
+    padding: 0 0 var(--manual-space-10);
+}
+
+.single-wp_instruction .manual-document__header {
+    padding: clamp(1.75rem, 3vw, 2.75rem) clamp(1.5rem, 3vw, 2.75rem) var(--manual-space-5);
+}
+
+.single-wp_instruction .manual-document > :not(.manual-document__header) {
+    padding-left: clamp(1.5rem, 3vw, 2.75rem);
+    padding-right: clamp(1.5rem, 3vw, 2.75rem);
+}
+
+.single-wp_instruction .manual-progress {
+    margin: var(--manual-space-6) 0 var(--manual-space-8);
+}
+
+.manual-section-intro {
+    line-height: var(--manual-line-height-relaxed);
+    margin: 0 0 var(--manual-space-5);
+}
+
+.single-wp_instruction .manual-content {
+    line-height: var(--manual-line-height-relaxed);
+}
+
+.single-wp_instruction .manual-content > * + * {
+    margin-top: var(--manual-content-gap);
+}
+
+.single-wp_instruction .manual-content p {
+    margin: 0 0 var(--manual-space-5);
+}
+
+.single-wp_instruction .manual-content ul,
+.single-wp_instruction .manual-content ol:not(.gwi-step-list__items) {
+    gap: var(--manual-stack-sm);
+    margin: 0 0 var(--manual-space-5);
+}
+
+.single-wp_instruction .manual-content h3 {
+    margin: var(--manual-space-8) 0 var(--manual-space-3);
+}
+
+.manual-quick-checklist {
+    margin: var(--manual-space-6) 0 0;
+}
+
+.manual-quick-checklist .manual-check-list {
+    gap: 0;
+}
+
+.manual-on-page__here {
+    letter-spacing: var(--manual-letter-spacing-label);
+    margin: 0 0 var(--manual-space-4);
+    padding: var(--manual-space-3) var(--manual-space-4);
+}
+
+.manual-on-page__here strong {
+    margin-top: var(--manual-space-2);
+}
+
+@media (max-width: 760px) {
+    .manual-main {
+        padding-top: var(--manual-space-6);
+    }
+
+    .manual-hero {
+        margin-bottom: var(--manual-space-6);
+        padding: var(--manual-space-8) var(--manual-space-5);
+    }
+
+    .manual-intent-grid,
+    .manual-tutorial-grid {
+        gap: var(--manual-space-5);
+    }
+}

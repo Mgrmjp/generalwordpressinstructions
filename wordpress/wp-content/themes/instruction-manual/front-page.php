@@ -59,8 +59,10 @@ $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
 
 <?php if (!empty($intent_categories)) : ?>
     <section class="manual-intent-section" aria-labelledby="manual-intent-title">
-        <h2 id="manual-intent-title" class="manual-section-title"><?php esc_html_e('Aloita tehtävästä', 'instruction-manual'); ?></h2>
-        <p class="manual-section-subtitle"><?php esc_html_e('Valitse mitä haluat tehdä.', 'instruction-manual'); ?></p>
+        <div class="manual-section-intro">
+            <h2 id="manual-intent-title" class="manual-section-title"><?php esc_html_e('Aloita tehtävästä', 'instruction-manual'); ?></h2>
+            <p class="manual-section-subtitle"><?php esc_html_e('Valitse mitä haluat tehdä.', 'instruction-manual'); ?></p>
+        </div>
         <div class="manual-intent-grid">
             <?php foreach ($intent_categories as $intent) : ?>
                 <?php
@@ -71,7 +73,7 @@ $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
                     <span class="manual-icon manual-intent-card__icon" aria-hidden="true"><?php echo manual_design_icon($intent_icon); ?></span>
                     <h3><?php echo esc_html($intent['title']); ?></h3>
                     <p><?php echo esc_html($intent['description']); ?></p>
-                    <span class="manual-intent-card__action"><?php esc_html_e('Aloita', 'instruction-manual'); ?> &rarr;</span>
+                    <span class="manual-intent-card__action"><?php esc_html_e('Aloita', 'instruction-manual'); ?><?php echo manual_link_arrow(); ?></span>
                 </a>
             <?php endforeach; ?>
         </div>
@@ -82,11 +84,13 @@ $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
     $first_path = $learning_paths[0];
 ?>
     <section id="polut" class="manual-paths-section" aria-labelledby="manual-paths-title">
-        <div class="manual-section-header">
-            <h2 id="manual-paths-title" class="manual-section-title"><?php esc_html_e('Suositeltu aloituspolku', 'instruction-manual'); ?></h2>
-            <a href="<?php echo esc_url($first_path['url']); ?>" class="manual-view-all"><?php esc_html_e('Näytä kaikki polut', 'instruction-manual'); ?> &rarr;</a>
+        <div class="manual-section-intro">
+            <div class="manual-section-header">
+                <h2 id="manual-paths-title" class="manual-section-title"><?php esc_html_e('Suositeltu aloituspolku', 'instruction-manual'); ?></h2>
+                <a href="<?php echo esc_url($first_path['url']); ?>" class="manual-view-all"><?php esc_html_e('Näytä kaikki polut', 'instruction-manual'); ?><?php echo manual_link_arrow(); ?></a>
+            </div>
+            <p class="manual-section-subtitle"><?php esc_html_e('Aloita tästä, jos olet uusi WordPress-käyttäjä.', 'instruction-manual'); ?></p>
         </div>
-        <p class="manual-section-subtitle"><?php esc_html_e('Aloita tästä, jos olet uusi WordPress-käyttäjä.', 'instruction-manual'); ?></p>
         <div class="manual-path-single">
             <div class="manual-path-single__marker">
                 <span class="manual-icon manual-path-single__icon" aria-hidden="true"><?php echo manual_design_icon('flag'); ?></span>
@@ -107,17 +111,19 @@ $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
                         </li>
                     <?php endforeach; ?>
                 </ol>
+                <a href="<?php echo esc_url($first_path['url']); ?>" class="manual-path-single__cta"><?php esc_html_e('Aloita polku', 'instruction-manual'); ?><?php echo manual_link_arrow(); ?></a>
             </div>
-            <a href="<?php echo esc_url($first_path['url']); ?>" class="manual-path-single__cta"><?php esc_html_e('Aloita polku', 'instruction-manual'); ?> &rarr;</a>
         </div>
     </section>
 <?php endif; ?>
 
 <?php if (!empty($featured)) : ?>
     <section class="manual-featured-section" aria-labelledby="manual-featured-title">
-        <div class="manual-section-header">
-            <h2 id="manual-featured-title" class="manual-section-title"><?php esc_html_e('Suosituimmat ohjeet', 'instruction-manual'); ?></h2>
-            <a href="<?php echo esc_url(manual_instruction_archive_url()); ?>" class="manual-view-all"><?php esc_html_e('Näytä kaikki ohjeet', 'instruction-manual'); ?> &rarr;</a>
+        <div class="manual-section-intro">
+            <div class="manual-section-header">
+                <h2 id="manual-featured-title" class="manual-section-title"><?php esc_html_e('Suosituimmat ohjeet', 'instruction-manual'); ?></h2>
+                <a href="<?php echo esc_url(manual_instruction_archive_url()); ?>" class="manual-view-all"><?php esc_html_e('Näytä kaikki ohjeet', 'instruction-manual'); ?><?php echo manual_link_arrow(); ?></a>
+            </div>
         </div>
         <div class="manual-tutorial-grid">
             <?php foreach ($featured as $featured_index => $tutorial) : ?>
@@ -143,7 +149,7 @@ $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
                             <?php endif; ?>
                         </div>
                     </div>
-                    <span class="manual-tutorial-card__action"><?php esc_html_e('Aloita', 'instruction-manual'); ?> &rarr;</span>
+                    <span class="manual-tutorial-card__action"><?php esc_html_e('Aloita', 'instruction-manual'); ?><?php echo manual_link_arrow(); ?></span>
                 </a>
             <?php endforeach; ?>
         </div>
@@ -151,12 +157,14 @@ $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
 <?php endif; ?>
 
 <section class="manual-glossary-strip-section" aria-labelledby="manual-glossary-strip-title">
-    <div class="manual-section-header">
-        <div>
-            <h2 id="manual-glossary-strip-title" class="manual-section-title"><?php esc_html_e('Sanasto', 'instruction-manual'); ?></h2>
-            <p class="manual-section-subtitle"><?php esc_html_e('Ymmärrä tärkeimmät käsitteet.', 'instruction-manual'); ?></p>
+    <div class="manual-section-intro">
+        <div class="manual-section-header">
+            <div class="manual-section-intro__titles">
+                <h2 id="manual-glossary-strip-title" class="manual-section-title"><?php esc_html_e('Sanasto', 'instruction-manual'); ?></h2>
+                <p class="manual-section-subtitle"><?php esc_html_e('Ymmärrä tärkeimmät käsitteet.', 'instruction-manual'); ?></p>
+            </div>
+            <a href="<?php echo esc_url(manual_glossary_url()); ?>" class="manual-view-all"><?php esc_html_e('Avaa sanasto', 'instruction-manual'); ?><?php echo manual_link_arrow(); ?></a>
         </div>
-        <a href="<?php echo esc_url(manual_glossary_url()); ?>" class="manual-view-all"><?php esc_html_e('Avaa sanasto', 'instruction-manual'); ?> &rarr;</a>
     </div>
     <dl class="manual-glossary-strip">
         <?php $glossary_item_index = 0; ?>

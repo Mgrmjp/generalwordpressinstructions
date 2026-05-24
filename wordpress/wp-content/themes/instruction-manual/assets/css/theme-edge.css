@@ -1,39 +1,5 @@
 /* Bold Edge public UI layer.
-   This file intentionally loads last and owns the public visual system. */
-
-:root {
-    --manual-canvas: #0a0f12;
-    --manual-paper: #f4f3ee;
-    --manual-surface: #ffffff;
-    --manual-panel: #ebece7;
-    --manual-ink: #0a0c0e;
-    --manual-muted: #56616b;
-    --manual-muted-light: #7b858f;
-    --manual-line: #0a0c0e;
-    --manual-line-strong: #0a0c0e;
-    --manual-spark: #2ef2c5;
-    --manual-spark-dim: #006f60;
-    --manual-accent: var(--manual-spark);
-    --manual-accent-strong: var(--manual-spark-dim);
-    --manual-accent-subtle: #dffbf5;
-    --manual-accent-hover: #25d9b0;
-    --manual-blue: #0877a8;
-    --manual-blue-subtle: #e0f2fb;
-    --manual-orange: #d95613;
-    --manual-orange-subtle: #fff0e7;
-    --manual-olive: #4b7c33;
-    --manual-olive-subtle: #edf5e6;
-    --manual-purple: #8b4fb0;
-    --manual-purple-subtle: #f0e8f6;
-    --manual-radius: 4px;
-    --manual-radius-sm: 3px;
-    --manual-radius-lg: 4px;
-    --manual-shadow-sm: 3px 3px 0 var(--manual-ink);
-    --manual-shadow: 5px 5px 0 var(--manual-ink);
-    --manual-shadow-lg: 8px 8px 0 var(--manual-ink), 0 24px 52px rgba(10, 12, 14, 0.18);
-    --manual-hard-shadow: 6px 6px 0 var(--manual-ink);
-    --manual-container: 1240px;
-}
+   Tokens: assets/css/design-tokens.css */
 
 html {
     scroll-behavior: smooth;
@@ -94,7 +60,6 @@ a:focus {
     font-weight: 900;
     letter-spacing: 0.08em;
     line-height: 1.08;
-    text-transform: uppercase;
 }
 
 .manual-nav {
@@ -110,7 +75,6 @@ a:focus {
     font-weight: 900;
     letter-spacing: 0.08em;
     line-height: 1;
-    text-transform: uppercase;
 }
 
 .manual-nav a {
@@ -228,7 +192,6 @@ a:focus {
     font-family: var(--manual-body);
     font-weight: 900;
     letter-spacing: 0.05em;
-    text-transform: uppercase;
 }
 
 .manual-search button:hover,
@@ -254,7 +217,6 @@ a:focus {
     font-size: 0.72rem;
     font-weight: 900;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
 }
 
 .manual-search-suggestions a {
@@ -274,7 +236,6 @@ a:focus {
     letter-spacing: 0.12em;
     line-height: 1.2;
     margin-bottom: 0.35rem;
-    text-transform: uppercase;
 }
 
 .manual-section-title::after {
@@ -296,7 +257,6 @@ a:focus {
     font-weight: 900;
     letter-spacing: 0.05em;
     text-decoration: none;
-    text-transform: uppercase;
 }
 
 .manual-view-all:hover,
@@ -334,7 +294,6 @@ a:focus {
     letter-spacing: 0.16em;
     line-height: 1;
     padding: 0.42rem 0.58rem;
-    text-transform: uppercase;
 }
 
 .manual-hero--home .manual-title,
@@ -475,7 +434,6 @@ a:focus {
     font-weight: 950;
     letter-spacing: 0.05em;
     text-decoration: none;
-    text-transform: uppercase;
 }
 
 .manual-intent-card__icon,
@@ -487,6 +445,12 @@ a:focus {
 .manual-intent-card--blue .manual-intent-card__action,
 .manual-tutorial-card--blue .manual-tutorial-card__icon {
     color: var(--manual-blue);
+}
+
+.manual-intent-card--green .manual-intent-card__icon,
+.manual-intent-card--green .manual-intent-card__action,
+.manual-tutorial-card--green .manual-tutorial-card__icon {
+    color: var(--manual-spark-dim);
 }
 
 .manual-intent-card--orange .manual-intent-card__icon,
@@ -524,7 +488,6 @@ a:focus {
     color: var(--manual-ink);
     font-weight: 900;
     letter-spacing: 0.05em;
-    text-transform: uppercase;
 }
 
 .manual-badge--difficulty,
@@ -602,7 +565,6 @@ a:focus {
     font-size: 0.72rem;
     font-weight: 950;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
 }
 
 .manual-library-search input[type="search"],
@@ -658,13 +620,13 @@ a:focus {
 }
 
 .manual-filter.is-active {
-    background: #12372d;
-    border-color: #12372d;
+    background: var(--manual-ink);
+    border-color: var(--manual-ink);
     color: #fff;
 }
 
 .manual-filter.is-active .manual-filter__count {
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(46, 242, 197, 0.22);
     color: #fff;
 }
 
@@ -724,7 +686,6 @@ a:focus {
     color: var(--manual-muted);
     font-weight: 900;
     letter-spacing: 0.05em;
-    text-transform: uppercase;
 }
 
 body.single-wp_instruction {
@@ -789,7 +750,6 @@ body.single-wp_instruction {
     color: #aeb8c4;
     font-weight: 950;
     letter-spacing: 0.06em;
-    text-transform: uppercase;
 }
 
 .single-wp_instruction .manual-progress a.is-active,
@@ -819,21 +779,11 @@ body.single-wp_instruction {
     font-weight: 950;
 }
 
-.single-wp_instruction .manual-quick-checklist,
 .single-wp_instruction .manual-check-box,
 .single-wp_instruction .manual-mistakes-box {
     border: 2px solid var(--manual-ink);
     border-radius: 2px;
     box-shadow: none;
-}
-
-.single-wp_instruction .manual-quick-checklist {
-    background: #f4f6f8;
-}
-
-.single-wp_instruction .manual-quick-checklist summary {
-    border-bottom-color: var(--manual-ink);
-    color: var(--manual-ink);
 }
 
 .single-wp_instruction .manual-check-box {
@@ -857,7 +807,6 @@ body.single-wp_instruction {
     color: #9aa5b1;
     font-weight: 950;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
 }
 
 .manual-doc-contents a,
@@ -914,7 +863,6 @@ body.single-wp_instruction {
     color: var(--manual-ink);
     font-weight: 950;
     letter-spacing: 0.06em;
-    text-transform: uppercase;
 }
 
 .manual-doc-aside__action:hover,
@@ -1034,18 +982,6 @@ body.single-wp_instruction {
     font-weight: 950;
 }
 
-html.manual-theme-dark {
-    --manual-paper: #070b0f;
-    --manual-surface: #121820;
-    --manual-panel: #19212b;
-    --manual-ink: #f4f7fa;
-    --manual-muted: #a8b3bf;
-    --manual-muted-light: #8f9aa6;
-    --manual-line: rgba(244, 247, 250, 0.28);
-    --manual-line-strong: rgba(244, 247, 250, 0.42);
-    --manual-accent-strong: var(--manual-spark);
-}
-
 html.manual-theme-dark body {
     background: linear-gradient(180deg, #050708 0%, #0b1016 100%);
     color: var(--manual-ink);
@@ -1107,7 +1043,12 @@ html.manual-theme-dark .manual-glossary-search input[type="search"] {
 html.manual-theme-dark .manual-filter.is-active {
     background: var(--manual-spark);
     border-color: var(--manual-spark);
-    color: #0a0c0e;
+    color: var(--manual-ink);
+}
+
+html.manual-theme-dark .manual-filter.is-active .manual-filter__count {
+    background: rgba(10, 12, 14, 0.18);
+    color: var(--manual-ink);
 }
 
 html.manual-theme-dark .manual-search button,
@@ -1287,8 +1228,7 @@ html.manual-theme-dark body.single-wp_instruction .manual-mistakes-box .manual-c
         min-height: 0;
     }
 
-    .manual-search,
-    .manual-hero-search form {
+    .manual-search {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
     }
@@ -1369,13 +1309,11 @@ html.manual-theme-dark body.single-wp_instruction .manual-mistakes-box .manual-c
         width: min(100% - 1.5rem, var(--manual-container));
     }
 
-    .manual-search,
-    .manual-hero-search form {
+    .manual-search {
         grid-template-columns: 1fr;
     }
 
-    .manual-search button,
-    .manual-hero-search button {
+    .manual-search button {
         width: 100%;
     }
 

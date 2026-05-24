@@ -137,7 +137,7 @@ if (is_tax('instruction_category')) {
                                     <span><?php echo esc_html($lang_label); ?></span>
                                 </div>
                             </div>
-                            <a class="manual-doc-row__link" href="<?php echo esc_url(get_permalink($post_id)); ?>"><?php esc_html_e('Aloita', 'instruction-manual'); ?> &rarr;</a>
+                            <a class="manual-doc-row__link" href="<?php echo esc_url(get_permalink($post_id)); ?>"><?php esc_html_e('Aloita', 'instruction-manual'); ?><?php echo manual_link_arrow(); ?></a>
                         </article>
                     <?php endforeach; ?>
                 </div>

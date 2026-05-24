@@ -40,7 +40,7 @@ $term_count = count($terms);
                 <a href="#sanasto-<?php echo esc_attr(sanitize_title($letter)); ?>"><?php echo esc_html($letter); ?></a>
             <?php endforeach; ?>
         </nav>
-        <a class="manual-glossary-guides-link" href="<?php echo esc_url(manual_instruction_archive_url()); ?>"><?php esc_html_e('Avaa kaikki ohjeet', 'instruction-manual'); ?> &rarr;</a>
+        <a class="manual-glossary-guides-link" href="<?php echo esc_url(manual_instruction_archive_url()); ?>"><?php esc_html_e('Avaa kaikki ohjeet', 'instruction-manual'); ?><?php echo manual_link_arrow(); ?></a>
     </aside>
 
     <section class="manual-glossary-content" aria-labelledby="manual-glossary-content-title">
@@ -94,7 +94,7 @@ $term_count = count($terms);
                             >
                                 <dt><?php echo esc_html($term); ?></dt>
                                 <dd><?php echo esc_html($definition); ?></dd>
-                                <a href="<?php echo esc_url($related_url); ?>"><?php esc_html_e('Ohjeet termistä', 'instruction-manual'); ?> &rarr;</a>
+                                <a href="<?php echo esc_url($related_url); ?>"><?php esc_html_e('Ohjeet termistä', 'instruction-manual'); ?><?php echo manual_link_arrow(); ?></a>
                             </div>
                         <?php endforeach; ?>
                     </dl>

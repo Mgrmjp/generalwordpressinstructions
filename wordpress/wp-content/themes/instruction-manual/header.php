@@ -76,32 +76,38 @@ if (is_singular('wp_instruction')) {
             <span class="manual-brand__title"><?php echo esc_html($manual_header_text['brand']); ?></span>
             <span class="manual-brand__tagline"><?php echo esc_html($manual_header_text['tagline']); ?></span>
         </a>
-        <nav class="manual-nav" aria-label="<?php echo esc_attr($manual_header_text['nav']); ?>">
-            <a href="<?php echo esc_url(home_url('/')); ?>"<?php echo is_front_page() ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['start']); ?></a>
-            <a href="<?php echo esc_url(manual_instruction_archive_url()); ?>"<?php echo $manual_is_instruction_library ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['guides']); ?></a>
-            <a href="<?php echo esc_url(home_url('/#polut')); ?>"><?php echo esc_html($manual_header_text['paths']); ?></a>
-            <a href="<?php echo esc_url(manual_glossary_url()); ?>"<?php echo $manual_is_glossary ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['glossary']); ?></a>
-            <?php if (current_user_can('edit_posts')) : ?>
-                <a href="<?php echo esc_url(admin_url('edit.php?post_type=wp_instruction')); ?>"><?php echo esc_html($manual_header_text['admin']); ?></a>
-            <?php endif; ?>
-            <a href="<?php echo esc_url($manual_language_switch_url); ?>" class="manual-lang-switch" aria-label="<?php echo esc_attr($manual_header_text['switch_label']); ?>"><?php echo esc_html($manual_header_text['language']); ?></a>
-            <button
-                type="button"
-                class="manual-theme-toggle"
-                data-manual-theme-toggle
-                data-label-dark="<?php echo esc_attr($manual_header_text['theme_light']); ?>"
-                data-label-light="<?php echo esc_attr($manual_header_text['theme_dark']); ?>"
-                aria-pressed="false"
-            ><?php echo esc_html($manual_header_text['theme_dark']); ?></button>
-        </nav>
-        <form class="manual-search" role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
-            <label class="screen-reader-text" for="manual-search-input"><?php echo esc_html($manual_header_text['search_label']); ?></label>
-            <span class="manual-search-field">
-                <input type="search" id="manual-search-input" name="s" placeholder="<?php echo esc_attr($manual_header_text['search_placeholder']); ?>" value="<?php echo esc_attr(get_search_query()); ?>">
-            </span>
-            <input type="hidden" name="post_type" value="wp_instruction">
-            <button type="submit"><?php echo esc_html($manual_header_text['search_button']); ?></button>
-        </form>
+        <div class="manual-site-header__toolbar">
+            <nav class="manual-nav" aria-label="<?php echo esc_attr($manual_header_text['nav']); ?>">
+                <div class="manual-nav__links">
+                    <a href="<?php echo esc_url(home_url('/')); ?>"<?php echo is_front_page() ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['start']); ?></a>
+                    <a href="<?php echo esc_url(manual_instruction_archive_url()); ?>"<?php echo $manual_is_instruction_library ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['guides']); ?></a>
+                    <a href="<?php echo esc_url(home_url('/#polut')); ?>"><?php echo esc_html($manual_header_text['paths']); ?></a>
+                    <a href="<?php echo esc_url(manual_glossary_url()); ?>"<?php echo $manual_is_glossary ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['glossary']); ?></a>
+                    <?php if (current_user_can('edit_posts')) : ?>
+                        <a href="<?php echo esc_url(admin_url('edit.php?post_type=wp_instruction')); ?>"><?php echo esc_html($manual_header_text['admin']); ?></a>
+                    <?php endif; ?>
+                </div>
+                <div class="manual-nav__tools">
+                    <a href="<?php echo esc_url($manual_language_switch_url); ?>" class="manual-lang-switch" aria-label="<?php echo esc_attr($manual_header_text['switch_label']); ?>"><?php echo esc_html($manual_header_text['language']); ?></a>
+                    <button
+                        type="button"
+                        class="manual-theme-toggle"
+                        data-manual-theme-toggle
+                        data-label-dark="<?php echo esc_attr($manual_header_text['theme_light']); ?>"
+                        data-label-light="<?php echo esc_attr($manual_header_text['theme_dark']); ?>"
+                        aria-pressed="false"
+                    ><?php echo esc_html($manual_header_text['theme_dark']); ?></button>
+                </div>
+            </nav>
+            <form class="manual-search" role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
+                <label class="screen-reader-text" for="manual-search-input"><?php echo esc_html($manual_header_text['search_label']); ?></label>
+                <span class="manual-search-field">
+                    <input type="search" id="manual-search-input" name="s" placeholder="<?php echo esc_attr($manual_header_text['search_placeholder']); ?>" value="<?php echo esc_attr(get_search_query()); ?>">
+                </span>
+                <input type="hidden" name="post_type" value="wp_instruction">
+                <button type="submit"><?php echo esc_html($manual_header_text['search_button']); ?></button>
+            </form>
+        </div>
     </div>
 </header>
 <main id="main" class="manual-main">

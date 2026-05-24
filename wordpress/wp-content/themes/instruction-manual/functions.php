@@ -6,6 +6,8 @@ if (!defined('ABSPATH')) {
 
 add_action('after_setup_theme', 'manual_setup');
 add_action('wp_enqueue_scripts', 'manual_enqueue_assets');
+add_action('enqueue_block_assets', 'manual_register_design_tokens');
+add_action('wp_enqueue_scripts', 'manual_enqueue_surface_after_plugin', 100);
 add_action('init', 'manual_register_static_routes');
 add_action('init', 'manual_flush_static_routes_if_needed', 20);
 add_action('rest_api_init', 'manual_register_instruction_rest_routes');
@@ -88,36 +90,57 @@ function manual_setup(): void
     ]);
 }
 
+function manual_register_design_tokens(): void
+{
+    $tokens_path = get_template_directory() . '/assets/css/design-tokens.css';
+
+    if (!file_exists($tokens_path)) {
+        return;
+    }
+
+    wp_register_style(
+        'instruction-manual-tokens',
+        get_template_directory_uri() . '/assets/css/design-tokens.css',
+        [],
+        (string) filemtime($tokens_path)
+    );
+}
+
 function manual_enqueue_assets(): void
 {
-    wp_enqueue_style('general-sans', 'https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap', [], null);
-    wp_enqueue_style('instruction-manual', get_stylesheet_uri(), ['general-sans'], wp_get_theme()->get('Version'));
+    $fonts_path = get_template_directory() . '/assets/css/fonts-mona-sans.css';
+
+    if (file_exists($fonts_path)) {
+        wp_enqueue_style(
+            'instruction-manual-fonts',
+            get_template_directory_uri() . '/assets/css/fonts-mona-sans.css',
+            [],
+            (string) filemtime($fonts_path)
+        );
+    }
+
+    manual_register_design_tokens();
+
+    $style_dependencies = wp_style_is('instruction-manual-fonts', 'enqueued') ? ['instruction-manual-fonts'] : [];
+
+    if (wp_style_is('instruction-manual-tokens', 'registered')) {
+        wp_enqueue_style('instruction-manual-tokens');
+        $style_dependencies[] = 'instruction-manual-tokens';
+    }
+
+    wp_enqueue_style('instruction-manual', get_stylesheet_uri(), $style_dependencies, wp_get_theme()->get('Version'));
 
     $script_path = get_template_directory() . '/assets/js/manual-app.js';
     $style_dependencies = ['instruction-manual'];
 
-    if (is_singular('wp_instruction')) {
-        $reader_css = get_template_directory() . '/assets/css/instruction-reader.css';
+    $surface_css = get_template_directory() . '/assets/css/theme-surface.css';
 
-        if (file_exists($reader_css)) {
-            wp_enqueue_style(
-                'instruction-manual-reader',
-                get_template_directory_uri() . '/assets/css/instruction-reader.css',
-                ['instruction-manual'],
-                (string) filemtime($reader_css)
-            );
-            $style_dependencies[] = 'instruction-manual-reader';
-        }
-    }
-
-    $edge_css = get_template_directory() . '/assets/css/theme-edge.css';
-
-    if (file_exists($edge_css)) {
+    if (file_exists($surface_css)) {
         wp_enqueue_style(
-            'instruction-manual-edge',
-            get_template_directory_uri() . '/assets/css/theme-edge.css',
+            'instruction-manual-surface',
+            get_template_directory_uri() . '/assets/css/theme-surface.css',
             $style_dependencies,
-            (string) filemtime($edge_css)
+            (string) filemtime($surface_css)
         );
     }
 
@@ -131,6 +154,36 @@ function manual_enqueue_assets(): void
         );
         wp_localize_script('instruction-manual-app', 'manualApp', manual_app_config());
     }
+}
+
+function manual_enqueue_surface_after_plugin(): void
+{
+    if (!wp_style_is('instruction-manual-surface', 'enqueued')) {
+        return;
+    }
+
+    $surface_path = get_template_directory() . '/assets/css/theme-surface.css';
+
+    if (!file_exists($surface_path)) {
+        return;
+    }
+
+    $dependencies = ['instruction-manual'];
+
+    if (wp_style_is('gwi-instructions', 'registered')) {
+        wp_enqueue_style('gwi-instructions');
+        $dependencies[] = 'gwi-instructions';
+    }
+
+    wp_dequeue_style('instruction-manual-surface');
+    wp_deregister_style('instruction-manual-surface');
+
+    wp_enqueue_style(
+        'instruction-manual-surface',
+        get_template_directory_uri() . '/assets/css/theme-surface.css',
+        $dependencies,
+        (string) filemtime($surface_path)
+    );
 }
 
 function manual_app_config(): array
@@ -193,6 +246,7 @@ function manual_app_config(): array
         'currentLanguage' => $current_language,
         'groups' => $groups,
         'labels' => $labels,
+        'linkArrowHtml' => manual_link_arrow(),
     ];
 }
 
@@ -385,11 +439,20 @@ function manual_design_icon(string $icon): string
         'theme' => $svg('<path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>'),
         'plugin' => $svg('<path d="M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z"/>'),
         'field' => $svg('<path d="M13 5h8"/><path d="M13 12h8"/><path d="M13 19h8"/><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/>'),
+        'arrow-right' => $svg('<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>'),
     ];
     $icons['edit'] = $icons['pen'];
     $icons['build'] = $icons['layout'];
 
     return $icons[$icon] ?? $icons['content'];
+}
+
+/**
+ * Decorative arrow for link CTAs (paired with manual-link-cta styles).
+ */
+function manual_link_arrow(): string
+{
+    return '<span class="manual-link-arrow" aria-hidden="true">' . manual_design_icon('arrow-right') . '</span>';
 }
 
 function manual_instruction_language_code(int $post_id): string

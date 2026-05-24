@@ -15,7 +15,6 @@
     font-weight: 800;
     letter-spacing: 0.08em;
     padding: 0 0.45rem;
-    text-transform: uppercase;
 }
 
 .gwi-language-switcher__item {
@@ -154,7 +153,6 @@
 .gwi-highlighted-screenshot__note strong {
     font-size: 0.76rem;
     letter-spacing: 0.06em;
-    text-transform: uppercase;
 }
 
 .gwi-highlighted-screenshot__note span {
@@ -452,7 +450,6 @@ html.gwi-screenshot-lightbox-open {
     font-weight: 800;
     letter-spacing: 0.05em;
     margin: 0;
-    text-transform: uppercase;
 }
 
 .gwi-callout__body {
@@ -583,139 +580,4 @@ html.gwi-screenshot-lightbox-open {
     .gwi-step-list__item::after {
         left: 1.2rem;
     }
-}
-
-/* Edge mode on single instruction pages */
-
-body.single-wp_instruction .gwi-step-list {
-    background: #fff;
-    border: 2px solid #0a0c0e;
-    border-radius: 2px;
-    box-shadow: 8px 8px 0 #0a0c0e;
-    margin: 2.75rem 0;
-}
-
-body.single-wp_instruction .gwi-step-list__header {
-    border-bottom: 2px solid #0a0c0e;
-}
-
-body.single-wp_instruction .gwi-step-list__title {
-    color: #0a0c0e;
-    font-size: clamp(1.35rem, 2.4vw, 1.75rem);
-    font-weight: 900;
-    letter-spacing: -0.03em;
-    text-transform: uppercase;
-}
-
-body.single-wp_instruction .gwi-step-list__subtitle {
-    color: #5c6570;
-    font-weight: 600;
-}
-
-body.single-wp_instruction .gwi-step-list__item::after {
-    background: #0a0c0e;
-    width: 2px;
-}
-
-body.single-wp_instruction .gwi-step-list__marker {
-    background: #0a0c0e;
-    border-radius: 2px;
-    box-shadow: inset 0 0 0 2px #2ef2c5;
-    color: #2ef2c5;
-    font-weight: 900;
-}
-
-body.single-wp_instruction .gwi-step-list__item.is-complete .gwi-step-list__marker {
-    background: #168a4a;
-    box-shadow: none;
-    color: #fff;
-}
-
-body.single-wp_instruction .manual-step-toggle {
-    background: #0a0c0e;
-    border: 1px solid #2ef2c5;
-    border-radius: 2px;
-    color: #2ef2c5;
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
-
-body.single-wp_instruction .manual-step-toggle:hover,
-body.single-wp_instruction .manual-step-toggle:focus {
-    background: #2ef2c5;
-    color: #0a0c0e;
-}
-
-body.single-wp_instruction .gwi-callout {
-    border: 2px solid #0a0c0e;
-    border-radius: 2px;
-    box-shadow: 5px 5px 0 #0a0c0e;
-}
-
-body.single-wp_instruction .gwi-callout--note {
-    background: #e8faf7;
-    border-left: 6px solid #13766d;
-}
-
-body.single-wp_instruction .gwi-callout--warning {
-    background: #fff0e5;
-    border-left: 6px solid #ea580c;
-}
-
-body.single-wp_instruction .gwi-callout--success {
-    background: #e9fcef;
-    border-left: 6px solid #16a34a;
-}
-
-body.single-wp_instruction .gwi-callout__label {
-    font-size: 0.72rem;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-}
-
-body.single-wp_instruction .gwi-callout__icon {
-    border-radius: 2px;
-}
-
-body.single-wp_instruction .gwi-callout__icon--note {
-    background: #13766d;
-}
-
-body.single-wp_instruction .gwi-highlighted-screenshot__note {
-    background: #0a0c0e;
-    border: 0;
-    border-radius: 0;
-    color: #2ef2c5;
-}
-
-body.single-wp_instruction .gwi-highlighted-screenshot__note span {
-    color: #f4f7fa;
-    font-weight: 600;
-}
-
-body.single-wp_instruction .gwi-highlighted-screenshot__note strong {
-    color: #2ef2c5;
-    letter-spacing: 0.12em;
-}
-
-body.single-wp_instruction .gwi-highlighted-screenshot__frame,
-body.single-wp_instruction .gwi-acf-screenshot-step__frame,
-body.single-wp_instruction .gwi-flexible-screenshot__frame {
-    border: 2px solid #0a0c0e;
-    border-radius: 2px;
-    box-shadow:
-        8px 8px 0 #0a0c0e,
-        0 20px 40px rgba(0, 0, 0, 0.35);
-}
-
-body.single-wp_instruction .gwi-screenshot-lightbox__panel {
-    border: 2px solid #2ef2c5;
-    border-radius: 2px;
-}
-
-body.single-wp_instruction .gwi-screenshot-lightbox__view.is-active {
-    background: #2ef2c5;
-    border-color: #2ef2c5;
-    color: #0a0c0e;
 }

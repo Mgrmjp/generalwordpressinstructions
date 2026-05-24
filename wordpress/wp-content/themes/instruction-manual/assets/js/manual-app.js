@@ -82,7 +82,7 @@
             '<span>' + escapeHtml(item.languageLabel) + '</span>',
             '</div>',
             '</div>',
-            '<a class="manual-doc-row__link" href="' + escapeHtml(item.url) + '">' + escapeHtml(labels.start || 'Open guide') + '</a>',
+            '<a class="manual-doc-row__link" href="' + escapeHtml(item.url) + '">' + escapeHtml(labels.start || 'Open guide') + (config.linkArrowHtml || '') + '</a>',
             '</article>',
         ].join('');
     }
@@ -477,7 +477,7 @@
         var here = document.querySelector('[data-manual-you-are-here]');
         var hereLabel = document.querySelector('[data-manual-you-are-here-label]');
 
-        if (!sections.length || !links.length || !window.IntersectionObserver) {
+        if (!sections.length || !links.length) {
             return;
         }
 
@@ -502,24 +502,53 @@
             }
         }
 
-        var observer = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                    setActive(entry.target.id);
+        function resolveActiveSectionId() {
+            var scrollY = window.scrollY || window.pageYOffset;
+            var viewportHeight = window.innerHeight;
+            var documentHeight = Math.max(
+                document.documentElement.scrollHeight,
+                document.body ? document.body.scrollHeight : 0
+            );
+            var bottomSlack = 64;
+            var headingLine = Math.round(viewportHeight * 0.22);
+            var lastSection = sections[sections.length - 1];
+
+            if (lastSection && scrollY + viewportHeight >= documentHeight - bottomSlack) {
+                return lastSection.id;
+            }
+
+            var activeId = sections[0].id;
+
+            sections.forEach(function (section) {
+                if (section.getBoundingClientRect().top <= headingLine) {
+                    activeId = section.id;
                 }
             });
-        }, {
-            rootMargin: '-20% 0px -65% 0px',
-            threshold: 0.01,
-        });
 
-        sections.forEach(function (section) {
-            observer.observe(section);
-        });
-
-        if (sections[0]) {
-            setActive(sections[0].id);
+            return activeId;
         }
+
+        var scrollTicking = false;
+
+        function updateActiveSection() {
+            setActive(resolveActiveSectionId());
+        }
+
+        function onScrollOrResize() {
+            if (scrollTicking) {
+                return;
+            }
+
+            scrollTicking = true;
+            window.requestAnimationFrame(function () {
+                updateActiveSection();
+                scrollTicking = false;
+            });
+        }
+
+        window.addEventListener('scroll', onScrollOrResize, { passive: true });
+        window.addEventListener('resize', onScrollOrResize, { passive: true });
+        updateActiveSection();
     }
 
     function initCodeCopy() {

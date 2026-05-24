@@ -12,6 +12,7 @@
     "screenshots:all": "npm run screenshots:en && npm run screenshots:fi && npm run screenshots:import && npm run screenshots:link"
   },
   "devDependencies": {
+    "@fontsource-variable/mona-sans": "^5.2.8",
     "@playwright/test": "^1.44.0"
   }
 }
