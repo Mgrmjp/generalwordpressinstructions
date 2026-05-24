@@ -2,7 +2,7 @@
 /**
  * Plugin Name: General WordPress Instructions
  * Description: Bilingual WordPress instruction system with highlighted screenshots, native blocks, ACF blocks, and Flexible Content support.
- * Version: 0.1.2
+ * Version: 0.1.3
  * Author: General WordPress Instructions
  * Text Domain: general-wp-instructions
  */
@@ -11,13 +11,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GWI_VERSION', '0.1.2');
+define('GWI_VERSION', '0.1.3');
 define('GWI_PLUGIN_FILE', __FILE__);
 define('GWI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('GWI_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 require_once GWI_PLUGIN_DIR . 'includes/post-type.php';
 require_once GWI_PLUGIN_DIR . 'includes/language-switcher.php';
+require_once GWI_PLUGIN_DIR . 'includes/callout.php';
 require_once GWI_PLUGIN_DIR . 'includes/blocks.php';
 require_once GWI_PLUGIN_DIR . 'includes/acf.php';
 require_once GWI_PLUGIN_DIR . 'includes/seed-content.php';

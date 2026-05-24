@@ -21,7 +21,14 @@ if ($image_url === '') {
 ?>
 <figure class="gwi-acf-screenshot-step">
     <div class="gwi-acf-screenshot-step__frame">
-        <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($image_alt); ?>" loading="lazy">
+        <?php
+        gwi_render_expandable_screenshot([
+            'detail_url' => $image_url,
+            'alt' => $image_alt,
+            'caption' => trim($highlight_label . ' ' . $action),
+            'frame_class' => 'gwi-screenshot-expandable__frame',
+        ]);
+        ?>
     </div>
     <?php if ($action !== '' || $highlight_label !== '') : ?>
         <figcaption>

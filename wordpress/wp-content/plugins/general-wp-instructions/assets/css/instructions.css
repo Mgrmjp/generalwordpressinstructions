@@ -38,51 +38,107 @@
 }
 
 .gwi-step-list {
-    background: var(--manual-paper, #f6f8fb);
+    background: var(--manual-surface, #fff);
     border: 1px solid var(--manual-line, #d7dee8);
-    border-radius: 8px;
-    margin: 2rem 0;
-    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: var(--manual-shadow-sm, 0 1px 2px rgba(23, 21, 20, 0.06));
+    margin: 2.5rem 0;
+    padding: 1.75rem 1.5rem 1.5rem;
+}
+
+.gwi-step-list__header {
+    border-bottom: 1px solid var(--manual-line, #ded5c7);
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
 }
 
 .gwi-step-list__title {
-    font-size: 1.35rem;
-    margin: 0 0 1rem;
+    color: var(--manual-accent-strong, #0b544e);
+    font-size: clamp(1.5rem, 2.5vw, 1.95rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0;
+}
+
+.gwi-step-list__subtitle {
+    color: var(--manual-muted, #625f5a);
+    font-size: 1rem;
+    line-height: 1.55;
+    margin: 0.55rem 0 0;
+    max-width: 40rem;
 }
 
 .gwi-step-list__items {
-    counter-reset: gwi-step;
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
 .gwi-step-list__item {
-    align-items: flex-start;
-    counter-increment: gwi-step;
+    align-items: start;
     display: grid;
-    gap: 0.85rem;
-    grid-template-columns: 2.25rem 1fr;
-    margin-top: 0.85rem;
+    gap: 0.35rem 1.1rem;
+    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+    padding: 1.15rem 0;
+    position: relative;
 }
 
-.gwi-step-list__item::before {
+.gwi-step-list__item + .gwi-step-list__item {
+    border-top: 1px solid var(--manual-line, #ded5c7);
+}
+
+.gwi-step-list__item::after {
+    background: var(--manual-accent-subtle, #dff2ee);
+    bottom: -1px;
+    content: "";
+    left: 1.35rem;
+    position: absolute;
+    top: 2.85rem;
+    width: 3px;
+    z-index: 0;
+}
+
+.gwi-step-list__item:last-child::after {
+    display: none;
+}
+
+.gwi-step-list__marker {
     align-items: center;
-    background: var(--manual-accent, #2563eb);
+    background: var(--manual-accent-strong, #0b544e);
     border-radius: 50%;
     color: #fff;
-    content: counter(gwi-step);
     display: inline-flex;
-    font-weight: 900;
-    height: 2.25rem;
+    font-size: 0.92rem;
+    font-weight: 800;
+    height: 2.75rem;
     justify-content: center;
-    width: 2.25rem;
+    position: relative;
+    width: 2.75rem;
+    z-index: 1;
+}
+
+.gwi-step-list__text {
+    color: var(--manual-ink, #171514);
+    font-size: 1.02rem;
+    line-height: 1.65;
+    padding-top: 0.35rem;
+}
+
+.gwi-step-list__item.is-complete .gwi-step-list__marker {
+    background: #168a4a;
+}
+
+.gwi-step-list__item.is-complete .gwi-step-list__text {
+    color: var(--manual-muted, #625f5a);
+    text-decoration: line-through;
 }
 
 .gwi-highlighted-screenshot,
 .gwi-acf-screenshot-step,
 .gwi-flexible-screenshot {
-    margin: 2rem 0;
+    margin: 2.75rem 0;
+    max-width: none;
 }
 
 .gwi-highlighted-screenshot__note {
@@ -112,10 +168,12 @@
 .gwi-flexible-screenshot__frame {
     background: #111827;
     border: 1px solid #111827;
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: var(--manual-shadow-lg, 0 18px 44px rgba(23, 21, 20, 0.13));
+    line-height: 0;
     overflow: hidden;
     position: relative;
-    min-height: 20rem;
+    min-height: 0;
 }
 
 .gwi-highlighted-screenshot__frame img,
@@ -124,7 +182,7 @@
     object-fit: contain;
     width: 100%;
     height: auto;
-    min-height: 20rem;
+    min-height: 0;
 }
 
 .gwi-highlighted-screenshot__note + .gwi-highlighted-screenshot__frame {
@@ -133,18 +191,101 @@
 
 .gwi-highlighted-screenshot img,
 .gwi-acf-screenshot-step img,
-.gwi-flexible-screenshot img {
+.gwi-flexible-screenshot img,
+.gwi-screenshot-expandable img {
     display: block;
     height: auto;
     width: 100%;
 }
 
-.gwi-highlighted-screenshot__box {
-    border: 4px solid #facc15;
-    border-radius: 6px;
-    box-shadow: 0 0 0 3px #111827, 0 0 0 9px rgba(250, 204, 21, 0.34);
+.gwi-screenshot-expandable {
+    background: none;
+    border: 0;
+    cursor: zoom-in;
+    display: block;
+    padding: 0;
+    position: relative;
+    text-align: left;
+    width: 100%;
+}
+
+.gwi-screenshot-expandable:focus-visible {
+    outline: 3px solid var(--manual-accent-strong, #004f48);
+    outline-offset: 3px;
+}
+
+.gwi-highlighted-screenshot__expand,
+.gwi-screenshot-expandable__frame {
+    display: block;
+    line-height: 0;
+    position: relative;
+    width: 100%;
+}
+
+.gwi-screenshot-expandable__badge {
+    align-items: center;
+    background: rgba(17, 24, 39, 0.82);
+    border-radius: 999px;
+    bottom: 0.75rem;
+    color: #fff;
+    display: inline-flex;
+    font-size: 0.82rem;
+    font-weight: 700;
+    gap: 0.4rem;
+    opacity: 0;
+    padding: 0.4rem 0.7rem;
     pointer-events: none;
     position: absolute;
+    right: 0.75rem;
+    transition: opacity 0.18s ease;
+}
+
+.gwi-screenshot-expandable:hover .gwi-screenshot-expandable__badge,
+.gwi-screenshot-expandable:focus-visible .gwi-screenshot-expandable__badge {
+    opacity: 1;
+}
+
+.gwi-screenshot-expandable__badge-icon {
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    display: inline-block;
+    height: 0.85rem;
+    position: relative;
+    width: 0.85rem;
+}
+
+.gwi-screenshot-expandable__badge-icon::before,
+.gwi-screenshot-expandable__badge-icon::after {
+    background: currentColor;
+    content: "";
+    position: absolute;
+}
+
+.gwi-screenshot-expandable__badge-icon::before {
+    height: 2px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+}
+
+.gwi-screenshot-expandable__badge-icon::after {
+    height: 60%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+}
+
+.gwi-highlighted-screenshot__box {
+    border: 3px solid #facc15;
+    border-radius: 6px;
+    box-shadow:
+        0 0 0 2px #111827,
+        0 0 0 9999px rgba(17, 24, 39, 0.45);
+    pointer-events: none;
+    position: absolute;
+    z-index: 2;
 }
 
 .gwi-highlighted-screenshot__label {
@@ -170,26 +311,228 @@
     margin-top: 0.75rem;
 }
 
-.gwi-callout,
-.gwi-flexible-callout {
-    background: #eff6ff;
-    border: 1px solid #9cc4ff;
-    border-left-width: 0.35rem;
+html.gwi-screenshot-lightbox-open {
+    overflow: hidden;
+}
+
+.gwi-screenshot-lightbox {
+    align-items: center;
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    padding: 1rem;
+    position: fixed;
+    z-index: 100000;
+}
+
+.gwi-screenshot-lightbox[hidden] {
+    display: none;
+}
+
+.gwi-screenshot-lightbox__backdrop {
+    background: rgba(15, 23, 42, 0.78);
+    inset: 0;
+    position: absolute;
+}
+
+.gwi-screenshot-lightbox__panel {
+    background: #f8fafc;
+    border-radius: 12px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+    display: grid;
+    gap: 0.75rem;
+    max-height: calc(100vh - 2rem);
+    max-width: min(96vw, 1600px);
+    overflow: hidden;
+    position: relative;
+    width: min(96vw, 1600px);
+    z-index: 1;
+}
+
+.gwi-screenshot-lightbox__header {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: space-between;
+    padding: 0.85rem 1rem 0;
+}
+
+.gwi-screenshot-lightbox__title {
+    color: #0f172a;
+    flex: 1 1 12rem;
+    font-size: 0.95rem;
+    font-weight: 650;
+    margin: 0;
+}
+
+.gwi-screenshot-lightbox__views {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.gwi-screenshot-lightbox__view {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    color: #0f172a;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 650;
+    padding: 0.35rem 0.75rem;
+}
+
+.gwi-screenshot-lightbox__view.is-active {
+    background: #004f48;
+    border-color: #004f48;
+    color: #fff;
+}
+
+.gwi-screenshot-lightbox__close {
+    background: #111827;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.45rem 0.85rem;
+}
+
+.gwi-screenshot-lightbox__stage {
+    background: #111827;
+    line-height: 0;
+    overflow: auto;
+    padding: 0.75rem;
+}
+
+.gwi-screenshot-lightbox__image {
+    display: block;
+    height: auto;
+    margin: 0 auto;
+    max-height: calc(100vh - 8rem);
+    max-width: 100%;
+    width: auto;
+}
+
+.gwi-callout {
+    border: 1px solid transparent;
+    border-radius: 12px;
+    margin: 2rem 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+.gwi-callout--note {
+    background: #edf8f6;
+    border-color: rgba(19, 118, 109, 0.28);
+}
+
+.gwi-callout--warning {
+    background: #fff4eb;
+    border-color: rgba(180, 83, 9, 0.35);
+}
+
+.gwi-callout--success {
+    background: #effaf3;
+    border-color: rgba(22, 138, 74, 0.32);
+}
+
+.gwi-callout__header {
+    align-items: center;
+    display: flex;
+    gap: 0.65rem;
+    padding: 0.85rem 1.15rem 0;
+}
+
+.gwi-callout__label {
+    color: var(--manual-ink, #171514);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.gwi-callout__body {
+    color: var(--manual-ink, #171514);
+    font-size: 1rem;
+    line-height: 1.65;
+    padding: 0.5rem 1.15rem 1.1rem;
+}
+
+.gwi-callout__body p {
+    margin: 0 0 0.75rem;
+}
+
+.gwi-callout__body p:last-child {
+    margin-bottom: 0;
+}
+
+.gwi-callout__icon {
+    background: var(--manual-accent-strong, #0b544e);
     border-radius: 8px;
-    margin: 1.5rem 0;
-    padding: 1rem 1.15rem;
+    flex-shrink: 0;
+    height: 1.65rem;
+    position: relative;
+    width: 1.65rem;
 }
 
-.gwi-callout--warning,
-.gwi-flexible-callout--warning {
-    background: #fff7ed;
-    border-color: #fb923c;
+.gwi-callout__icon--warning {
+    background: #c2410c;
 }
 
-.gwi-callout--success,
-.gwi-flexible-callout--success {
-    background: #ecfdf3;
-    border-color: #34d399;
+.gwi-callout__icon--success {
+    background: #168a4a;
+}
+
+.gwi-callout__icon--note::before {
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 12px 0 0 #fff;
+    content: "";
+    height: 0.35rem;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-85%, -50%);
+    width: 0.35rem;
+}
+
+.gwi-callout__icon--warning::before {
+    border-left: 0.4rem solid transparent;
+    border-right: 0.4rem solid transparent;
+    border-bottom: 0.7rem solid #fff;
+    content: "";
+    left: 50%;
+    position: absolute;
+    top: 0.28rem;
+    transform: translateX(-50%);
+}
+
+.gwi-callout__icon--warning::after {
+    background: #fff;
+    border-radius: 1px;
+    bottom: 0.3rem;
+    content: "";
+    height: 0.45rem;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+    width: 0.14rem;
+}
+
+.gwi-callout__icon--success::before {
+    border: solid #fff;
+    border-width: 0 0 0.14rem 0.14rem;
+    content: "";
+    height: 0.45rem;
+    left: 50%;
+    position: absolute;
+    top: 0.42rem;
+    transform: translate(-55%, -15%) rotate(-45deg);
+    width: 0.75rem;
 }
 
 .gwi-editor-card {
@@ -232,4 +575,147 @@
     .gwi-language-switcher__label {
         padding-top: 0.45rem;
     }
+
+    .gwi-step-list__item {
+        grid-template-columns: 2.5rem minmax(0, 1fr);
+    }
+
+    .gwi-step-list__item::after {
+        left: 1.2rem;
+    }
+}
+
+/* Edge mode on single instruction pages */
+
+body.single-wp_instruction .gwi-step-list {
+    background: #fff;
+    border: 2px solid #0a0c0e;
+    border-radius: 2px;
+    box-shadow: 8px 8px 0 #0a0c0e;
+    margin: 2.75rem 0;
+}
+
+body.single-wp_instruction .gwi-step-list__header {
+    border-bottom: 2px solid #0a0c0e;
+}
+
+body.single-wp_instruction .gwi-step-list__title {
+    color: #0a0c0e;
+    font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+}
+
+body.single-wp_instruction .gwi-step-list__subtitle {
+    color: #5c6570;
+    font-weight: 600;
+}
+
+body.single-wp_instruction .gwi-step-list__item::after {
+    background: #0a0c0e;
+    width: 2px;
+}
+
+body.single-wp_instruction .gwi-step-list__marker {
+    background: #0a0c0e;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 2px #2ef2c5;
+    color: #2ef2c5;
+    font-weight: 900;
+}
+
+body.single-wp_instruction .gwi-step-list__item.is-complete .gwi-step-list__marker {
+    background: #168a4a;
+    box-shadow: none;
+    color: #fff;
+}
+
+body.single-wp_instruction .manual-step-toggle {
+    background: #0a0c0e;
+    border: 1px solid #2ef2c5;
+    border-radius: 2px;
+    color: #2ef2c5;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+body.single-wp_instruction .manual-step-toggle:hover,
+body.single-wp_instruction .manual-step-toggle:focus {
+    background: #2ef2c5;
+    color: #0a0c0e;
+}
+
+body.single-wp_instruction .gwi-callout {
+    border: 2px solid #0a0c0e;
+    border-radius: 2px;
+    box-shadow: 5px 5px 0 #0a0c0e;
+}
+
+body.single-wp_instruction .gwi-callout--note {
+    background: #e8faf7;
+    border-left: 6px solid #13766d;
+}
+
+body.single-wp_instruction .gwi-callout--warning {
+    background: #fff0e5;
+    border-left: 6px solid #ea580c;
+}
+
+body.single-wp_instruction .gwi-callout--success {
+    background: #e9fcef;
+    border-left: 6px solid #16a34a;
+}
+
+body.single-wp_instruction .gwi-callout__label {
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+}
+
+body.single-wp_instruction .gwi-callout__icon {
+    border-radius: 2px;
+}
+
+body.single-wp_instruction .gwi-callout__icon--note {
+    background: #13766d;
+}
+
+body.single-wp_instruction .gwi-highlighted-screenshot__note {
+    background: #0a0c0e;
+    border: 0;
+    border-radius: 0;
+    color: #2ef2c5;
+}
+
+body.single-wp_instruction .gwi-highlighted-screenshot__note span {
+    color: #f4f7fa;
+    font-weight: 600;
+}
+
+body.single-wp_instruction .gwi-highlighted-screenshot__note strong {
+    color: #2ef2c5;
+    letter-spacing: 0.12em;
+}
+
+body.single-wp_instruction .gwi-highlighted-screenshot__frame,
+body.single-wp_instruction .gwi-acf-screenshot-step__frame,
+body.single-wp_instruction .gwi-flexible-screenshot__frame {
+    border: 2px solid #0a0c0e;
+    border-radius: 2px;
+    box-shadow:
+        8px 8px 0 #0a0c0e,
+        0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+body.single-wp_instruction .gwi-screenshot-lightbox__panel {
+    border: 2px solid #2ef2c5;
+    border-radius: 2px;
+}
+
+body.single-wp_instruction .gwi-screenshot-lightbox__view.is-active {
+    background: #2ef2c5;
+    border-color: #2ef2c5;
+    color: #0a0c0e;
 }

@@ -32,7 +32,7 @@ function gwi_seed_site_config(): array
         ),
         'fi' => gwi_create_seed_instruction(
             'kayttajien-hallinta-fi',
-            'Kayttajien hallinta',
+            'Käyttäjien hallinta',
             'fi',
             gwi_seed_managing_users_fi()
         ),
@@ -82,7 +82,7 @@ function gwi_seed_creating_menus_en(): string
 function gwi_seed_creating_menus_fi(): string
 {
     return '<!-- wp:paragraph --><p>Valikot ohjaavat sivustosi navigointia. Voit luoda mukautettuja valikoita sivuista, artikkeleista, kategorioista ja mukautetuista linkeista.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Luo navigointivalikko","steps":[{"text":"Mene Ulkoasu-valikkoon ja klikkaa Valikot."},{"text":"Syota valikon nimi ja klikkaa Luo valikko."},{"text":"Lisaa kohteita vasemman paneelin paneeleista: Sivut, Artikkelit, Mukautetut linkit tai Kategoriat."},{"text":"Vetaa kohteita jarkjestääksesi ne tai sisennä luodaksesi alivalikkoja."},{"text":"Valitse näyttösijainti Valikon asetukset -kohdasta alhaalla."},{"text":"Klikkaa Tallenna valikko soveltaaksesi muutokset."}]} /-->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Luo navigointivalikko","steps":[{"text":"Mene Ulkoasu-valikkoon ja klikkaa Valikot."},{"text":"Syötä valikon nimi ja klikkaa Luo valikko."},{"text":"Lisää kohteita vasemman paneelin paneeleista: Sivut, Artikkelit, Mukautetut linkit tai Kategoriat."},{"text":"Vedä kohteita järjestääksesi ne tai sisennä luodaksesi alivalikkoja."},{"text":"Valitse näyttösijainti Valikon asetukset -kohdasta alhaalla."},{"text":"Klikkaa Tallenna valikko soveltaaksesi muutokset."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"nav-menus","caption":"Valikkoeditori rakenteella ja sijaintiasetuksilla"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
         . '<!-- wp:paragraph --><p>Vinkki: Voit luoda useita valikoita eri sijainteihin kuten ylätunnisteeseen, alatunnisteeseen ja sivupalkkiin.</p><!-- /wp:paragraph -->';
 }
@@ -97,10 +97,10 @@ function gwi_seed_managing_users_en(): string
 
 function gwi_seed_managing_users_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Kayttajat ovat henkiloita, jotka voivat kirjautua sivustollesi. Jokaisella kayttajalla on rooli, joka maarittaa mitä he voivat tehda: Paakayttaja, Toimittaja, Kirjoittaja, Osallistuja tai Tilaaja.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Hallinnoi kayttajia","steps":[{"text":"Mene Kayttajat nähdaaksesi kaikki rekisteröityneet kayttajat."},{"text":"Klikkaa Lisää uusi luodaksesi uuden kayttajatilin."},{"text":"Syötä kayttajanimi, sahkoposti ja salasana uudelle kayttajalle."},{"text":"Valitse rooli Roli-pudotusvalikosta."},{"text":"Klikkaa Lisää uusi kayttaja tallentaaksesi tilin."},{"text":"Vie hiiren kayttajan päälle Muokataksesi tai Poistaaksesi heidän tilinsä."}]} /-->'
-        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"users-list","caption":"Kayttajalista Lisää uusi -painike korostettuna"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: Anna kayttajille pienin tarvittava rooli. Paakayttajilla on täysi pääsy, kun taas Tilaajat voivat hallita vain omaa profiiliaan.</p><!-- /wp:paragraph -->';
+    return '<!-- wp:paragraph --><p>Käyttäjät ovat henkilöitä, jotka voivat kirjautua sivustollesi. Jokaisella käyttäjällä on rooli, joka määrittää mitä he voivat tehdä: Pääkäyttäjä, Toimittaja, Kirjoittaja, Osallistuja tai Tilaaja.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Hallinnoi käyttäjiä","steps":[{"text":"Mene Käyttäjät-näkymään nähdäksesi kaikki rekisteröityneet käyttäjät."},{"text":"Klikkaa Lisää uusi luodaksesi uuden käyttäjätilin."},{"text":"Syötä käyttäjänimi, sähköposti ja salasana uudelle käyttäjälle."},{"text":"Valitse rooli Roli-pudotusvalikosta."},{"text":"Klikkaa Lisää uusi käyttäjä tallentaaksesi tilin."},{"text":"Vie hiiren käyttäjän päälle muokataksesi tai poistaaksesi hänen tilinsä."}]} /-->'
+        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"users-list","caption":"Käyttäjälista: Lisää uusi -painike korostettuna"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
+        . '<!-- wp:paragraph --><p>Vinkki: Anna käyttäjille pienin tarvittava rooli. Pääkäyttäjillä on täysi pääsy, kun taas Tilaajat voivat hallita vain omaa profiiliaan.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_wordpress_settings_en(): string
@@ -113,8 +113,8 @@ function gwi_seed_wordpress_settings_en(): string
 
 function gwi_seed_wordpress_settings_fi(): string
 {
-    return '<!-- wp:paragraph --><p>WordPress-asetukset hallitsevat sivustosi toimintaa. Paasetukset sisaltävat Yleiset, Kirjoittaminen, Lukeminen, Keskustelu, Media ja Osoiterakenteet.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Muokkaa WordPress-asetuksia","steps":[{"text":"Mene Asetukset nähdäksesi kaikki saatavilla olevat asetussivut."},{"text":"Yleiset asetukset: Aseta sivuston otsikku, kuvaus, URL-osoite, päivämäärämuoto ja aikavyöhyke."},{"text":"Lukemisen asetukset: Valitse näyttääkö etusivu viimeisimmät artikkelit vai staattisen sivun."},{"text":"Keskustelun asetukset: Muokkaa kommenttien moderointia, avatarja ja ilmoitusvaihtoehtoja."},{"text":"Osoiterakenteen asetukset: Valitse URL-rakenteesi. Artikkelin nimi on suositeltu useimmille sivustoille."}]} /-->'
+    return '<!-- wp:paragraph --><p>WordPress-asetukset hallitsevat sivustosi toimintaa. Pääasetukset sisältävät Yleiset, Kirjoittaminen, Lukeminen, Keskustelu, Media ja Osoiterakenteet.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Muokkaa WordPress-asetuksia","steps":[{"text":"Mene Asetukset nähdäksesi kaikki saatavilla olevat asetussivut."},{"text":"Yleiset asetukset: Aseta sivuston otsikko, kuvaus, URL-osoite, päivämäärämuoto ja aikavyöhyke."},{"text":"Lukemisen asetukset: Valitse näyttääkö etusivu viimeisimmät artikkelit vai staattisen sivun."},{"text":"Keskustelun asetukset: Muokkaa kommenttien moderointia, avatarja ja ilmoitusvaihtoehtoja."},{"text":"Osoiterakenteen asetukset: Valitse URL-rakenteesi. Artikkelin nimi on suositeltu useimmille sivustoille."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"settings-general","caption":"Yleiset asetukset -sivu keskeisilla vaihtoehdoilla"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
         . '<!-- wp:paragraph --><p>Vinkki: Aseta osoiterakenteesi aikaisin ja vältä sen muuttamista myöhemmin, koska se vaikuttaa kaikkiin olemassa oleviin URL-osoitteisiisi.</p><!-- /wp:paragraph -->';
 }
@@ -129,8 +129,8 @@ function gwi_seed_theme_customizer_en(): string
 
 function gwi_seed_theme_customizer_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Teeman mukauttaja antaa muuttaa sivustosi ulkoasua reaaliaikaisella esikatselulla. Voit muokata varia, fontteja, valikkoja, widgetteja ja muita teemakohtaisia vaihtoehtoja.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Kaytä teeman mukauttajaa","steps":[{"text":"Mene Ulkoasu-valikkoon ja klikkaa Mukauta."},{"text":"Käytä vasenta paneelia navigoidaksesi mukautusosioiden valilla."},{"text":"Muuta vaihtoehtoja ja katso reaaliaikainen esikatselu paivittyvän oikealla."},{"text":"Käytä Piilota ohjauspainiketta nhdäksesi täysleveyn esikatselun."},{"text":"Klikkaa Julkaise tallentaaksesi muutokset, tai Tallenna luonnos tallentaaksesi julkaisematta."}]} /-->'
+    return '<!-- wp:paragraph --><p>Teeman mukauttaja antaa muuttaa sivustosi ulkoasua reaaliaikaisella esikatselulla. Voit muokata värejä, fontteja, valikoita, widgettejä ja muita teemakohtaisia vaihtoehtoja.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä teeman mukauttajaa","steps":[{"text":"Mene Ulkoasu-valikkoon ja klikkaa Mukauta."},{"text":"Käytä vasenta paneelia navigoidaksesi mukautusosioiden välillä."},{"text":"Muuta vaihtoehtoja ja katso reaaliaikaisen esikatselun päivittyvän oikealla."},{"text":"Käytä Piilota ohjauspainiketta nähdäksesi täysleveän esikatselun."},{"text":"Klikkaa Julkaise tallentaaksesi muutokset tai Tallenna luonnos tallentaaksesi julkaisematta."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"customizer","caption":"Teeman mukauttaja reaaliaikaisella esikatselulla ja ohjaimilla"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
         . '<!-- wp:paragraph --><p>Vinkki: Mukauttajan vaihtoehdot riippuvat aktiivisestä teemastasi. Teeman vaihtaminen antaa eri mukautusvaihtoehtoja.</p><!-- /wp:paragraph -->';
 }

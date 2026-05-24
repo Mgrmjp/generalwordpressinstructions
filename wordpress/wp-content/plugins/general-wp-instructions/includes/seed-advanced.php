@@ -17,7 +17,7 @@ function gwi_seed_advanced(): array
         ),
         'fi' => gwi_create_seed_instruction(
             'mukautetut-kentat-acf-fi',
-            'Mukautetut kentat ACF:lla',
+            'Mukautetut kentät ACF:lla',
             'fi',
             gwi_seed_custom_fields_acf_fi()
         ),
@@ -32,7 +32,7 @@ function gwi_seed_advanced(): array
         ),
         'fi' => gwi_create_seed_instruction(
             'joustavat-sisaltoasettelut-fi',
-            'Joustavat sisaltoasettelut',
+            'Joustavat sisältöasettelut',
             'fi',
             gwi_seed_flexible_content_fi()
         ),
@@ -77,7 +77,7 @@ function gwi_seed_advanced(): array
         ),
         'fi' => gwi_create_seed_instruction(
             'suorituskyky-ja-valimuisti-fi',
-            'Suorituskyky ja valimuisti',
+            'Suorituskyky ja välimuisti',
             'fi',
             gwi_seed_performance_caching_fi()
         ),
@@ -96,10 +96,10 @@ function gwi_seed_custom_fields_acf_en(): string
 
 function gwi_seed_custom_fields_acf_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Advanced Custom Fields (ACF) antaa lisata ylimääräisiä tietokenttia artikkeleihin, sivuihin ja mukautettuihin sisaltotyyppeihin. Kayta sitä kun normaali editori ei riitä.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä ACF-mukautettuja kenttia","steps":[{"text":"Muokatessasi artikkelia tai sivua, vieritä alas loytääksesi ACF-kenttäryhmät editorin alla."},{"text":"Täytä kentät ohjeiden mukaan. Kentät voivat sisaltaa tekstia, kuvia, valintoja, päivämääria ja muuta."},{"text":"Jotkin kentät ovat pakollisia ja merkitty tähdellä. Täytä ne ennen julkaisua."},{"text":"Kenttäryhmät ovat kehittajan jarjestämia. Ota yhteyttä heihin jos tarvitset uusia kenttia."},{"text":"Tallenna tai julkaise artikkeli tallentaaksesi mukautettujen kenttien arvot."}]} /-->'
+    return '<!-- wp:paragraph --><p>Advanced Custom Fields (ACF) antaa lisätä ylimääräisiä tietokenttiä artikkeleihin, sivuihin ja mukautettuihin sisältötyyppeihin. Käytä sitä, kun normaali editori ei riitä.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä ACF-mukautettuja kenttiä","steps":[{"text":"Muokatessasi artikkelia tai sivua vieritä alas löytääksesi ACF-kenttäryhmät editorin alla."},{"text":"Täytä kentät ohjeiden mukaan. Kentät voivat sisältää tekstiä, kuvia, valintoja, päivämääriä ja muuta."},{"text":"Jotkin kentät ovat pakollisia ja merkitty tähdellä. Täytä ne ennen julkaisua."},{"text":"Kenttäryhmät ovat kehittäjän järjestämiä. Ota yhteyttä heihin, jos tarvitset uusia kenttiä."},{"text":"Tallenna tai julkaise artikkeli tallentaaksesi mukautettujen kenttien arvot."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"acf-field-groups","caption":"ACF-kenttäryhmät WordPress-hallinnassa"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: ACF-kentat näkyvät muokkausruudulla automaattisesti kehittajan asettamien kenttäryhmäsaantojen perusteella.</p><!-- /wp:paragraph -->';
+        . '<!-- wp:paragraph --><p>Vinkki: ACF-kentät näkyvät muokkausruudulla automaattisesti kehittäjän asettamien kenttäryhmäsääntöjen perusteella.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_flexible_content_en(): string
@@ -112,10 +112,10 @@ function gwi_seed_flexible_content_en(): string
 
 function gwi_seed_flexible_content_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Joustava sisalto on ACF-ominaisuus, joka antaa muokkaajien rakentaa sivuja lisäämällä, poistamalla ja järjestämällä sisalto-osioita uudelleen. Jokainen osio on esimääritelty asettelu omilla kentillään.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Muokkaa joustavia sisaltoasetteluja","steps":[{"text":"Vieritä Joustava sisalto -kenttäryhmään muokatessasi sivua."},{"text":"Klikkaa Lisää rivi nähdäksesi saatavilla olevat asetteluvaihtoehdot."},{"text":"Valitse asettelutyyppi pudotusvalikosta. Jokaisella asettelulla on eri kentat."},{"text":"Täytä kentat lisäämällesi osiolle."},{"text":"Käytä vetokahvaa järjestääksesi osiot uudelleen. Klikkaa Poista poistaaksesi osion."},{"text":"Tallenna sivu soveltaaksesi muutokset."}]} /-->'
-        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"acf-field-groups","caption":"Joustava sisalto -kenttäryhmä asetteluvaihtoehdoilla"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: Lisaa [gwi_flexible_content] lyhytkoodi artikkelin sisaltoon jos osiot eivat näy automaattisesti etupäässä.</p><!-- /wp:paragraph -->';
+    return '<!-- wp:paragraph --><p>Joustava sisältö on ACF-ominaisuus, joka antaa muokkaajien rakentaa sivuja lisäämällä, poistamalla ja järjestämällä sisältöosioita uudelleen. Jokainen osio on esimääritelty asettelu omilla kentillään.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Muokkaa joustavia sisältöasetteluja","steps":[{"text":"Vieritä Joustava sisältö -kenttäryhmään muokatessasi sivua."},{"text":"Klikkaa Lisää rivi nähdäksesi saatavilla olevat asetteluvaihtoehdot."},{"text":"Valitse asettelutyyppi pudotusvalikosta. Jokaisella asettelulla on eri kentät."},{"text":"Täytä kentät lisäämällesi osiolle."},{"text":"Käytä vetokahvaa järjestääksesi osiot uudelleen. Klikkaa Poista poistaaksesi osion."},{"text":"Tallenna sivu soveltaaksesi muutokset."}]} /-->'
+        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"acf-field-groups","caption":"Joustava sisältö -kenttäryhmä asetteluvaihtoehdoilla"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
+        . '<!-- wp:paragraph --><p>Vinkki: Lisää [gwi_flexible_content] -lyhytkoodi artikkelin sisältöön, jos osiot eivät näy automaattisesti etupäässä.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_acf_blocks_en(): string
@@ -128,10 +128,10 @@ function gwi_seed_acf_blocks_en(): string
 
 function gwi_seed_acf_blocks_fi(): string
 {
-    return '<!-- wp:paragraph --><p>ACF-lohkot ovat mukautettuja Gutenberg-lohkoja, jotka on luotu Advanced Custom Fieldsilla. Ne näkyvät lohkon lisaajassa WordPressin omien lohkojen rinnalla.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä ACF-lohkoja","steps":[{"text":"Avaa lohkon lisaaja klikkaamalla plus-painiketta editorin tyokalurivissa."},{"text":"Hae ACF-lohkon nimea, kuten Ohjeilmoitus tai Kuvakaappausvaihe."},{"text":"Klikkaa lohkoa lisätäksesi sen sisaltoosi."},{"text":"Täytä lohkon kentat editorissa tai lohkon asetussivupalkissa."},{"text":"Käytä lohkon tyokalurivia tasataksesi, siirtääksesi tai muuntaaksesi lohkon."},{"text":"Esikatsele sivua nähdäksesi miten lohko renderöityy etupäässä."}]} /-->'
-        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"block-editor-add-block","caption":"ACF-lohkot saatavilla lohkon lisaajassa"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: ACF-lohkot kayttaytyvat kuin natiivilohkot. Voit tallentaa ne osaksi uudelleenkaytettavia lohkoja tai malleja.</p><!-- /wp:paragraph -->';
+    return '<!-- wp:paragraph --><p>ACF-lohkot ovat mukautettuja Gutenberg-lohkoja, jotka on luotu Advanced Custom Fieldsilla. Ne näkyvät lohkon lisääjässä WordPressin omien lohkojen rinnalla.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä ACF-lohkoja","steps":[{"text":"Avaa lohkon lisääjä klikkaamalla plus-painiketta editorin työkalurivissä."},{"text":"Hae ACF-lohkon nimeä, kuten Ohjeilmoitus tai Kuvakaappausvaihe."},{"text":"Klikkaa lohkoa lisätäksesi sen sisältöösi."},{"text":"Täytä lohkon kentät editorissa tai lohkon asetussivupalkissa."},{"text":"Käytä lohkon työkaluriviä tasataksesi, siirtääksesi tai muuntaaksesi lohkon."},{"text":"Esikatsele sivua nähdäksesi, miten lohko renderöityy etupäässä."}]} /-->'
+        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"block-editor-add-block","caption":"ACF-lohkot saatavilla lohkon lisääjässä"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
+        . '<!-- wp:paragraph --><p>Vinkki: ACF-lohkot käyttäytyvät kuin natiivilohkot. Voit tallentaa ne osaksi uudelleenkäytettäviä lohkoja tai malleja.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_seo_basics_en(): string
@@ -144,10 +144,10 @@ function gwi_seed_seo_basics_en(): string
 
 function gwi_seed_seo_basics_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Hakukoneoptimointi (SEO) auttaa sivustosi sisaltoa sijoittumaan paremmin hakutuloksissa. WordPressissa on sisäänrakennettuja ominaisuuksia, ja lisäosat kuten Yoast SEO tai RankMath lisäävat työkaluja.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Sovella perus-SEO:ta","steps":[{"text":"Kirjoita selkeä, kuvaava otsikko jokaiselle artikkelille ja sivulle. Sisällytä paasiasanakirjoituksesi."},{"text":"Käytä otsikoita (H2, H3) rakentaaksesi sisaltosi loogisesti."},{"text":"Lisää vaihtoehtoinen teksti kaikkiin kuviin kuvaillen mita ne näyttävät."},{"text":"Kirjoita metakuvaus jos SEO-lisäosa tarjoaa siihen kentän."},{"text":"Käytä sisäisiä linkkejä yhdistääksesi liittyvän sisaltosi sivustollasi."},{"text":"Pidä URL-osoitteet lyhyinä ja kuvaavina. Käytä Osoiterakenteen asetuksia rakenteen määrittämiseen."}]} /-->'
+    return '<!-- wp:paragraph --><p>Hakukoneoptimointi (SEO) auttaa sivustosi sisältöä sijoittumaan paremmin hakutuloksissa. WordPressissa on sisäänrakennettuja ominaisuuksia, ja lisäosat kuten Yoast SEO tai RankMath lisäävät työkaluja.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Sovella perus-SEO:ta","steps":[{"text":"Kirjoita selkeä, kuvaava otsikko jokaiselle artikkelille ja sivulle. Sisällytä pääavainsanasi."},{"text":"Käytä otsikoita (H2, H3) rakentaaksesi sisältösi loogisesti."},{"text":"Lisää vaihtoehtoinen teksti kaikkiin kuviin kuvaillen, mitä ne näyttävät."},{"text":"Kirjoita metakuvaus, jos SEO-lisäosa tarjoaa siihen kentän."},{"text":"Käytä sisäisiä linkkejä yhdistääksesi liittyvän sisältösi sivustollasi."},{"text":"Pidä URL-osoitteet lyhyinä ja kuvaavina. Käytä Osoiterakenteen asetuksia rakenteen määrittämiseen."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"seo-dashboard","caption":"SEO-lisäosan hallintapaneeli optimoinnin hallintaan"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: Keskity ensin kirjoittamaan hyödyllistä, hyvin rakennettua sisaltoa. SEO-lisäosat voivat ohjata, mutta laadukas sisalto on tärkein sijoittumistekijä.</p><!-- /wp:paragraph -->';
+        . '<!-- wp:paragraph --><p>Vinkki: Keskity ensin kirjoittamaan hyödyllistä, hyvin rakennettua sisältöä. SEO-lisäosat voivat ohjata, mutta laadukas sisältö on tärkein sijoittumistekijä.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_performance_caching_en(): string
@@ -160,8 +160,8 @@ function gwi_seed_performance_caching_en(): string
 
 function gwi_seed_performance_caching_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Sivuston nopeus vaikuttaa kayttökokemukseen ja hakutulossijoituksiin. WordPressin suorituskykyä voidaan parantaa välimuistilla, kuvien optimoinnilla ja oikealla hostingilla.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Paranna sivuston suorituskykyä","steps":[{"text":"Asenna välimuistilisäosa kuten WP Super Cache tai W3 Total Cache tarjoamaan staattisia sivuja."},{"text":"Optimoi kuvat ennen lataamista. Käytä oikeaa kokoa ja pakenna tiedostot."},{"text":"Käytä CDN:aa (Content Delivery Network) tarjoamaan staattisia resursseja lähempana kävijöitä."},{"text":"Pidä WordPress, teemat ja lisäosat päivitettyinä turvallisuus- ja suorituskyvyn korjauksia varten."},{"text":"Poista käyttämättömät lisäosat ja teemat vähentääksesi palvelimen kuormitusta."},{"text":"Valitse laadukas hosting hyvillä palvelinvastausajoilla."}]} /-->'
+    return '<!-- wp:paragraph --><p>Sivuston nopeus vaikuttaa käyttökokemukseen ja hakutulossijoituksiin. WordPressin suorituskykyä voidaan parantaa välimuistilla, kuvien optimoinnilla ja oikealla hostingilla.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Paranna sivuston suorituskykyä","steps":[{"text":"Asenna välimuistilisäosa kuten WP Super Cache tai W3 Total Cache tarjoamaan staattisia sivuja."},{"text":"Optimoi kuvat ennen lataamista. Käytä oikeaa kokoa ja pakkaa tiedostot."},{"text":"Käytä CDN:aa (Content Delivery Network) tarjoamaan staattisia resursseja lähempana kävijöitä."},{"text":"Pidä WordPress, teemat ja lisäosat päivitettyinä turvallisuus- ja suorituskyvyn korjauksia varten."},{"text":"Poista käyttämättömät lisäosat ja teemat vähentääksesi palvelimen kuormitusta."},{"text":"Valitse laadukas hosting hyvillä palvelinvastausajoilla."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"settings-general","caption":"WordPress-asetukset suorituskykyyn liittyvillä vaihtoehdoilla"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
         . '<!-- wp:paragraph --><p>Vinkki: Testaa sivustosi nopeutta säännöllisesti käyttämällä työkaluja kuten Google PageSpeed Insights tai GTmetrix.</p><!-- /wp:paragraph -->';
 }

@@ -4,8 +4,9 @@
       "id": "pages-list-add-new",
       "title": {
         "en": "Pages list: Add New",
-        "fi": "Sivulista: Lisaa uusi"
+        "fi": "Sivulista: Lisää uusi"
       },
+      "capture": "focus",
       "url": "/wp-admin/edit.php?post_type=page",
       "waitFor": "#wpbody",
       "highlights": [
@@ -13,7 +14,7 @@
           "selector": ".page-title-action, a[href*=\"post-new.php?post_type=page\"]",
           "label": {
             "en": "Add New",
-            "fi": "Lisaa uusi"
+            "fi": "Lisää uusi"
           }
         }
       ]
@@ -22,16 +23,18 @@
       "id": "block-editor-add-block",
       "title": {
         "en": "Block Editor: Add block",
-        "fi": "Lohkoeditori: Lisaa lohko"
+        "fi": "Lohkoeditori: Lisää lohko"
       },
+      "optional": true,
+      "capture": "focus",
       "url": "/wp-admin/post-new.php?post_type=page",
       "waitFor": "body.block-editor-page, .block-editor-writing-flow",
       "highlights": [
         {
-          "selector": ".edit-post-header-toolbar__inserter-toggle, .block-editor-inserter__toggle, button[aria-label='Add block'], button[aria-label='Toggle block inserter']",
+          "selector": ".edit-post-header-toolbar__inserter-toggle, .editor-document-tools__inserter-toggle, .block-editor-inserter__toggle, button[aria-label='Add block'], button[aria-label='Toggle block inserter'], button[aria-label*='Add block'], button[aria-label*='Open block inserter'], button[aria-label*='Lisää lohko'], button[aria-label*='Avaa lohko']",
           "label": {
             "en": "Add block",
-            "fi": "Lisaa lohko"
+            "fi": "Lisää lohko"
           },
           "optional": true
         }
@@ -41,8 +44,9 @@
       "id": "media-library-add-new",
       "title": {
         "en": "Media Library: Add New",
-        "fi": "Mediakirjasto: Lisaa uusi"
+        "fi": "Mediakirjasto: Lisää uusi"
       },
+      "capture": "focus",
       "url": "/wp-admin/upload.php",
       "waitFor": "#wpbody",
       "highlights": [
@@ -50,7 +54,7 @@
           "selector": ".page-title-action, a[href*=\"media-new.php\"]",
           "label": {
             "en": "Add New media",
-            "fi": "Lisaa uusi mediatiedosto"
+            "fi": "Lisää uusi mediatiedosto"
           }
         }
       ]
@@ -59,8 +63,9 @@
       "id": "instruction-list-add-new",
       "title": {
         "en": "Instructions: Add New",
-        "fi": "Ohjeet: Lisaa uusi"
+        "fi": "Ohjeet: Lisää uusi"
       },
+      "capture": "focus",
       "url": "/wp-admin/edit.php?post_type=wp_instruction",
       "waitFor": "#wpbody",
       "highlights": [
@@ -68,7 +73,7 @@
           "selector": ".page-title-action, a[href*=\"post-new.php?post_type=wp_instruction\"]",
           "label": {
             "en": "Add New Instruction",
-            "fi": "Lisaa uusi ohje"
+            "fi": "Lisää uusi ohje"
           }
         }
       ]
@@ -79,6 +84,8 @@
         "en": "Classic Editor: Publish",
         "fi": "Perinteinen editori: Julkaise"
       },
+      "optional": true,
+      "capture": "focus",
       "url": "/wp-admin/post-new.php?classic-editor",
       "waitFor": "#submitdiv, body.wp-admin, #wpcontent",
       "highlights": [
@@ -98,11 +105,12 @@
         "en": "Dashboard: Home",
         "fi": "Hallintapaneeli: Koti"
       },
+      "capture": "focus",
       "url": "/wp-admin/",
       "waitFor": "#dashboard-widgets-wrap, #wpbody",
       "highlights": [
         {
-          "selector": "#dashboard-widgets-wrap, #wpbody",
+          "selector": "#dashboard_right_now, #dashboard-widgets-wrap .postbox:first-of-type, #dashboard-widgets-wrap",
           "label": {
             "en": "Dashboard widgets",
             "fi": "Hallintapaneelin widgetit"
@@ -116,6 +124,7 @@
         "en": "Posts: List",
         "fi": "Artikkelit: Lista"
       },
+      "capture": "focus",
       "url": "/wp-admin/edit.php",
       "waitFor": "#wpbody",
       "highlights": [
@@ -123,7 +132,7 @@
           "selector": ".page-title-action, a[href*=\"post-new.php\"]",
           "label": {
             "en": "Add New Post",
-            "fi": "Lisaa uusi artikkeli"
+            "fi": "Lisää uusi artikkeli"
           }
         }
       ]
@@ -134,11 +143,12 @@
         "en": "Posts: Categories",
         "fi": "Artikkelit: Kategoriat"
       },
+      "capture": "focus",
       "url": "/wp-admin/edit-tags.php?taxonomy=category",
       "waitFor": "#wpbody",
       "highlights": [
         {
-          "selector": "#wpbody, .wp-list-table, #the-list",
+          "selector": "#col-left .form-wrap, .page-title-action, .form-table",
           "label": {
             "en": "Categories list",
             "fi": "Kategorioiden lista"
@@ -152,11 +162,12 @@
         "en": "Posts: Tags",
         "fi": "Artikkelit: Asiasanat"
       },
+      "capture": "focus",
       "url": "/wp-admin/edit-tags.php?taxonomy=post_tag",
       "waitFor": "#wpbody",
       "highlights": [
         {
-          "selector": "#wpbody, .wp-list-table, #the-list",
+          "selector": "#col-left .form-wrap, .page-title-action, .form-table",
           "label": {
             "en": "Tags list",
             "fi": "Asiasanojen lista"
@@ -168,16 +179,17 @@
       "id": "media-library-grid",
       "title": {
         "en": "Media Library: Grid View",
-        "fi": "Mediakirjasto: Ruudukkonakyma"
+        "fi": "Mediakirjasto: Ruudukkonäkymä"
       },
+      "capture": "focus",
       "url": "/wp-admin/upload.php",
       "waitFor": "#wpbody",
       "highlights": [
         {
-          "selector": ".view-switch, .media-grid",
+          "selector": ".view-switch, .media-toolbar-secondary, .media-grid",
           "label": {
             "en": "View switcher",
-            "fi": "Nakymän vaihtaja"
+            "fi": "Näkymän vaihtaja"
           }
         }
       ]
@@ -188,11 +200,12 @@
         "en": "Comments: List",
         "fi": "Kommentit: Lista"
       },
+      "capture": "focus",
       "url": "/wp-admin/edit-comments.php",
       "waitFor": "#wpbody",
       "highlights": [
         {
-          "selector": "#wpbody, .wp-list-table, .tablenav",
+          "selector": ".wrap > h1, .subsubsub, .tablenav.top",
           "label": {
             "en": "Comments list",
             "fi": "Kommenttilista"
@@ -206,11 +219,12 @@
         "en": "Menus: Editor",
         "fi": "Valikot: Editori"
       },
+      "capture": "focus",
       "url": "/wp-admin/nav-menus.php",
       "waitFor": "#wpbody, #menu-management",
       "highlights": [
         {
-          "selector": "#menu-management, #wpbody",
+          "selector": "#nav-menu-header, #menu-management, #menu-to-edit",
           "label": {
             "en": "Menu editor",
             "fi": "Valikkoeditori"
@@ -222,17 +236,15 @@
       "id": "users-list",
       "title": {
         "en": "Users: List",
-        "fi": "Kayttajat: Lista"
+        "fi": "Käyttäjät: Lista"
       },
+      "capture": "focus",
       "url": "/wp-admin/users.php",
       "waitFor": "#wpbody",
+      "focusPaddingBottom": 120,
       "highlights": [
         {
-          "selector": ".page-title-action, a[href*=\"user-new.php\"]",
-          "label": {
-            "en": "Add New User",
-            "fi": "Lisaa uusi kayttaja"
-          }
+          "selector": "a.page-title-action[href*=\"user-new.php\"], .wrap .page-title-action"
         }
       ]
     },
@@ -242,11 +254,12 @@
         "en": "Settings: General",
         "fi": "Asetukset: Yleiset"
       },
+      "capture": "focus",
       "url": "/wp-admin/options-general.php",
       "waitFor": "#wpbody",
       "highlights": [
         {
-          "selector": "#wpbody, .form-table",
+          "selector": ".wrap > h1, form .form-table",
           "label": {
             "en": "General settings",
             "fi": "Yleiset asetukset"
@@ -260,11 +273,12 @@
         "en": "Settings: Reading",
         "fi": "Asetukset: Lukeminen"
       },
+      "capture": "focus",
       "url": "/wp-admin/options-reading.php",
       "waitFor": "#wpbody",
       "highlights": [
         {
-          "selector": "#wpbody, .form-table",
+          "selector": ".wrap > h1, form .form-table",
           "label": {
             "en": "Reading settings",
             "fi": "Lukemisen asetukset"
@@ -278,11 +292,12 @@
         "en": "Settings: Permalinks",
         "fi": "Asetukset: Osoiterakenteet"
       },
+      "capture": "focus",
       "url": "/wp-admin/options-permalink.php",
       "waitFor": "#wpbody",
       "highlights": [
         {
-          "selector": "#wpbody, .form-table",
+          "selector": ".wrap > h1, form .form-table",
           "label": {
             "en": "Permalink settings",
             "fi": "Osoiterakenteen asetukset"
@@ -296,11 +311,13 @@
         "en": "Theme Customizer",
         "fi": "Teeman mukauttaja"
       },
+      "capture": "focus",
+      "focusMaxWidth": 900,
       "url": "/wp-admin/customize.php",
       "waitFor": "#wpbody, .wp-full-overlay, #customize-controls",
       "highlights": [
         {
-          "selector": "#customize-controls, .wp-full-overlay, #wpbody",
+          "selector": "#customize-controls",
           "label": {
             "en": "Customizer",
             "fi": "Mukauttaja"
@@ -312,16 +329,18 @@
       "id": "block-editor-inserter",
       "title": {
         "en": "Block Editor: Inserter",
-        "fi": "Lohkoeditori: Lisaaja"
+        "fi": "Lohkoeditori: Lisääjä"
       },
+      "optional": true,
+      "capture": "focus",
       "url": "/wp-admin/post-new.php",
       "waitFor": ".edit-post-header-toolbar, .block-editor-editor, #wpbody",
       "highlights": [
         {
-          "selector": ".edit-post-header-toolbar__inserter-toggle, .block-editor-inserter__toggle, button[aria-label='Add block'], button[aria-label='Toggle block inserter'], .edit-post-header-toolbar",
+          "selector": ".edit-post-header-toolbar__inserter-toggle, .editor-document-tools__inserter-toggle, .block-editor-inserter__toggle, button[aria-label='Add block'], button[aria-label='Toggle block inserter'], button[aria-label*='Add block'], button[aria-label*='Open block inserter'], button[aria-label*='Lisää lohko'], button[aria-label*='Avaa lohko'], .edit-post-header-toolbar",
           "label": {
             "en": "Open inserter",
-            "fi": "Avaa lisaaja"
+            "fi": "Avaa lisääjä"
           },
           "optional": true
         }
@@ -331,8 +350,9 @@
       "id": "block-editor-reusable-list",
       "title": {
         "en": "Reusable Blocks: List",
-        "fi": "Uudelleenkaytettavat lohkot: Lista"
+        "fi": "Uudelleenkäytettävät lohkot: Lista"
       },
+      "capture": "focus",
       "url": "/wp-admin/edit.php?post_type=wp_block",
       "waitFor": "#wpbody",
       "highlights": [
@@ -340,7 +360,7 @@
           "selector": ".page-title-action, a[href*=\"post-new.php?post_type=wp_block\"]",
           "label": {
             "en": "Add New Pattern",
-            "fi": "Lisaa uusi malli"
+            "fi": "Lisää uusi malli"
           }
         }
       ]
@@ -351,6 +371,8 @@
         "en": "Classic Editor: Formatting",
         "fi": "Perinteinen editori: Muotoilu"
       },
+      "optional": true,
+      "capture": "focus",
       "url": "/wp-admin/post-new.php?classic-editor",
       "waitFor": "#wpcontent, #wp-content-editor-container",
       "highlights": [
@@ -358,7 +380,7 @@
           "selector": "#wp-content-editor-container, #wp-content-wrap, .mce-toolbar",
           "label": {
             "en": "Editor toolbar",
-            "fi": "Editorin tyokalurivi"
+            "fi": "Editorin työkalurivi"
           }
         }
       ]
@@ -367,16 +389,18 @@
       "id": "acf-field-groups",
       "title": {
         "en": "ACF: Field Groups",
-        "fi": "ACF: Kenttaryhmat"
+        "fi": "ACF: Kenttäryhmät"
       },
+      "optional": true,
+      "capture": "focus",
       "url": "/wp-admin/edit.php?post_type=acf-field-group",
       "waitFor": "#wpbody",
       "highlights": [
         {
-          "selector": "#wpbody, .page-title-action, a[href*=\"post-new.php?post_type=acf-field-group\"]",
+          "selector": ".page-title-action, a[href*=\"post-new.php?post_type=acf-field-group\"]",
           "label": {
             "en": "ACF Field Groups",
-            "fi": "ACF-kenttaryhmat"
+            "fi": "ACF-kenttäryhmät"
           }
         }
       ]
@@ -387,11 +411,13 @@
         "en": "SEO: Dashboard",
         "fi": "SEO: Hallintapaneeli"
       },
+      "optional": true,
+      "capture": "focus",
       "url": "/wp-admin/admin.php?page=wpseo_dashboard",
       "waitFor": "#wpbody, #wpseo-dashboard",
       "highlights": [
         {
-          "selector": "#wpbody, #wpseo-dashboard, .wpseo-dashboard",
+          "selector": "#wpseo-dashboard, .wpseo-dashboard",
           "label": {
             "en": "SEO dashboard",
             "fi": "SEO-hallintapaneeli"

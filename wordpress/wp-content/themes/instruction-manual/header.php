@@ -12,6 +12,7 @@ $manual_is_instruction_library = is_post_type_archive('wp_instruction')
     || is_singular('wp_instruction')
     || is_tax('instruction_category')
     || (is_search() && get_query_var('post_type') === 'wp_instruction');
+$manual_is_glossary = manual_is_glossary_view();
 $manual_header_language = manual_instruction_sanitize_language(get_query_var('instruction_language'));
 
 if (is_singular('wp_instruction')) {
@@ -36,6 +37,8 @@ $manual_header_text = $manual_header_is_english
         'language' => __('EN', 'instruction-manual'),
         'switch_to' => 'fi',
         'skip' => __('Skip to content', 'instruction-manual'),
+        'theme_dark' => __('Dark mode', 'instruction-manual'),
+        'theme_light' => __('Light mode', 'instruction-manual'),
     ]
     : [
         'brand' => __('WordPress-ohjeet', 'instruction-manual'),
@@ -53,6 +56,8 @@ $manual_header_text = $manual_header_is_english
         'language' => __('FI', 'instruction-manual'),
         'switch_to' => 'en',
         'skip' => __('Siirry sisältöön', 'instruction-manual'),
+        'theme_dark' => __('Tumma tila', 'instruction-manual'),
+        'theme_light' => __('Vaalea tila', 'instruction-manual'),
     ];
 $manual_language_switch_url = manual_instruction_language_filter_url($manual_header_text['switch_to']);
 
@@ -75,11 +80,19 @@ if (is_singular('wp_instruction')) {
             <a href="<?php echo esc_url(home_url('/')); ?>"<?php echo is_front_page() ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['start']); ?></a>
             <a href="<?php echo esc_url(manual_instruction_archive_url()); ?>"<?php echo $manual_is_instruction_library ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['guides']); ?></a>
             <a href="<?php echo esc_url(home_url('/#polut')); ?>"><?php echo esc_html($manual_header_text['paths']); ?></a>
-            <a href="<?php echo esc_url(manual_instruction_archive_url() . '#glossary'); ?>"><?php echo esc_html($manual_header_text['glossary']); ?></a>
+            <a href="<?php echo esc_url(manual_glossary_url()); ?>"<?php echo $manual_is_glossary ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['glossary']); ?></a>
             <?php if (current_user_can('edit_posts')) : ?>
                 <a href="<?php echo esc_url(admin_url('edit.php?post_type=wp_instruction')); ?>"><?php echo esc_html($manual_header_text['admin']); ?></a>
             <?php endif; ?>
             <a href="<?php echo esc_url($manual_language_switch_url); ?>" class="manual-lang-switch" aria-label="<?php echo esc_attr($manual_header_text['switch_label']); ?>"><?php echo esc_html($manual_header_text['language']); ?></a>
+            <button
+                type="button"
+                class="manual-theme-toggle"
+                data-manual-theme-toggle
+                data-label-dark="<?php echo esc_attr($manual_header_text['theme_light']); ?>"
+                data-label-light="<?php echo esc_attr($manual_header_text['theme_dark']); ?>"
+                aria-pressed="false"
+            ><?php echo esc_html($manual_header_text['theme_dark']); ?></button>
         </nav>
         <form class="manual-search" role="search" method="get" action="<?php echo esc_url(home_url('/')); ?>">
             <label class="screen-reader-text" for="manual-search-input"><?php echo esc_html($manual_header_text['search_label']); ?></label>

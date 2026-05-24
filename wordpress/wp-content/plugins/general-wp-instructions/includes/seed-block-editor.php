@@ -17,7 +17,7 @@ function gwi_seed_block_editor(): array
         ),
         'fi' => gwi_create_seed_instruction(
             'lohkojen-kaytto-fi',
-            'Lohkojen kaytto',
+            'Lohkojen käyttö',
             'fi',
             gwi_seed_working_with_blocks_fi()
         ),
@@ -32,7 +32,7 @@ function gwi_seed_block_editor(): array
         ),
         'fi' => gwi_create_seed_instruction(
             'yleiset-sisaltolohkot-fi',
-            'Yleiset sisaltolohkot',
+            'Yleiset sisältölohkot',
             'fi',
             gwi_seed_common_content_blocks_fi()
         ),
@@ -77,7 +77,7 @@ function gwi_seed_block_editor(): array
         ),
         'fi' => gwi_create_seed_instruction(
             'uudelleenkaytettavat-lohkot-ja-mallit-fi',
-            'Uudelleenkaytettavat lohkot ja mallit',
+            'Uudelleenkäytettävät lohkot ja mallit',
             'fi',
             gwi_seed_reusable_blocks_fi()
         ),
@@ -96,10 +96,10 @@ function gwi_seed_working_with_blocks_en(): string
 
 function gwi_seed_working_with_blocks_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Lohkot ovat WordPress-editorin rakennusyksikokset. Jokainen sisallön palanen on lohko: kappaleet, otsikot, kuvat, painikkeet ja muut.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Tyo lohkojen kanssa","steps":[{"text":"Klikkaa plus-painiketta editorin tyokalurivissa avataksesi lohkon lisaajan."},{"text":"Hae tai selaa tarvitsemaasi lohkotyyppia ja klikkaa lisätäksesi sen."},{"text":"Klikkaa lohkoa valitaksesi sen ja nähdaksesi sen tyokalurivin muotoiluvaihtoehdoilla."},{"text":"Käytä nuolia lohkon tyokalurivissa siirtääksesi lohkoja."},{"text":"Klikkaa kolmen pisteen valikkoa lisavaihtoehtoihin kuten kopioi, ryhmitä tai poista."},{"text":"Käytä Listanäkymä-painiketta tyokalurivissa nhdäksesi kaikki lohkot sisäkkäisena listana."}]} /-->'
-        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"block-editor-inserter","caption":"Lohkoeditori lisaajan painike korostettuna"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: Paina Enter luodaksesi uuden kappalelohkon. Kirjoita / avataksesi lohkon lisaajan kauttakomentona.</p><!-- /wp:paragraph -->';
+    return '<!-- wp:paragraph --><p>Lohkot ovat WordPress-editorin rakennusyksiköitä. Jokainen sisällön palanen on lohko: kappaleet, otsikot, kuvat, painikkeet ja muut.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Työ lohkojen kanssa","steps":[{"text":"Klikkaa plus-painiketta editorin työkalurivissä avataksesi lohkon lisääjän."},{"text":"Hae tai selaa tarvitsemaasi lohkotyyppiä ja klikkaa lisätäksesi sen."},{"text":"Klikkaa lohkoa valitaksesi sen ja nähdäksesi sen työkalurivin muotoiluvaihtoehdoilla."},{"text":"Käytä nuolia lohkon työkalurivissä siirtääksesi lohkoja."},{"text":"Klikkaa kolmen pisteen valikkoa lisävaihtoehtoihin kuten kopioi, ryhmitä tai poista."},{"text":"Käytä Listanäkymä-painiketta työkalurivissä nähdäksesi kaikki lohkot sisäkkäisenä listana."}]} /-->'
+        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"block-editor-inserter","caption":"Lohkoeditori: lisääjän painike korostettuna"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
+        . '<!-- wp:paragraph --><p>Vinkki: Paina Enter luodaksesi uuden kappalelohkon. Kirjoita / avataksesi lohkon lisääjän kauttakomentona.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_common_content_blocks_en(): string
@@ -112,10 +112,10 @@ function gwi_seed_common_content_blocks_en(): string
 
 function gwi_seed_common_content_blocks_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Useimmin kaytetyt lohkot ovat tekstisisaltoa: kappaleet, otsikot, listat, lainaukset ja taulukot.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä yleisia sisaltolohkoja","steps":[{"text":"Kappale: Oletuslohko tavalliselle tekstille. Aloita kirjoittaminen."},{"text":"Otsikko: Käytä H2 paasioihin, H3 alaosioihin. Lisaa lisaajasta tai kirjoita ## seettuna valilyönnista."},{"text":"Listaa: Valitse jarjestetty (numeroitu) tai jarjestamaton (merkitty) listaa lisaajasta."},{"text":"Lainaus: Lisaa vetolainauksia tai lohkolainauksia valinnaisella viittauksella."},{"text":"Taulukko: Lisaa taulukko riveilla ja sarakkeilla rakennetulle datalle."},{"text":"Erotin: Lisaa vaakaviiva visuaalisesti erottamaan sisaltloosiot."}]} /-->'
-        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"block-editor-add-block","caption":"Lohkon lisaaja näyttää sisaltolohkot"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: Käytä Muunna-painiketta lohkon tyokalurivissa muuttaaksesi yhden lohkotyypin toiseksi, kuten kappale listaksi.</p><!-- /wp:paragraph -->';
+    return '<!-- wp:paragraph --><p>Useimmin käytetyt lohkot ovat tekstisisältöä: kappaleet, otsikot, listat, lainaukset ja taulukot.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä yleisiä sisältölohkoja","steps":[{"text":"Kappale: Oletuslohko tavalliselle tekstille. Aloita kirjoittaminen."},{"text":"Otsikko: Käytä H2 pääosioihin, H3 alaosioihin. Lisää lisääjästä tai kirjoita ## ja välilyönti."},{"text":"Lista: Valitse järjestetty (numeroitu) tai järjestämätön (merkitty) lista lisääjästä."},{"text":"Lainaus: Lisää vetolainauksia tai lohkolainauksia valinnaisella viittauksella."},{"text":"Taulukko: Lisää taulukko riveillä ja sarakkeilla rakennetulle datalle."},{"text":"Erotin: Lisää vaakaviiva visuaalisesti erottamaan sisältöosiot."}]} /-->'
+        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"block-editor-add-block","caption":"Lohkon lisääjä näyttää sisältölohkot"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
+        . '<!-- wp:paragraph --><p>Vinkki: Käytä Muunna-painiketta lohkon työkalurivissä muuttaaksesi yhden lohkotyypin toiseksi, kuten kappale listaksi.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_media_blocks_en(): string
@@ -128,8 +128,8 @@ function gwi_seed_media_blocks_en(): string
 
 function gwi_seed_media_blocks_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Medialohkot antavat lisata kuvia, gallerioita, videoita, aania ja tiedostoja sisaltoosi.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä medialohkoja","steps":[{"text":"Kuva: Lisaa yksittäinen kuva mediakirjastostasi tai lataa uusi."},{"text":"Galleria: Näytä useita kuvia ruudukkoasettelulla valinnaisilla kuvateksteilla."},{"text":"Video: Upota videotiedostoa tai liitä URL-osoite YouTubesta, Vimeosta tai muista alustoista."},{"text":"Aani: Lisaa aänitiedostoja sisäänrakennetulla soittimella podcasteille tai musiikille."},{"text":"Tiedosto: Lisaa ladattava tiedosto valinnaisella latauspainikkeella."},{"text":"Kansi: Lisaa taustakuva tekstipäällä sankariosioihin."}]} /-->'
+    return '<!-- wp:paragraph --><p>Medialohkot antavat lisätä kuvia, gallerioita, videoita, ääniä ja tiedostoja sisältöösi.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä medialohkoja","steps":[{"text":"Kuva: Lisää yksittäinen kuva mediakirjastostasi tai lataa uusi."},{"text":"Galleria: Näytä useita kuvia ruudukkoasettelulla valinnaisilla kuvateksteilla."},{"text":"Video: Upota videotiedostoa tai liitä URL-osoite YouTubesta, Vimeosta tai muista alustoista."},{"text":"Ääni: Lisää äänitiedostoja sisäänrakennetulla soittimella podcasteille tai musiikille."},{"text":"Tiedosto: Lisää ladattava tiedosto valinnaisella latauspainikkeella."},{"text":"Kansi: Lisää taustakuva tekstipäällä sankariosioihin."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"media-library-add-new","caption":"Mediakirjasto kuvien ja tiedostojen valintaan"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
         . '<!-- wp:paragraph --><p>Vinkki: Lisää aina vaihtoehtoinen teksti kuviin saavutettavuutta varten. Käytä Kansi-lohkoa silmiinpaneviin sankariosioihin.</p><!-- /wp:paragraph -->';
 }
@@ -144,9 +144,9 @@ function gwi_seed_layout_blocks_en(): string
 
 function gwi_seed_layout_blocks_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Asettelulohkot auttavat rakentamaan sivusi rakenteen sarakkeilla, ryhmillä ja valilyontielementeilla.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä asetteluohkoja","steps":[{"text":"Sarakkeet: Luo monisarakkeisia asetteluja 2, 3, 4 tai useammalla sarakkeella."},{"text":"Ryhmä: Yhdistä useat lohkot yhdeksi ryhmäksi helppoa hallintaa varten."},{"text":"Painikkeet: Lisaa yksi tai useampi toimintopainike mukautettavilla tyyleilla."},{"text":"Valilyönti: Lisaa pystysuora tila sisaltoosioiden valille."},{"text":"Erotin: Lisaa vaakaviiva valinnaisella levealla tai täyslevealla tyylillä."},{"text":"Rivi ja Pino: Järjestä lohkot vaakasuoraan (rivi) tai pystysuoraan (pino) flexbox-ohjaimilla."}]} /-->'
-        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"block-editor-add-block","caption":"Asettelulohkot lohkon lisaajassa"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
+    return '<!-- wp:paragraph --><p>Asettelulohkot auttavat rakentamaan sivusi rakenteen sarakkeilla, ryhmillä ja välielementeillä.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä asettelulohkoja","steps":[{"text":"Sarakkeet: Luo monisarakkeisia asetteluja 2, 3, 4 tai useammalla sarakkeella."},{"text":"Ryhmä: Yhdistä useat lohkot yhdeksi ryhmäksi helppoa hallintaa varten."},{"text":"Painikkeet: Lisää yksi tai useampi toimintopainike mukautettavilla tyyleillä."},{"text":"Välilyönti: Lisää pystysuora tila sisältöosioiden välille."},{"text":"Erotin: Lisää vaakaviiva valinnaisella leveällä tai täysleveällä tyylillä."},{"text":"Rivi ja Pino: Järjestä lohkot vaakasuoraan (rivi) tai pystysuoraan (pino) flexbox-ohjaimilla."}]} /-->'
+        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"block-editor-add-block","caption":"Asettelulohkot lohkon lisääjässä"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
         . '<!-- wp:paragraph --><p>Vinkki: Käytä Ryhmä-lohkoa soveltaaksesi taustavärejä tai täyttöä useisiin lohkoihin kerralla.</p><!-- /wp:paragraph -->';
 }
 
@@ -160,8 +160,8 @@ function gwi_seed_reusable_blocks_en(): string
 
 function gwi_seed_reusable_blocks_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Uudelleenkaytettavat lohkot ja mallit antavat tallentaa ja kayttaa uudelleen sisaltoa sivustollasi. Kayta niita johdonmukaisille elementeille kuten toimintosioille, vastuuvapauslausekkeille tai mukautetuille asetteluille.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä uudelleenkaytettavia lohkoja ja malleja","steps":[{"text":"Valitse yksi tai useampi lohko ja klikkaa kolmen pisteen valikkoa, sitten valitse Luo uudelleenkaytettava lohko."},{"text":"Nimeä uudelleenkaytettava lohkosi ja tallenna se. Se naytyy lisaajassa Uudelleenkaytettavat-kohdassa."},{"text":"Muokkaa uudelleenkaytettavaa lohkoa kerran ja kaikki esiintymat paivittyvat automaattisesti sivustollasi."},{"text":"Muunna uudelleenkaytettava lohko tavallisiksi lohkoiksi jos tarvitsee muokata yhta esiintymaa itsenaisesti."},{"text":"Selaa Malleja lisaajassa esikaytettyjen lohkojen asetteluja teemastasi."}]} /-->'
-        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"block-editor-reusable-list","caption":"Uudelleenkaytettavien lohkojen hallintasivu"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: Käytä Malleja asetteluille, jotka haluat mukauttaa yksittaisesti. Käytä Uudelleenkaytettavia lohkoja sisallolle, jonka tulisi pysya identtisena kaikkialla.</p><!-- /wp:paragraph -->';
+    return '<!-- wp:paragraph --><p>Uudelleenkäytettävät lohkot ja mallit antavat tallentaa ja käyttää uudelleen sisältöä sivustollasi. Käytä niitä johdonmukaisille elementeille kuten toimintosioille, vastuuvapauslausekkeille tai mukautetuille asetteluille.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä uudelleenkäytettäviä lohkoja ja malleja","steps":[{"text":"Valitse yksi tai useampi lohko ja klikkaa kolmen pisteen valikkoa, sitten valitse Luo uudelleenkäytettävä lohko."},{"text":"Nimeä uudelleenkäytettävä lohkosi ja tallenna se. Se näkyy lisääjässä Uudelleenkäytettävät-kohdassa."},{"text":"Muokkaa uudelleenkäytettävää lohkoa kerran ja kaikki esiintymät päivittyvät automaattisesti sivustollasi."},{"text":"Muunna uudelleenkäytettävä lohko tavallisiksi lohkoiksi jos tarvitsee muokata yhtä esiintymää itsenäisesti."},{"text":"Selaa Malleja lisääjässä esikäytettyjen lohkojen asetteluja teemastasi."}]} /-->'
+        . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"block-editor-reusable-list","caption":"Uudelleenkäytettävien lohkojen hallintasivu"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
+        . '<!-- wp:paragraph --><p>Vinkki: Käytä Malleja asetteluille, jotka haluat mukauttaa yksittäisesti. Käytä uudelleenkäytettäviä lohkoja sisällölle, jonka tulisi pysyä identtisena kaikkialla.</p><!-- /wp:paragraph -->';
 }

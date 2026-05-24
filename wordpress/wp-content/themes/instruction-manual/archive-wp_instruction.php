@@ -29,6 +29,16 @@ foreach ($instructions as $instruction) {
         $grouped_instructions[manual_instruction_group_key($instruction->ID)][] = $instruction;
     }
 }
+
+$active_category_slug = '';
+
+if (is_tax('instruction_category')) {
+    $active_term = get_queried_object();
+
+    if ($active_term instanceof WP_Term) {
+        $active_category_slug = $active_term->slug;
+    }
+}
 ?>
 
 <section class="manual-hero manual-hero--archive">
@@ -39,18 +49,42 @@ foreach ($instructions as $instruction) {
     </p>
 </section>
 
+<div
+    class="manual-library-app"
+    data-manual-library
+    data-language="<?php echo esc_attr($current_language); ?>"
+    data-category="<?php echo esc_attr($active_category_slug); ?>"
+>
 <section class="manual-filterbar" aria-label="<?php esc_attr_e('Ohjesuodattimet', 'instruction-manual'); ?>">
+    <div class="manual-library-search" role="search" aria-label="<?php esc_attr_e('Hae ohjekirjastosta', 'instruction-manual'); ?>">
+        <label for="manual-library-search-input"><?php esc_html_e('Hae ohjeita', 'instruction-manual'); ?></label>
+        <div class="manual-library-search__row">
+            <input
+                type="search"
+                id="manual-library-search-input"
+                data-manual-library-search
+                value="<?php echo esc_attr(get_search_query()); ?>"
+                placeholder="<?php esc_attr_e('Etsi tehtävää, asetusta tai ongelmaa', 'instruction-manual'); ?>"
+                autocomplete="off"
+            >
+            <button type="button" data-manual-library-clear><?php esc_html_e('Tyhjennä', 'instruction-manual'); ?></button>
+        </div>
+        <p class="manual-result-count" data-manual-results-count>
+            <?php echo esc_html(sprintf(_n('%d ohje', '%d ohjetta', count($instructions), 'instruction-manual'), count($instructions))); ?>
+        </p>
+    </div>
+
     <nav class="manual-filters" aria-label="<?php esc_attr_e('Suodata kielen mukaan', 'instruction-manual'); ?>">
         <span class="manual-filterbar__label"><?php esc_html_e('Kieli', 'instruction-manual'); ?></span>
-        <a href="<?php echo esc_url(manual_instruction_language_filter_url()); ?>" class="manual-filter <?php echo $current_language === '' ? 'is-active' : ''; ?>"><?php esc_html_e('Kaikki', 'instruction-manual'); ?></a>
+        <a href="<?php echo esc_url(manual_instruction_language_filter_url()); ?>" class="manual-filter <?php echo $current_language === '' ? 'is-active' : ''; ?>" data-manual-language=""><?php esc_html_e('Kaikki', 'instruction-manual'); ?></a>
         <?php foreach (manual_instruction_language_options() as $language_code => $language_label) : ?>
-            <a href="<?php echo esc_url(manual_instruction_language_filter_url($language_code)); ?>" class="manual-filter <?php echo $current_language === $language_code ? 'is-active' : ''; ?>"><?php echo esc_html(manual_language_filter_label_fi($language_code)); ?></a>
+            <a href="<?php echo esc_url(manual_instruction_language_filter_url($language_code)); ?>" class="manual-filter <?php echo $current_language === $language_code ? 'is-active' : ''; ?>" data-manual-language="<?php echo esc_attr($language_code); ?>"><?php echo esc_html(manual_language_filter_label_fi($language_code)); ?></a>
         <?php endforeach; ?>
     </nav>
 
     <nav class="manual-filters" aria-label="<?php esc_attr_e('Suodata aiheen mukaan', 'instruction-manual'); ?>">
         <span class="manual-filterbar__label"><?php esc_html_e('Aihe', 'instruction-manual'); ?></span>
-        <a href="<?php echo esc_url(manual_instruction_url_with_language(manual_instruction_archive_url())); ?>" class="manual-filter <?php echo !is_tax('instruction_category') ? 'is-active' : ''; ?>"><?php esc_html_e('Kaikki aiheet', 'instruction-manual'); ?></a>
+        <a href="<?php echo esc_url(manual_instruction_url_with_language(manual_instruction_archive_url())); ?>" class="manual-filter <?php echo !is_tax('instruction_category') ? 'is-active' : ''; ?>" data-manual-category="" data-manual-url="<?php echo esc_url(manual_instruction_archive_url()); ?>"><?php esc_html_e('Kaikki aiheet', 'instruction-manual'); ?></a>
         <?php
         $categories = get_terms(['taxonomy' => 'instruction_category', 'hide_empty' => true]);
         if (!is_wp_error($categories) && !empty($categories)) :
@@ -61,7 +95,7 @@ foreach ($instructions as $instruction) {
                     continue;
                 }
         ?>
-            <a href="<?php echo esc_url(manual_instruction_url_with_language($category_url)); ?>" class="manual-filter <?php echo $is_active ? 'is-active' : ''; ?>"><?php echo esc_html(manual_instruction_category_label($category)); ?> <span class="manual-filter__count"><?php echo esc_html($category->count); ?></span></a>
+            <a href="<?php echo esc_url(manual_instruction_url_with_language($category_url)); ?>" class="manual-filter <?php echo $is_active ? 'is-active' : ''; ?>" data-manual-category="<?php echo esc_attr($category->slug); ?>" data-manual-url="<?php echo esc_url($category_url); ?>"><?php echo esc_html(manual_instruction_category_label($category)); ?> <span class="manual-filter__count"><?php echo esc_html($category->count); ?></span></a>
         <?php
             endforeach;
         endif;
@@ -70,7 +104,7 @@ foreach ($instructions as $instruction) {
 </section>
 
 <?php if (!empty($instructions)) : ?>
-    <section id="library" class="manual-cabinet" aria-label="<?php esc_attr_e('Ohjeasiakirjat', 'instruction-manual'); ?>">
+    <section id="library" class="manual-cabinet" data-manual-library-results aria-live="polite" aria-label="<?php esc_attr_e('Ohjeasiakirjat', 'instruction-manual'); ?>">
         <?php foreach ($groups as $group_key => $group) : ?>
             <?php if (empty($grouped_instructions[$group_key])) : ?>
                 <?php continue; ?>
@@ -111,25 +145,10 @@ foreach ($instructions as $instruction) {
         <?php endforeach; ?>
     </section>
 <?php else : ?>
-    <section class="manual-empty">
+    <section class="manual-empty" data-manual-library-results aria-live="polite">
         <p><?php esc_html_e('Tämä hakuehto ei vastaa vielä yhtään ohjetta.', 'instruction-manual'); ?></p>
     </section>
 <?php endif; ?>
-
-<section id="glossary" class="manual-support-section" aria-labelledby="manual-glossary-title">
-    <div class="manual-section-heading">
-        <p class="manual-eyebrow"><?php esc_html_e('Sanasto selkokielellä', 'instruction-manual'); ?></p>
-        <h2 id="manual-glossary-title"><?php esc_html_e('WordPress-termit', 'instruction-manual'); ?></h2>
-        <p class="manual-section-subtitle"><?php esc_html_e('Keskeiset WordPress-termit lyhyesti selitettynä.', 'instruction-manual'); ?></p>
-    </div>
-    <dl class="manual-glossary">
-        <?php foreach (manual_glossary_terms() as $term => $definition) : ?>
-            <div>
-                <dt><?php echo esc_html($term); ?></dt>
-                <dd><?php echo esc_html($definition); ?></dd>
-            </div>
-        <?php endforeach; ?>
-    </dl>
-</section>
+</div>
 
 <?php get_footer(); ?>

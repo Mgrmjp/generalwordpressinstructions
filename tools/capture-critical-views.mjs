@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
 import { chromium } from '@playwright/test';
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
+import { createScreenshotLogger } from './lib/screenshot-log.mjs';
 
 const DEFAULT_CONFIG = 'config/critical-views.json';
 const DEFAULT_OUTPUT = 'wordpress/wp-content/uploads/instruction-screenshots';
@@ -78,6 +79,16 @@ Options:
   --language <en|fi>   Label language. Default: en
   --headed             Run Chromium visibly for debugging
   --help               Show this help
+
+Config capture modes:
+  viewport             Capture the browser viewport.
+  fullPage             Capture the entire page.
+  element              Capture captureSelector only.
+  focus                Crop around highlighted elements with readable context.
+
+Highlight options (per entry in highlights[]):
+  showLabel            Render tooltip on PNG (default: off; use caption in docs instead).
+  padding              Outline inset in px (default: 6).
 `);
 }
 
@@ -138,17 +149,13 @@ async function login(page, baseUrl, username, password) {
 async function injectHighlightStyles(page) {
     await page.addStyleTag({
         content: `
-            .__gwi_capture_target {
-                outline: 6px solid #ffd400 !important;
-                outline-offset: 4px !important;
-                box-shadow: 0 0 0 4px #111, 0 0 0 12px rgba(255, 212, 0, 0.45) !important;
-                border-radius: 6px !important;
-            }
-
             .__gwi_capture_overlay {
-                border: 6px solid #ffd400 !important;
-                border-radius: 8px !important;
-                box-shadow: 0 0 0 4px #111, 0 0 0 12px rgba(255, 212, 0, 0.45) !important;
+                background: transparent !important;
+                border: 3px solid #facc15 !important;
+                border-radius: 6px !important;
+                box-shadow:
+                    0 0 0 2px #111827,
+                    0 0 0 9999px rgba(17, 24, 39, 0.52) !important;
                 box-sizing: border-box !important;
                 pointer-events: none !important;
                 z-index: 2147483647 !important;
@@ -163,22 +170,27 @@ async function injectHighlightStyles(page) {
             }
 
             .__gwi_capture_label {
-                background: #111 !important;
-                border: 3px solid #ffd400 !important;
-                border-radius: 999px !important;
+                background: #111827 !important;
+                border: 2px solid #facc15 !important;
+                border-radius: 6px !important;
                 color: #fff !important;
-                font: 900 16px/1.1 Arial, sans-serif !important;
-                left: -6px !important;
-                padding: 8px 12px !important;
+                font: 700 14px/1.2 system-ui, sans-serif !important;
+                left: 0 !important;
+                padding: 6px 10px !important;
                 position: absolute !important;
-                top: calc(100% + 10px) !important;
+                top: calc(100% + 8px) !important;
                 white-space: nowrap !important;
+            }
+
+            .__gwi_capture_label--above {
+                bottom: calc(100% + 8px) !important;
+                top: auto !important;
             }
         `,
     });
 }
 
-async function findFirstVisibleLocator(page, selector) {
+async function findFirstVisibleLocator(page, selector, timeout = 2000) {
     const selectors = selector.split(',').map((item) => item.trim()).filter(Boolean);
 
     for (const currentSelector of selectors) {
@@ -189,7 +201,7 @@ async function findFirstVisibleLocator(page, selector) {
         }
 
         try {
-            await locator.waitFor({ state: 'visible', timeout: 2000 });
+            await locator.waitFor({ state: 'visible', timeout });
             return locator;
         } catch {
             continue;
@@ -199,78 +211,217 @@ async function findFirstVisibleLocator(page, selector) {
     return null;
 }
 
-async function applyHighlight(page, highlight, language, captureMode) {
+async function applyHighlight(page, highlight, language, captureMode, logger) {
     const locator = await findFirstVisibleLocator(page, highlight.selector);
 
     if (!locator) {
         if (highlight.optional) {
-            console.warn(`Optional selector not found: ${highlight.selector}`);
-            return;
+            logger.log('warn', 'Optional selector not found', {
+                selector: highlight.selector,
+            });
+            logger.bumpCount('warnings');
+            return null;
         }
 
         throw new Error(`Required selector not found: ${highlight.selector}`);
     }
 
     const label = localized(highlight.label, language);
-    await locator.scrollIntoViewIfNeeded();
-    await locator.evaluate((element, payload) => {
-        element.classList.add('__gwi_capture_target');
+    const showLabel = highlight.showLabel === true;
+    const padding = Number.isFinite(highlight.padding) ? highlight.padding : 6;
 
+    await locator.scrollIntoViewIfNeeded();
+
+    return await locator.evaluate((element, payload) => {
         const rect = element.getBoundingClientRect();
         const overlay = document.createElement('div');
+        const pad = payload.padding;
+        const isDocumentCapture = payload.captureMode === 'fullPage' || payload.captureMode === 'focus';
 
-        const isFullPage = payload.captureMode === 'fullPage';
-        overlay.className = '__gwi_capture_overlay ' + (isFullPage
+        overlay.className = '__gwi_capture_overlay ' + (isDocumentCapture
             ? '__gwi_capture_overlay--document'
             : '__gwi_capture_overlay--viewport');
 
-        if (isFullPage) {
-            overlay.style.left = `${window.scrollX + rect.left - 8}px`;
-            overlay.style.top = `${window.scrollY + rect.top - 8}px`;
-        } else {
-            overlay.style.left = `${rect.left - 8}px`;
-            overlay.style.top = `${rect.top - 8}px`;
-        }
+        const left = (isDocumentCapture ? window.scrollX : 0) + rect.left - pad;
+        const top = (isDocumentCapture ? window.scrollY : 0) + rect.top - pad;
 
-        overlay.style.width = `${rect.width + 16}px`;
-        overlay.style.height = `${rect.height + 16}px`;
+        overlay.style.left = `${left}px`;
+        overlay.style.top = `${top}px`;
+        overlay.style.width = `${rect.width + pad * 2}px`;
+        overlay.style.height = `${rect.height + pad * 2}px`;
 
-        if (payload.label) {
+        if (payload.showLabel && payload.label) {
             const labelElement = document.createElement('div');
-            labelElement.className = '__gwi_capture_label';
+            const placeAbove = rect.bottom + 48 > window.innerHeight;
+
+            labelElement.className = '__gwi_capture_label' + (placeAbove ? ' __gwi_capture_label--above' : '');
             labelElement.textContent = payload.label;
             overlay.appendChild(labelElement);
         }
 
         document.body.appendChild(overlay);
-    }, { label, captureMode });
+
+        return {
+            x: window.scrollX + rect.left - pad,
+            y: window.scrollY + rect.top - pad,
+            width: rect.width + pad * 2,
+            height: rect.height + pad * 2,
+        };
+    }, { label, captureMode, showLabel, padding });
 }
 
-async function captureView(page, baseUrl, view, language, outputDir) {
-    const title = localized(view.title, language) || view.id;
-    console.log(`Capturing: ${title}`);
+function numberOption(value, fallback) {
+    return Number.isFinite(value) ? value : fallback;
+}
 
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
+
+async function focusedClip(page, highlightRects, view) {
+    const rects = highlightRects.filter(Boolean);
+
+    if (!rects.length) {
+        return null;
+    }
+
+    const metrics = await page.evaluate(() => {
+        const body = document.body;
+        const documentElement = document.documentElement;
+
+        return {
+            width: Math.max(
+                documentElement.scrollWidth,
+                body ? body.scrollWidth : 0,
+                window.innerWidth
+            ),
+            height: Math.max(
+                documentElement.scrollHeight,
+                body ? body.scrollHeight : 0,
+                window.innerHeight
+            ),
+        };
+    });
+
+    const union = rects.reduce((current, rect) => {
+        if (!current) {
+            return { ...rect };
+        }
+
+        const left = Math.min(current.x, rect.x);
+        const top = Math.min(current.y, rect.y);
+        const right = Math.max(current.x + current.width, rect.x + rect.width);
+        const bottom = Math.max(current.y + current.height, rect.y + rect.height);
+
+        return {
+            x: left,
+            y: top,
+            width: right - left,
+            height: bottom - top,
+        };
+    }, null);
+
+    const paddingX = numberOption(view.focusPaddingX, numberOption(view.focusPadding, 220));
+    const paddingTop = numberOption(view.focusPaddingTop, numberOption(view.focusPaddingY, 120));
+    const paddingBottom = numberOption(view.focusPaddingBottom, numberOption(view.focusPaddingY, 180));
+    const minWidth = Math.min(metrics.width, numberOption(view.focusMinWidth, 900));
+    const minHeight = Math.min(metrics.height, numberOption(view.focusMinHeight, 360));
+    const maxWidth = Math.min(metrics.width, numberOption(view.focusMaxWidth, 1180));
+    const maxHeight = Math.min(metrics.height, numberOption(view.focusMaxHeight, 720));
+
+    let x = union.x - paddingX;
+    let y = union.y - paddingTop;
+    let width = union.width + paddingX * 2;
+    let height = union.height + paddingTop + paddingBottom;
+
+    if (width < minWidth) {
+        x -= (minWidth - width) / 2;
+        width = minWidth;
+    }
+
+    if (height < minHeight) {
+        y -= (minHeight - height) / 2;
+        height = minHeight;
+    }
+
+    width = Math.min(width, maxWidth);
+    height = Math.min(height, maxHeight);
+    x = clamp(x, 0, Math.max(0, metrics.width - width));
+    y = clamp(y, 0, Math.max(0, metrics.height - height));
+    width = Math.min(width, metrics.width - x);
+    height = Math.min(height, metrics.height - y);
+
+    return {
+        x: Math.round(x),
+        y: Math.round(y),
+        width: Math.max(1, Math.round(width)),
+        height: Math.max(1, Math.round(height)),
+    };
+}
+
+async function captureView(page, baseUrl, view, language, outputDir, logger) {
+    const title = localized(view.title, language) || view.id;
+    const startedMs = Date.now();
     const captureMode = view.capture || 'viewport';
+
+    logger.log('info', 'Capturing view', {
+        screenshotId: view.id,
+        language,
+        title,
+        url: view.url,
+        captureMode,
+    });
 
     await page.goto(adminUrl(baseUrl, view.url), { waitUntil: 'domcontentloaded' });
 
     if (view.waitFor) {
-        await page.locator(view.waitFor).first().waitFor({ state: 'visible', timeout: 15000 });
+        const readyLocator = await findFirstVisibleLocator(page, view.waitFor, 15000);
+
+        if (!readyLocator) {
+            throw new Error(`Wait selector not visible: ${view.waitFor}`);
+        }
     }
 
     await injectHighlightStyles(page);
 
+    const highlightRects = [];
+
     for (const highlight of view.highlights || []) {
-        await applyHighlight(page, highlight, language, captureMode);
+        const highlightRect = await applyHighlight(page, highlight, language, captureMode, logger);
+        if (highlightRect) {
+            highlightRects.push(highlightRect);
+        }
     }
 
     await page.waitForTimeout(400);
 
     const outputPath = resolve(outputDir, `${view.id}-${language}.png`);
 
+    if (captureMode === 'focus' && view.optional && highlightRects.length === 0) {
+        throw new Error('Focused capture target not found');
+    }
+
     if (captureMode === 'element' && view.captureSelector) {
         const el = page.locator(view.captureSelector).first();
         await el.screenshot({ path: outputPath });
+    } else if (captureMode === 'focus') {
+        const clip = await focusedClip(page, highlightRects, view);
+
+        if (clip) {
+            await page.screenshot({ path: outputPath, clip });
+            logger.log('info', 'Applied focused crop', {
+                screenshotId: view.id,
+                language,
+                clip,
+            });
+        } else {
+            await page.screenshot({ path: outputPath });
+            logger.log('warn', 'Focused crop fell back to viewport capture', {
+                screenshotId: view.id,
+                language,
+            });
+            logger.bumpCount('warnings');
+        }
     } else {
         await page.screenshot({
             path: outputPath,
@@ -278,7 +429,31 @@ async function captureView(page, baseUrl, view, language, outputDir) {
         });
     }
 
-    console.log(`Saved: ${outputPath} (mode: ${captureMode})`);
+    if (captureMode === 'focus' && highlightRects.length > 0) {
+        const contextPath = resolve(outputDir, `${view.id}-${language}-context.png`);
+
+        await page.screenshot({ path: contextPath });
+
+        logger.log('info', 'Saved context screenshot', {
+            screenshotId: view.id,
+            language,
+            path: contextPath,
+            bytes: statSync(contextPath).size,
+        });
+    }
+
+    const bytes = statSync(outputPath).size;
+    const durationMs = Date.now() - startedMs;
+
+    logger.log('info', 'Saved screenshot', {
+        screenshotId: view.id,
+        language,
+        path: outputPath,
+        captureMode,
+        bytes,
+        durationMs,
+    });
+    logger.bumpCount('success');
 }
 
 async function main() {
@@ -296,8 +471,21 @@ async function main() {
     const password = requiredEnv('WP_PASSWORD');
     const views = readConfig(args.config);
     const outputDir = resolve(args.output);
+    const logger = createScreenshotLogger({
+        step: `capture-${args.language}`,
+        logDir: resolve(outputDir, 'logs'),
+    });
 
     mkdirSync(outputDir, { recursive: true });
+
+    logger.log('info', 'Capture run started', {
+        baseUrl,
+        language: args.language,
+        config: resolve(args.config),
+        outputDir,
+        viewCount: views.length,
+        jsonlPath: logger.jsonlPath,
+    });
 
     const browser = await chromium.launch({ headless: !args.headed });
     const context = await browser.newContext({
@@ -307,14 +495,49 @@ async function main() {
     });
     const page = await context.newPage();
 
+    let failedViews = 0;
+
     try {
         await login(page, baseUrl, username, password);
+        logger.log('info', 'WordPress login succeeded', { baseUrl, user: username });
 
         for (const view of views) {
-            await captureView(page, baseUrl, view, args.language, outputDir);
+            try {
+                await captureView(page, baseUrl, view, args.language, outputDir, logger);
+            } catch (error) {
+                if (view.optional) {
+                    logger.log('warn', 'Skipped optional view', {
+                        screenshotId: view.id,
+                        language: args.language,
+                        error: error.message,
+                    });
+                    logger.bumpCount('warnings');
+                    continue;
+                }
+
+                failedViews += 1;
+                logger.log('error', 'Capture failed for view', {
+                    screenshotId: view.id,
+                    language: args.language,
+                    error: error.message,
+                });
+                logger.bumpCount('errors');
+            }
         }
     } finally {
         await browser.close();
+    }
+
+    const summary = logger.finish(failedViews > 0 ? 'failed' : 'success', {
+        baseUrl,
+        language: args.language,
+        outputDir,
+        viewCount: views.length,
+        failedViews,
+    });
+
+    if (summary.status === 'failed') {
+        process.exitCode = 1;
     }
 }
 

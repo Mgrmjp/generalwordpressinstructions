@@ -33,7 +33,14 @@ if (!function_exists('have_rows') || !have_rows('instruction_sections')) {
             <?php if ($image_url !== '') : ?>
                 <figure class="gwi-flexible-screenshot">
                     <div class="gwi-flexible-screenshot__frame">
-                        <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($image_alt); ?>" loading="lazy">
+                        <?php
+                        gwi_render_expandable_screenshot([
+                            'detail_url' => $image_url,
+                            'alt' => $image_alt,
+                            'caption' => trim($highlight_label . ' ' . $action),
+                            'frame_class' => 'gwi-screenshot-expandable__frame',
+                        ]);
+                        ?>
                     </div>
                     <?php if ($action !== '' || $highlight_label !== '') : ?>
                         <figcaption>
@@ -46,14 +53,30 @@ if (!function_exists('have_rows') || !have_rows('instruction_sections')) {
                 </figure>
             <?php endif; ?>
         <?php elseif (get_row_layout() === 'checklist') : ?>
+            <?php
+            $checklist_language = get_the_ID() > 0 && function_exists('gwi_get_instruction_language')
+                ? gwi_get_instruction_language(get_the_ID())
+                : '';
+            $checklist_subtitle = $checklist_language === 'fi'
+                ? __('Suorita vaiheet järjestyksessä.', 'general-wp-instructions')
+                : __('Complete these steps in order.', 'general-wp-instructions');
+            ?>
             <section class="gwi-step-list">
-                <h2 class="gwi-step-list__title"><?php echo esc_html((string) get_sub_field('heading')); ?></h2>
+                <header class="gwi-step-list__header">
+                    <h2 class="gwi-step-list__title"><?php echo esc_html((string) get_sub_field('heading')); ?></h2>
+                    <p class="gwi-step-list__subtitle"><?php echo esc_html($checklist_subtitle); ?></p>
+                </header>
                 <?php if (have_rows('items')) : ?>
                     <ol class="gwi-step-list__items">
-                        <?php while (have_rows('items')) : ?>
-                            <?php the_row(); ?>
-                            <li class="gwi-step-list__item">
-                                <span><?php echo esc_html((string) get_sub_field('text')); ?></span>
+                        <?php
+                        $step_index = 0;
+                        while (have_rows('items')) :
+                            the_row();
+                            $step_index++;
+                            ?>
+                            <li class="gwi-step-list__item" data-step="<?php echo esc_attr((string) $step_index); ?>">
+                                <span class="gwi-step-list__marker" aria-hidden="true"><?php echo esc_html((string) $step_index); ?></span>
+                                <span class="gwi-step-list__text"><?php echo esc_html((string) get_sub_field('text')); ?></span>
                             </li>
                         <?php endwhile; ?>
                     </ol>
@@ -62,12 +85,12 @@ if (!function_exists('have_rows') || !have_rows('instruction_sections')) {
         <?php elseif (get_row_layout() === 'callout') : ?>
             <?php
             $variant = (string) get_sub_field('variant');
-            $variant = in_array($variant, ['note', 'warning', 'success'], true) ? $variant : 'note';
             $content = (string) get_sub_field('content');
+            $language = get_the_ID() > 0 && function_exists('gwi_get_instruction_language')
+                ? gwi_get_instruction_language(get_the_ID())
+                : '';
+            gwi_render_callout($variant, $content, $language);
             ?>
-            <aside class="<?php echo esc_attr('gwi-flexible-callout gwi-flexible-callout--' . $variant); ?>">
-                <?php echo wp_kses_post(wpautop($content)); ?>
-            </aside>
         <?php endif; ?>
     <?php endwhile; ?>
 </div>

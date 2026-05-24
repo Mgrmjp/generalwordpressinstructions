@@ -5,14 +5,10 @@ if (!defined('ABSPATH')) {
 }
 
 $variant = function_exists('get_field') ? (string) get_field('variant') : 'note';
-$variant = in_array($variant, ['note', 'warning', 'success'], true) ? $variant : 'note';
 $content = function_exists('get_field') ? (string) get_field('content') : '';
-$classes = 'gwi-callout gwi-callout--' . $variant;
+$post_id = get_the_ID();
+$language = ($post_id > 0 && function_exists('gwi_get_instruction_language'))
+    ? gwi_get_instruction_language($post_id)
+    : '';
 
-if ($content === '' && is_admin()) {
-    $content = __('Add callout content in the block fields.', 'general-wp-instructions');
-}
-?>
-<aside class="<?php echo esc_attr($classes); ?>">
-    <?php echo wp_kses_post(wpautop($content)); ?>
-</aside>
+gwi_render_callout($variant, $content, $language);

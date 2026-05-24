@@ -19,16 +19,6 @@ $glossary_preview = manual_glossary_preview(5);
 $featured_icons = ['code', 'pen', 'layout'];
 $featured_tones = ['green', 'blue', 'orange'];
 $glossary_icons = ['block', 'cache', 'theme', 'plugin', 'field'];
-
-$recent_fi = get_posts([
-    'post_type' => 'wp_instruction',
-    'post_status' => 'publish',
-    'posts_per_page' => 5,
-    'meta_key' => '_gwi_language',
-    'meta_value' => 'fi',
-    'orderby' => 'modified',
-    'order' => 'DESC',
-]);
 ?>
 
 <section class="manual-hero manual-hero--home">
@@ -166,7 +156,7 @@ $recent_fi = get_posts([
             <h2 id="manual-glossary-strip-title" class="manual-section-title"><?php esc_html_e('Sanasto', 'instruction-manual'); ?></h2>
             <p class="manual-section-subtitle"><?php esc_html_e('Ymmärrä tärkeimmät käsitteet.', 'instruction-manual'); ?></p>
         </div>
-        <a href="<?php echo esc_url(manual_instruction_archive_url()); ?>#glossary" class="manual-view-all"><?php esc_html_e('Avaa sanasto', 'instruction-manual'); ?> &rarr;</a>
+        <a href="<?php echo esc_url(manual_glossary_url()); ?>" class="manual-view-all"><?php esc_html_e('Avaa sanasto', 'instruction-manual'); ?> &rarr;</a>
     </div>
     <dl class="manual-glossary-strip">
         <?php $glossary_item_index = 0; ?>
@@ -185,22 +175,5 @@ $recent_fi = get_posts([
         <?php endforeach; ?>
     </dl>
 </section>
-
-<?php if (!empty($recent_fi)) : ?>
-    <section class="manual-recent-section" aria-labelledby="manual-recent-title">
-        <div class="manual-section-header">
-            <h2 id="manual-recent-title" class="manual-section-title"><?php esc_html_e('Viimeksi tarkistetut', 'instruction-manual'); ?></h2>
-            <a href="<?php echo esc_url(manual_instruction_archive_url()); ?>" class="manual-view-all"><?php esc_html_e('Näytä kaikki', 'instruction-manual'); ?> &rarr;</a>
-        </div>
-        <div class="manual-mini-list">
-            <?php foreach ($recent_fi as $instruction) : ?>
-                <a href="<?php echo esc_url(get_permalink($instruction)); ?>">
-                    <span><?php echo esc_html(manual_instruction_task_title($instruction->ID)); ?></span>
-                    <small><?php echo esc_html(get_the_modified_date('d.m.Y', $instruction)); ?></small>
-                </a>
-            <?php endforeach; ?>
-        </div>
-    </section>
-<?php endif; ?>
 
 <?php get_footer(); ?>

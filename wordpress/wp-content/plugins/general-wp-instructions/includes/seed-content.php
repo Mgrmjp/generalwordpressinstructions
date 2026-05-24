@@ -29,11 +29,33 @@ function gwi_seed_instruction_content(): void
     gwi_assign_seed_categories();
 }
 
+function gwi_resync_seed_instructions(): int
+{
+    $GLOBALS['gwi_seed_sync_existing'] = true;
+    $GLOBALS['gwi_seed_sync_count'] = 0;
+
+    gwi_seed_instruction_content();
+
+    unset($GLOBALS['gwi_seed_sync_existing']);
+
+    return (int) ($GLOBALS['gwi_seed_sync_count'] ?? 0);
+}
+
 function gwi_create_seed_instruction(string $slug, string $title, string $language, string $content): int
 {
     $existing = get_page_by_path($slug, OBJECT, 'wp_instruction');
 
     if ($existing instanceof WP_Post) {
+        if (!empty($GLOBALS['gwi_seed_sync_existing'])) {
+            wp_update_post([
+                'ID' => $existing->ID,
+                'post_title' => $title,
+                'post_content' => $content,
+                'post_excerpt' => gwi_seed_instruction_excerpt($content),
+            ]);
+            $GLOBALS['gwi_seed_sync_count'] = (int) ($GLOBALS['gwi_seed_sync_count'] ?? 0) + 1;
+        }
+
         return (int) $existing->ID;
     }
 

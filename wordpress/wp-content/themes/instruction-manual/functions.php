@@ -6,11 +6,75 @@ if (!defined('ABSPATH')) {
 
 add_action('after_setup_theme', 'manual_setup');
 add_action('wp_enqueue_scripts', 'manual_enqueue_assets');
+add_action('init', 'manual_register_static_routes');
+add_action('init', 'manual_flush_static_routes_if_needed', 20);
+add_action('rest_api_init', 'manual_register_instruction_rest_routes');
 add_filter('query_vars', 'manual_instruction_query_vars');
+add_filter('template_include', 'manual_static_template_include');
+add_filter('body_class', 'manual_static_body_classes');
 add_action('pre_get_posts', 'manual_filter_instruction_archive_by_language');
 add_filter('posts_search', 'manual_expand_instruction_search', 10, 2);
 add_filter('the_content', 'manual_cleanup_instruction_content_language', 18);
 add_filter('document_title_parts', 'manual_document_title_parts');
+
+function manual_static_routes_version(): string
+{
+    return '20260524-glossary-v1';
+}
+
+function manual_register_static_routes(): void
+{
+    add_rewrite_rule('^sanasto/?$', 'index.php?manual_view=glossary', 'top');
+}
+
+function manual_flush_static_routes_if_needed(): void
+{
+    if (get_option('manual_static_routes_version') === manual_static_routes_version()) {
+        return;
+    }
+
+    manual_register_static_routes();
+    flush_rewrite_rules(false);
+    update_option('manual_static_routes_version', manual_static_routes_version());
+}
+
+function manual_is_glossary_view(): bool
+{
+    return get_query_var('manual_view') === 'glossary';
+}
+
+function manual_glossary_url(): string
+{
+    return home_url('/sanasto/');
+}
+
+function manual_static_template_include(string $template): string
+{
+    if (!manual_is_glossary_view()) {
+        return $template;
+    }
+
+    global $wp_query;
+
+    if ($wp_query instanceof WP_Query) {
+        $wp_query->is_404 = false;
+    }
+
+    status_header(200);
+
+    $glossary_template = locate_template('glossary.php');
+
+    return $glossary_template !== '' ? $glossary_template : $template;
+}
+
+function manual_static_body_classes(array $classes): array
+{
+    if (manual_is_glossary_view()) {
+        $classes[] = 'manual-glossary-view';
+    }
+
+    return $classes;
+}
 
 function manual_setup(): void
 {
@@ -28,26 +92,302 @@ function manual_enqueue_assets(): void
 {
     wp_enqueue_style('general-sans', 'https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap', [], null);
     wp_enqueue_style('instruction-manual', get_stylesheet_uri(), ['general-sans'], wp_get_theme()->get('Version'));
+
+    $script_path = get_template_directory() . '/assets/js/manual-app.js';
+    $style_dependencies = ['instruction-manual'];
+
+    if (is_singular('wp_instruction')) {
+        $reader_css = get_template_directory() . '/assets/css/instruction-reader.css';
+
+        if (file_exists($reader_css)) {
+            wp_enqueue_style(
+                'instruction-manual-reader',
+                get_template_directory_uri() . '/assets/css/instruction-reader.css',
+                ['instruction-manual'],
+                (string) filemtime($reader_css)
+            );
+            $style_dependencies[] = 'instruction-manual-reader';
+        }
+    }
+
+    $edge_css = get_template_directory() . '/assets/css/theme-edge.css';
+
+    if (file_exists($edge_css)) {
+        wp_enqueue_style(
+            'instruction-manual-edge',
+            get_template_directory_uri() . '/assets/css/theme-edge.css',
+            $style_dependencies,
+            (string) filemtime($edge_css)
+        );
+    }
+
+    if (file_exists($script_path)) {
+        wp_enqueue_script(
+            'instruction-manual-app',
+            get_template_directory_uri() . '/assets/js/manual-app.js',
+            [],
+            (string) filemtime($script_path),
+            true
+        );
+        wp_localize_script('instruction-manual-app', 'manualApp', manual_app_config());
+    }
+}
+
+function manual_app_config(): array
+{
+    $groups = [];
+
+    foreach (manual_instruction_library_groups() as $key => $group) {
+        $groups[$key] = [
+            'title' => $group['title'],
+            'description' => $group['description'],
+        ];
+    }
+
+    $current_language = '';
+
+    if (is_singular('wp_instruction')) {
+        $current_language = manual_instruction_language_code((int) get_queried_object_id());
+    } else {
+        $current_language = manual_instruction_current_language();
+    }
+
+    $is_english = $current_language === 'en';
+    $labels = $is_english
+        ? [
+            'results' => __('guides', 'instruction-manual'),
+            'result' => __('guide', 'instruction-manual'),
+            'empty' => __('No guides match these filters.', 'instruction-manual'),
+            'start' => __('Open guide', 'instruction-manual'),
+            'searching' => __('Searching...', 'instruction-manual'),
+            'suggestions' => __('Suggested guides', 'instruction-manual'),
+            'clear' => __('Clear', 'instruction-manual'),
+            'done' => __('Done', 'instruction-manual'),
+            'undo' => __('Undo', 'instruction-manual'),
+            'youAreHere' => __('You are here', 'instruction-manual'),
+            'copyCode' => __('Copy', 'instruction-manual'),
+            'codeCopied' => __('Copied', 'instruction-manual'),
+            'darkModeOn' => __('Dark mode', 'instruction-manual'),
+            'darkModeOff' => __('Light mode', 'instruction-manual'),
+        ]
+        : [
+            'results' => __('ohjetta', 'instruction-manual'),
+            'result' => __('ohje', 'instruction-manual'),
+            'empty' => __('Mikään ohje ei vastaa näitä suodattimia.', 'instruction-manual'),
+            'start' => __('Avaa ohje', 'instruction-manual'),
+            'searching' => __('Haetaan...', 'instruction-manual'),
+            'suggestions' => __('Ehdotetut ohjeet', 'instruction-manual'),
+            'clear' => __('Tyhjennä', 'instruction-manual'),
+            'done' => __('Valmis', 'instruction-manual'),
+            'undo' => __('Peru', 'instruction-manual'),
+            'youAreHere' => __('Olet tässä', 'instruction-manual'),
+            'copyCode' => __('Kopioi', 'instruction-manual'),
+            'codeCopied' => __('Kopioitu', 'instruction-manual'),
+            'darkModeOn' => __('Tumma tila', 'instruction-manual'),
+            'darkModeOff' => __('Vaalea tila', 'instruction-manual'),
+        ];
+
+    return [
+        'restUrl' => esc_url_raw(rest_url('instruction-manual/v1/instructions')),
+        'archiveUrl' => esc_url_raw(manual_instruction_archive_url()),
+        'currentLanguage' => $current_language,
+        'groups' => $groups,
+        'labels' => $labels,
+    ];
+}
+
+function manual_register_instruction_rest_routes(): void
+{
+    register_rest_route('instruction-manual/v1', '/instructions', [
+        'methods' => WP_REST_Server::READABLE,
+        'callback' => 'manual_rest_get_instructions',
+        'permission_callback' => '__return_true',
+        'args' => [
+            'search' => [
+                'sanitize_callback' => 'sanitize_text_field',
+            ],
+            'language' => [
+                'sanitize_callback' => 'manual_instruction_sanitize_language',
+            ],
+            'category' => [
+                'sanitize_callback' => 'sanitize_key',
+            ],
+            'limit' => [
+                'sanitize_callback' => 'absint',
+            ],
+        ],
+    ]);
+}
+
+function manual_rest_get_instructions(WP_REST_Request $request): WP_REST_Response
+{
+    $language = manual_instruction_sanitize_language($request->get_param('language'));
+    $category = sanitize_key((string) $request->get_param('category'));
+    $search = trim((string) $request->get_param('search'));
+    $limit = absint($request->get_param('limit'));
+    $limit = $limit > 0 ? min(100, $limit) : 60;
+
+    $args = [
+        'post_type' => 'wp_instruction',
+        'post_status' => 'publish',
+        'posts_per_page' => -1,
+        'orderby' => 'title',
+        'order' => 'ASC',
+    ];
+
+    if ($language !== '') {
+        $args['meta_query'] = [
+            [
+                'key' => '_gwi_language',
+                'value' => $language,
+                'compare' => '=',
+            ],
+        ];
+    }
+
+    if ($category !== '') {
+        $args['tax_query'] = [
+            [
+                'taxonomy' => 'instruction_category',
+                'field' => 'slug',
+                'terms' => [$category],
+            ],
+        ];
+    }
+
+    $items = [];
+
+    foreach (get_posts($args) as $post) {
+        if (!$post instanceof WP_Post || !manual_instruction_matches_search($post->ID, $search)) {
+            continue;
+        }
+
+        $items[] = manual_instruction_response_item($post);
+
+        if (count($items) >= $limit) {
+            break;
+        }
+    }
+
+    return rest_ensure_response([
+        'items' => $items,
+        'count' => count($items),
+    ]);
+}
+
+function manual_instruction_response_item(WP_Post $post): array
+{
+    $terms = get_the_terms($post->ID, 'instruction_category');
+    $categories = [];
+    $category_slugs = [];
+
+    if (!is_wp_error($terms) && !empty($terms)) {
+        foreach ($terms as $term) {
+            $categories[] = [
+                'id' => $term->term_id,
+                'slug' => $term->slug,
+                'name' => manual_instruction_category_label($term),
+            ];
+            $category_slugs[] = $term->slug;
+        }
+    }
+
+    return [
+        'id' => $post->ID,
+        'title' => manual_instruction_task_title($post->ID),
+        'url' => get_permalink($post),
+        'purpose' => manual_instruction_purpose($post->ID),
+        'difficulty' => manual_instruction_difficulty_display_label($post->ID),
+        'minutes' => manual_instruction_estimated_minutes($post->ID),
+        'language' => manual_instruction_language_code($post->ID),
+        'languageLabel' => manual_instruction_language_display_label($post->ID),
+        'groupKey' => manual_instruction_group_key($post->ID),
+        'categories' => $categories,
+        'categorySlugs' => $category_slugs,
+    ];
+}
+
+function manual_instruction_matches_search(int $post_id, string $search): bool
+{
+    $search = trim($search);
+
+    if ($search === '') {
+        return true;
+    }
+
+    $terms = array_merge(
+        [$search],
+        preg_split('/\s+/u', $search) ?: [],
+        manual_expand_finnish_search($search),
+        manual_expanded_search_terms($search)
+    );
+    $terms = array_values(array_unique(array_filter(array_map('trim', $terms))));
+    $haystack = manual_lowercase(manual_instruction_search_haystack($post_id));
+
+    foreach ($terms as $term) {
+        if ($term !== '' && str_contains($haystack, manual_lowercase($term))) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function manual_instruction_search_haystack(int $post_id): string
+{
+    $terms = get_the_terms($post_id, 'instruction_category');
+    $category_text = '';
+
+    if (!is_wp_error($terms) && !empty($terms)) {
+        $category_text = implode(' ', array_map(static function (WP_Term $term): string {
+            return $term->name . ' ' . $term->slug;
+        }, $terms));
+    }
+
+    return implode(' ', [
+        get_the_title($post_id),
+        get_post_field('post_name', $post_id),
+        manual_instruction_task_title($post_id),
+        manual_instruction_purpose($post_id),
+        manual_instruction_card_excerpt($post_id, 80),
+        $category_text,
+    ]);
+}
+
+function manual_lowercase(string $value): string
+{
+    if (function_exists('mb_strtolower')) {
+        return mb_strtolower($value, 'UTF-8');
+    }
+
+    return strtolower($value);
 }
 
 function manual_design_icon(string $icon): string
 {
-    $attrs = 'viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"';
+    $attrs = 'xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"';
+    $svg = static function (string $paths) use ($attrs): string {
+        return '<svg ' . $attrs . '>' . $paths . '</svg>';
+    };
+
+    // Icon paths are from Lucide's open SVG set; keys keep the theme API stable.
     $icons = [
-        'content' => '<svg ' . $attrs . '><path d="M18 10h24l8 8v30a6 6 0 0 1-6 6H18a6 6 0 0 1-6-6V16a6 6 0 0 1 6-6Z"/><path d="M42 10v10h10"/><path d="M22 24h16M22 32h12M22 40h8"/><path d="m39 42 9-9a4 4 0 0 1 6 6l-9 9-8 2 2-8Z"/></svg>',
-        'page' => '<svg ' . $attrs . '><path d="M10 16a6 6 0 0 1 6-6h32a6 6 0 0 1 6 6v28a6 6 0 0 1-6 6H16a6 6 0 0 1-6-6V16Z"/><path d="M10 22h44"/><path d="M18 32h14v12H18z"/><path d="M39 38h14M46 31v14"/></svg>',
-        'fix' => '<svg ' . $attrs . '><path d="M28 12h8l2 7a18 18 0 0 1 5 3l7-2 4 7-5 5a18 18 0 0 1 0 6l5 5-4 7-7-2a18 18 0 0 1-5 3l-2 7h-8l-2-7a18 18 0 0 1-5-3l-7 2-4-7 5-5a18 18 0 0 1 0-6l-5-5 4-7 7 2a18 18 0 0 1 5-3l2-7Z"/><circle cx="32" cy="35" r="8"/><path d="m39 47 11 11M45 52l5-5"/></svg>',
-        'settings' => '<svg ' . $attrs . '><path d="M30 12h8l2 7 6 3 7-2 4 7-5 5v6l5 5-4 7-7-2-6 3-2 7h-8l-2-7-6-3-7 2-4-7 5-5v-6l-5-5 4-7 7 2 6-3 2-7Z"/><circle cx="34" cy="35" r="7"/><path d="M10 18h10M10 46h12M48 16h8M46 50h10"/></svg>',
-        'flag' => '<svg ' . $attrs . '><path d="M18 54V13"/><path d="M20 14c8-5 14 5 25 0v23c-11 5-17-5-25 0V14Z"/></svg>',
-        'code' => '<svg ' . $attrs . '><path d="m24 20-12 12 12 12M40 20l12 12-12 12M35 14 29 50"/></svg>',
-        'pen' => '<svg ' . $attrs . '><path d="m14 46 4-14 26-26a6 6 0 0 1 8 8L26 40 14 46Z"/><path d="m38 12 14 14"/><path d="M18 32 28 42"/></svg>',
-        'layout' => '<svg ' . $attrs . '><path d="M12 14h16v16H12zM36 14h16v16H36zM12 38h16v12H12zM36 38h16v12H36z"/></svg>',
-        'block' => '<svg ' . $attrs . '><path d="M14 14h14v14H14zM36 14h14v14H36zM14 36h14v14H14zM36 36h14v14H36z"/></svg>',
-        'cache' => '<svg ' . $attrs . '><path d="M14 18c0-4 8-8 18-8s18 4 18 8-8 8-18 8-18-4-18-8Z"/><path d="M14 18v14c0 4 8 8 18 8s18-4 18-8V18"/><path d="M14 32v14c0 4 8 8 18 8s18-4 18-8V32"/><path d="M22 47h.1M22 33h.1"/></svg>',
-        'theme' => '<svg ' . $attrs . '><path d="M32 10a22 22 0 0 0 0 44h4a5 5 0 0 0 3-9 4 4 0 0 1 2-7h3a10 10 0 0 0 10-10C54 18 44 10 32 10Z"/><circle cx="22" cy="28" r="2"/><circle cx="30" cy="22" r="2"/><circle cx="39" cy="25" r="2"/><circle cx="26" cy="38" r="2"/></svg>',
-        'plugin' => '<svg ' . $attrs . '><path d="M24 10h16v10h8v16h-8v18H24V36h-8V20h8V10Z"/><path d="M29 10v8M35 10v8M29 54v-8M35 54v-8"/></svg>',
-        'field' => '<svg ' . $attrs . '><path d="M20 16h34M20 32h34M20 48h34"/><circle cx="12" cy="16" r="3"/><circle cx="12" cy="32" r="3"/><circle cx="12" cy="48" r="3"/></svg>',
+        'content' => $svg('<path d="M14.364 13.634a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506l4.013-4.009a1 1 0 0 0-3.004-3.004z"/><path d="M14.487 7.858A1 1 0 0 1 14 7V2"/><path d="M20 19.645V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l2.516 2.516"/><path d="M8 18h1"/>'),
+        'page' => $svg('<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/>'),
+        'fix' => $svg('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"/>'),
+        'settings' => $svg('<path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/>'),
+        'flag' => $svg('<path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/>'),
+        'code' => $svg('<path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/>'),
+        'pen' => $svg('<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>'),
+        'layout' => $svg('<rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/>'),
+        'block' => $svg('<path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2"/><rect x="14" y="2" width="8" height="8" rx="1"/>'),
+        'cache' => $svg('<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 15 21.84"/><path d="M21 5V8"/><path d="M21 12L18 17H22L19 22"/><path d="M3 12A9 3 0 0 0 14.59 14.87"/>'),
+        'theme' => $svg('<path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>'),
+        'plugin' => $svg('<path d="M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z"/>'),
+        'field' => $svg('<path d="M13 5h8"/><path d="M13 12h8"/><path d="M13 19h8"/><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/>'),
     ];
+    $icons['edit'] = $icons['pen'];
+    $icons['build'] = $icons['layout'];
 
     return $icons[$icon] ?? $icons['content'];
 }
@@ -78,11 +418,18 @@ function manual_instruction_single_text(int $post_id, string $key): string
             'no_related' => __('Liittyviä ohjeita ei ole vielä saatavilla.', 'instruction-manual'),
             'tools_label' => __('Ohjeen työkalut', 'instruction-manual'),
             'contents' => __('Sisältö', 'instruction-manual'),
-            'details' => __('Ohjeen tiedot', 'instruction-manual'),
-            'status' => __('Tila', 'instruction-manual'),
-            'last_reviewed' => __('Viimeksi tarkistettu', 'instruction-manual'),
-            'owner' => __('Vastuuhenkilö', 'instruction-manual'),
-            'clarity' => __('Selkeys', 'instruction-manual'),
+            'manual_contents' => __('Ohjealueet', 'instruction-manual'),
+            'all_guides' => __('Kaikki ohjeet', 'instruction-manual'),
+            'on_this_page' => __('Tällä sivulla', 'instruction-manual'),
+            'you_are_here' => __('Olet tässä', 'instruction-manual'),
+            'quick_checklist' => __('Pikachecklist ennen aloitusta', 'instruction-manual'),
+            'steps_intro' => __('Seuraa vaiheita järjestyksessä. Merkitse valmiiksi kun olet tehnyt kohdan.', 'instruction-manual'),
+            'overview_intro' => __('Lyhyt kuvaus siitä, mitä tämä ohje auttaa sinua tekemään.', 'instruction-manual'),
+            'dark_mode_on' => __('Tumma tila', 'instruction-manual'),
+            'dark_mode_off' => __('Vaalea tila', 'instruction-manual'),
+            'copy_code' => __('Kopioi', 'instruction-manual'),
+            'code_copied' => __('Kopioitu', 'instruction-manual'),
+            'guide_actions' => __('Toiminnot', 'instruction-manual'),
             'print' => __('Tulosta', 'instruction-manual'),
             'copy_link' => __('Kopioi linkki', 'instruction-manual'),
             'copied' => __('Kopioitu!', 'instruction-manual'),
@@ -103,11 +450,18 @@ function manual_instruction_single_text(int $post_id, string $key): string
             'no_related' => __('No related guides are available yet.', 'instruction-manual'),
             'tools_label' => __('Guide tools', 'instruction-manual'),
             'contents' => __('Contents', 'instruction-manual'),
-            'details' => __('Guide details', 'instruction-manual'),
-            'status' => __('Status', 'instruction-manual'),
-            'last_reviewed' => __('Last reviewed', 'instruction-manual'),
-            'owner' => __('Owner', 'instruction-manual'),
-            'clarity' => __('Clarity', 'instruction-manual'),
+            'manual_contents' => __('Contents', 'instruction-manual'),
+            'all_guides' => __('All guides', 'instruction-manual'),
+            'on_this_page' => __('On this page', 'instruction-manual'),
+            'you_are_here' => __('You are here', 'instruction-manual'),
+            'quick_checklist' => __('Quick checklist before you start', 'instruction-manual'),
+            'steps_intro' => __('Follow the steps in order. Mark each one done when you finish it.', 'instruction-manual'),
+            'overview_intro' => __('A short summary of what this guide helps you accomplish.', 'instruction-manual'),
+            'dark_mode_on' => __('Dark mode', 'instruction-manual'),
+            'dark_mode_off' => __('Light mode', 'instruction-manual'),
+            'copy_code' => __('Copy', 'instruction-manual'),
+            'code_copied' => __('Copied', 'instruction-manual'),
+            'guide_actions' => __('Actions', 'instruction-manual'),
             'print' => __('Print', 'instruction-manual'),
             'copy_link' => __('Copy link', 'instruction-manual'),
             'copied' => __('Copied!', 'instruction-manual'),
@@ -143,7 +497,9 @@ function manual_document_title_parts(array $title): array
 {
     $title['site'] = __('WordPress-ohjeet', 'instruction-manual');
 
-    if (is_front_page()) {
+    if (manual_is_glossary_view()) {
+        $title['title'] = __('WordPress-sanasto', 'instruction-manual');
+    } elseif (is_front_page()) {
         $title['title'] = __('WordPress-ohjeet selkeästi', 'instruction-manual');
     } elseif (is_post_type_archive('wp_instruction')) {
         $title['title'] = __('Kaikki ohjeet', 'instruction-manual');
@@ -176,6 +532,7 @@ function manual_instruction_archive_url(): string
 function manual_instruction_query_vars(array $vars): array
 {
     $vars[] = 'instruction_language';
+    $vars[] = 'manual_view';
 
     return $vars;
 }
@@ -202,7 +559,15 @@ function manual_instruction_sanitize_language($language): string
 
 function manual_instruction_current_language(): string
 {
-    return manual_instruction_sanitize_language(get_query_var('instruction_language'));
+    $raw_language = get_query_var('instruction_language');
+
+    if (is_string($raw_language) && strtolower($raw_language) === 'all') {
+        return '';
+    }
+
+    $language = manual_instruction_sanitize_language($raw_language);
+
+    return $language !== '' ? $language : 'fi';
 }
 
 function manual_filter_instruction_archive_by_language(WP_Query $query): void
@@ -225,7 +590,13 @@ function manual_filter_instruction_archive_by_language(WP_Query $query): void
         $query->set('order', 'ASC');
     }
 
-    $language = manual_instruction_sanitize_language($query->get('instruction_language'));
+    $raw_language = $query->get('instruction_language');
+
+    if (is_string($raw_language) && strtolower($raw_language) === 'all') {
+        return;
+    }
+
+    $language = manual_instruction_sanitize_language($raw_language);
 
     if ($language === '') {
         $language = 'fi';
@@ -256,7 +627,7 @@ function manual_instruction_language_filter_url(string $language = ''): string
     }
 
     if ($language === '') {
-        return remove_query_arg('instruction_language', $base_url);
+        return add_query_arg('instruction_language', 'all', $base_url);
     }
 
     return add_query_arg('instruction_language', manual_instruction_sanitize_language($language), $base_url);
@@ -312,7 +683,7 @@ function manual_instruction_card_excerpt(int $post_id, int $word_limit = 24): st
     $text = preg_replace('/\s+/', ' ', $text);
     $text = trim((string) $text);
 
-    return $text !== '' ? wp_trim_words($text, $word_limit) : '';
+    return $text !== '' ? wp_trim_words($text, $word_limit, '...') : '';
 }
 
 function manual_instruction_text_from_content(string $content): string
@@ -867,6 +1238,126 @@ function manual_glossary_terms(): array
         __('Sivupohja', 'instruction-manual') => __('Uudelleenkäytettävä rakenne, joka määrittää mitä sisältökenttiä tai osioita on saatavilla.', 'instruction-manual'),
         __('Uudelleenohjaus', 'instruction-manual') => __('Sääntö, joka ohjaa kävijät yhdestä URL-osoitteesta toiseen.', 'instruction-manual'),
         __('Julkinen sivu', 'instruction-manual') => __('Sivu, jonka kävijät näkevät – ei WordPressin muokkausnäkymä.', 'instruction-manual'),
+        __('ACF', 'instruction-manual') => __('Advanced Custom Fields -lisäosa, jolla sivuille ja artikkeleille voidaan lisätä omia kenttiä.', 'instruction-manual'),
+        __('ACF-lohko', 'instruction-manual') => __('Mukautettu lohko, jonka kentät on rakennettu Advanced Custom Fieldsilla.', 'instruction-manual'),
+        __('Ajastettu julkaisu', 'instruction-manual') => __('Sisältö, joka on asetettu julkaistavaksi automaattisesti tiettynä päivänä ja kellonaikana.', 'instruction-manual'),
+        __('Alatunniste', 'instruction-manual') => __('Sivuston alaosa, jossa on usein yhteystietoja, linkkejä tai lisänavigaatio.', 'instruction-manual'),
+        __('Alt-teksti', 'instruction-manual') => __('Kuvan vaihtoehtoinen teksti. Se auttaa hakukoneita ja ruudunlukijoita ymmärtämään kuvan sisällön.', 'instruction-manual'),
+        __('Ankkurilinkki', 'instruction-manual') => __('Linkki, joka vie saman sivun tiettyyn kohtaan.', 'instruction-manual'),
+        __('Arkisto', 'instruction-manual') => __('Sivu, joka listaa useita sisältöjä, kuten artikkeleita, kategorian sisältöjä tai hakutuloksia.', 'instruction-manual'),
+        __('Artikkeli', 'instruction-manual') => __('Ajankohtainen julkaisu tai blogikirjoitus, joka voi kuulua kategorioihin ja avainsanoihin.', 'instruction-manual'),
+        __('Asetukset', 'instruction-manual') => __('WordPressin hallinta-alue, jossa säädetään sivuston yleisiä toimintoja.', 'instruction-manual'),
+        __('Asettelu', 'instruction-manual') => __('Sisällön rakenne sivulla: esimerkiksi sarakkeet, nostot, kuvat ja tekstialueet.', 'instruction-manual'),
+        __('Avainsana', 'instruction-manual') => __('Artikkeleihin liitettävä tunniste, jolla samankaltaista sisältöä voidaan ryhmitellä.', 'instruction-manual'),
+        __('Automaattitallennus', 'instruction-manual') => __('WordPressin väliaikainen tallennus, joka voi palauttaa muutoksia jos selain sulkeutuu vahingossa.', 'instruction-manual'),
+        __('CDN', 'instruction-manual') => __('Sisällönjakeluverkko, joka voi nopeuttaa kuvien, tyylien ja tiedostojen lataamista eri sijainneista.', 'instruction-manual'),
+        __('Editorin sivupalkki', 'instruction-manual') => __('Muokkausnäkymän oikea paneeli, jossa säädetään sivun, artikkelin tai valitun lohkon asetuksia.', 'instruction-manual'),
+        __('Esikatselu', 'instruction-manual') => __('Näkymä, jossa muutosta voi tarkistaa ennen julkaisua tai päivittämistä.', 'instruction-manual'),
+        __('Etupää', 'instruction-manual') => __('Sivuston julkinen puoli, jonka kävijät näkevät selaimessa.', 'instruction-manual'),
+        __('Galleria', 'instruction-manual') => __('Usean kuvan kokonaisuus, joka näytetään sivulla yhdessä.', 'instruction-manual'),
+        __('Hallintapalkki', 'instruction-manual') => __('Kirjautuneelle käyttäjälle näkyvä yläpalkki, josta pääsee nopeasti muokkaukseen ja hallintaan.', 'instruction-manual'),
+        __('Hallintapaneeli', 'instruction-manual') => __('WordPressin sisäinen hallinta-alue, jossa sisältöä, käyttäjiä, teemoja ja asetuksia muokataan.', 'instruction-manual'),
+        __('Hakukoneoptimointi', 'instruction-manual') => __('Sisällön ja sivuston rakenteen parantamista, jotta hakukoneet ymmärtävät sivut paremmin.', 'instruction-manual'),
+        __('Hakutulos', 'instruction-manual') => __('Sivuston sisäisen haun tai hakukoneen näyttämä tulos.', 'instruction-manual'),
+        __('Hosting', 'instruction-manual') => __('Palvelu ja palvelinympäristö, jossa WordPress-sivusto sijaitsee.', 'instruction-manual'),
+        __('HTML', 'instruction-manual') => __('Merkintäkieli, jolla verkkosivun rakenne kuvataan. WordPress tuottaa sitä sivun sisällöstä ja lohkoista.', 'instruction-manual'),
+        __('HTTPS', 'instruction-manual') => __('Suojattu verkkoyhteys, joka näkyy selaimen osoitteessa lukon tai https-alkuisen osoitteen muodossa.', 'instruction-manual'),
+        __('Indeksointi', 'instruction-manual') => __('Prosessi, jossa hakukone lisää sivun omaan hakemistoonsa hakutuloksia varten.', 'instruction-manual'),
+        __('Joustava sisältö', 'instruction-manual') => __('ACF:n kenttätyyppi, jolla sivulle voidaan lisätä ja järjestää valmiita sisältöosioita.', 'instruction-manual'),
+        __('Julkaise', 'instruction-manual') => __('Toiminto, joka tekee luonnoksesta julkisen sivun tai artikkelin.', 'instruction-manual'),
+        __('Julkaisupäivä', 'instruction-manual') => __('Päivä ja aika, jolloin sisältö julkaistaan tai on julkaistu.', 'instruction-manual'),
+        __('Julkaisutila', 'instruction-manual') => __('Kertoo onko sisältö luonnos, julkaistu, ajastettu, yksityinen tai roskakorissa.', 'instruction-manual'),
+        __('Kappale', 'instruction-manual') => __('Tavallinen tekstilohko WordPress-editorissa.', 'instruction-manual'),
+        __('Kategoria', 'instruction-manual') => __('Artikkelien aihealue, jolla sisältöä voidaan ryhmitellä laajempiin kokonaisuuksiin.', 'instruction-manual'),
+        __('Keskustelun asetukset', 'instruction-manual') => __('Asetukset, joissa hallitaan kommentteja, ilmoituksia ja keskustelun oletuksia.', 'instruction-manual'),
+        __('Kenttäryhmä', 'instruction-manual') => __('ACF:n kokoelma kenttiä, joka näkyy tietyissä muokkausnäkymissä.', 'instruction-manual'),
+        __('Kirjoittamisen asetukset', 'instruction-manual') => __('Asetukset, jotka vaikuttavat sisällön kirjoittamisen oletuksiin ja julkaisutapoihin.', 'instruction-manual'),
+        __('Kirjautuminen', 'instruction-manual') => __('Toiminto, jolla käyttäjä pääsee WordPressin hallintaan omilla tunnuksillaan.', 'instruction-manual'),
+        __('Kirjoittaja', 'instruction-manual') => __('Käyttäjärooli, joka voi yleensä kirjoittaa ja julkaista omia artikkeleitaan.', 'instruction-manual'),
+        __('Kommentti', 'instruction-manual') => __('Kävijän tai käyttäjän jättämä viesti artikkelin tai sivun yhteyteen, jos kommentointi on käytössä.', 'instruction-manual'),
+        __('Kommenttien moderointi', 'instruction-manual') => __('Kommenttien tarkistamista, hyväksymistä, poistamista tai merkitsemistä roskapostiksi.', 'instruction-manual'),
+        __('Kommenttijono', 'instruction-manual') => __('Näkymä, jossa odottavat, hyväksytyt, roskapostiksi merkityt ja poistetut kommentit näkyvät.', 'instruction-manual'),
+        __('Kotisivu', 'instruction-manual') => __('Sivuston etusivu. Se voi olla staattinen sivu tai lista uusimmista artikkeleista.', 'instruction-manual'),
+        __('Kuva', 'instruction-manual') => __('Mediakirjastoon ladattu kuvatiedosto, jota voidaan käyttää sivuilla ja artikkeleissa.', 'instruction-manual'),
+        __('Kuvateksti', 'instruction-manual') => __('Kuvan yhteydessä näkyvä lyhyt seliteteksti.', 'instruction-manual'),
+        __('Käyttäjä', 'instruction-manual') => __('Henkilö, jolla on tunnus WordPress-sivustolle ja jokin käyttäjärooli.', 'instruction-manual'),
+        __('Käyttäjärooli', 'instruction-manual') => __('Määrittää mitä käyttäjä saa tehdä WordPressissä, kuten muokata sivuja tai hallita asetuksia.', 'instruction-manual'),
+        __('Käyttöoikeus', 'instruction-manual') => __('Tietty oikeus tehdä jokin toiminto WordPressissä, kuten julkaista, muokata tai hallita asetuksia.', 'instruction-manual'),
+        __('Liitetiedosto', 'instruction-manual') => __('Mediakirjastoon ladattu tiedosto, kuten kuva, PDF tai dokumentti.', 'instruction-manual'),
+        __('Linkki', 'instruction-manual') => __('Klikattava osoite, joka vie toiselle sivulle, tiedostoon tai sivustolle.', 'instruction-manual'),
+        __('Lisäosa', 'instruction-manual') => __('WordPressiin asennettava toiminnallisuuspaketti. Sama asia kuin plugin.', 'instruction-manual'),
+        __('Lista', 'instruction-manual') => __('Lohko, jolla tehdään luettelomerkkejä tai numeroituja listoja.', 'instruction-manual'),
+        __('Lohkoeditori', 'instruction-manual') => __('WordPressin nykyinen editori, jossa sisältö rakennetaan erillisistä lohkoista.', 'instruction-manual'),
+        __('Lohkomalli', 'instruction-manual') => __('Valmis lohkojen yhdistelmä, jonka voi lisätä sivulle uudelleenkäytettäväksi rakenteeksi.', 'instruction-manual'),
+        __('Logo', 'instruction-manual') => __('Sivuston tunnuskuva tai tekstimuotoinen merkki, joka näkyy usein ylätunnisteessa.', 'instruction-manual'),
+        __('Luonnos', 'instruction-manual') => __('Tallennettu sisältö, jota ei ole vielä julkaistu kävijöille.', 'instruction-manual'),
+        __('Lyhytkoodi', 'instruction-manual') => __('Hakasulkeissa kirjoitettava koodi, joka lisää sivulle valmiin toiminnon tai sisällön.', 'instruction-manual'),
+        __('Lukemisen asetukset', 'instruction-manual') => __('Asetukset, joissa valitaan esimerkiksi etusivu ja artikkeleiden näyttötapa.', 'instruction-manual'),
+        __('Media-asetukset', 'instruction-manual') => __('Asetukset, jotka vaikuttavat kuvien oletuskokoihin ja mediatiedostojen käsittelyyn.', 'instruction-manual'),
+        __('Mediakirjasto', 'instruction-manual') => __('WordPressin paikka kuville, PDF-tiedostoille, videoille ja muille ladatuille tiedostoille.', 'instruction-manual'),
+        __('Metakuvaus', 'instruction-manual') => __('Hakukoneille tarkoitettu lyhyt kuvaus sivun sisällöstä. Usein SEO-lisäosan kenttä.', 'instruction-manual'),
+        __('Mobiilinäkymä', 'instruction-manual') => __('Sivun ulkoasu puhelimella tai pienellä näytöllä.', 'instruction-manual'),
+        __('Mukautettu kenttä', 'instruction-manual') => __('Lisäkenttä, johon tallennetaan sivulle tai artikkelille erillistä dataa.', 'instruction-manual'),
+        __('Mukautettu linkki', 'instruction-manual') => __('Valikkoon lisättävä linkki, joka voi osoittaa mihin tahansa URL-osoitteeseen.', 'instruction-manual'),
+        __('Mukautettu sisältötyyppi', 'instruction-manual') => __('WordPressiin lisätty oma sisältölaji, kuten ohje, tapahtuma, tuote tai henkilö.', 'instruction-manual'),
+        __('Muokkaaja', 'instruction-manual') => __('Henkilö, joka päivittää sivuston sisältöä WordPressissä.', 'instruction-manual'),
+        __('Murupolku', 'instruction-manual') => __('Navigaatiopolku, joka näyttää käyttäjän sijainnin sivuston rakenteessa.', 'instruction-manual'),
+        __('Navigaatio', 'instruction-manual') => __('Sivuston linkkirakenne, jonka avulla kävijä liikkuu sivulta toiselle.', 'instruction-manual'),
+        __('Noindex', 'instruction-manual') => __('SEO-asetus, jolla hakukoneita pyydetään olemaan lisäämättä sivua hakutuloksiin.', 'instruction-manual'),
+        __('Osoiterakenne', 'instruction-manual') => __('Sääntö, jonka mukaan WordPress muodostaa sivujen ja artikkeleiden URL-osoitteet.', 'instruction-manual'),
+        __('Osallistuja', 'instruction-manual') => __('Käyttäjärooli, joka voi yleensä kirjoittaa luonnoksia mutta ei julkaista niitä itse.', 'instruction-manual'),
+        __('Otsikko', 'instruction-manual') => __('Teksti, joka nimeää sivun, artikkelin tai sisältöosion.', 'instruction-manual'),
+        __('Painike', 'instruction-manual') => __('Korostettu linkki, jota käytetään selkeänä toimintakehotuksena.', 'instruction-manual'),
+        __('Palautusversio', 'instruction-manual') => __('Aiempi tallennettu versio sisällöstä, johon voidaan tarvittaessa palata.', 'instruction-manual'),
+        __('Palvelin', 'instruction-manual') => __('Tekninen ympäristö, jossa WordPress, tietokanta ja tiedostot toimivat.', 'instruction-manual'),
+        __('PDF', 'instruction-manual') => __('Tiedostomuoto, jota käytetään usein ladattaville dokumenteille ja lomakkeille.', 'instruction-manual'),
+        __('Perinteinen editori', 'instruction-manual') => __('WordPressin vanhempi tekstieditori, jossa sisältöä muokataan yhtenä pääsisältöalueena.', 'instruction-manual'),
+        __('Päävalikko', 'instruction-manual') => __('Sivuston tärkein navigaatiovalikko, joka näkyy yleensä ylätunnisteessa.', 'instruction-manual'),
+        __('Pysyvä linkki', 'instruction-manual') => __('Sivun tai artikkelin pysyvä URL-osoite.', 'instruction-manual'),
+        __('Päivitä', 'instruction-manual') => __('Painike, jolla julkaistun sivun tai artikkelin muutokset tallennetaan.', 'instruction-manual'),
+        __('Päivitys', 'instruction-manual') => __('WordPressin, teeman tai lisäosan uusi versio, joka voi sisältää korjauksia ja parannuksia.', 'instruction-manual'),
+        __('Pääkäyttäjä', 'instruction-manual') => __('Käyttäjärooli, jolla on laajat oikeudet sivuston sisältöön, asetuksiin, teemoihin ja lisäosiin.', 'instruction-manual'),
+        __('Responsiivinen', 'instruction-manual') => __('Sivusto tai asettelu, joka mukautuu eri kokoisille näytöille.', 'instruction-manual'),
+        __('Robots.txt', 'instruction-manual') => __('Tiedosto tai sääntö, jolla annetaan hakukoneille ohjeita sivuston indeksointiin.', 'instruction-manual'),
+        __('Rooli', 'instruction-manual') => __('Käyttäjälle annettu oikeustaso, kuten pääkäyttäjä, toimittaja tai tilaaja.', 'instruction-manual'),
+        __('Roskakori', 'instruction-manual') => __('Paikka poistetulle sisällölle ennen pysyvää poistamista.', 'instruction-manual'),
+        __('Roskaposti', 'instruction-manual') => __('Ei-toivottu kommentti tai viesti, joka kannattaa poistaa tai suodattaa.', 'instruction-manual'),
+        __('Salasanasuojattu', 'instruction-manual') => __('Sisältö, jonka näkeminen vaatii erillisen salasanan.', 'instruction-manual'),
+        __('SEO', 'instruction-manual') => __('Hakukoneoptimoinnin lyhenne. Tavoitteena on tehdä sivusta ymmärrettävämpi hakukoneille ja käyttäjille.', 'instruction-manual'),
+        __('Sisäinen linkki', 'instruction-manual') => __('Linkki saman sivuston toiseen sivuun tai artikkeliin.', 'instruction-manual'),
+        __('Sisältöosio', 'instruction-manual') => __('Sivun erillinen alue, kuten hero, teksti-kuva-osio, nosto tai yhteydenottolohko.', 'instruction-manual'),
+        __('Sisältötyyppi', 'instruction-manual') => __('WordPressin tapa erottaa erilaiset sisällöt, kuten sivut, artikkelit ja omat sisältötyypit.', 'instruction-manual'),
+        __('Sitemap', 'instruction-manual') => __('Sivustokartta, joka auttaa hakukoneita löytämään sivuston tärkeät URL-osoitteet.', 'instruction-manual'),
+        __('Sivu', 'instruction-manual') => __('Pysyvämpi sisältö, kuten etusivu, yhteystiedot tai palvelusivu.', 'instruction-manual'),
+        __('Sivupalkki', 'instruction-manual') => __('Sivun reuna-alue, jossa voi olla navigaatiota, widgettejä tai muuta lisäsisältöä.', 'instruction-manual'),
+        __('Sivuston kuvaus', 'instruction-manual') => __('Lyhyt kuvausteksti, joka kertoo sivuston tarkoituksen. Löytyy yleisistä asetuksista.', 'instruction-manual'),
+        __('Sivuston otsikko', 'instruction-manual') => __('Sivuston nimi WordPressin asetuksissa.', 'instruction-manual'),
+        __('Sivustokuvake', 'instruction-manual') => __('Pieni kuvake, joka näkyy selaimen välilehdessä ja kirjanmerkeissä.', 'instruction-manual'),
+        __('Slug', 'instruction-manual') => __('URL-osoitteen tekninen tunniste, esimerkiksi sivun nimestä muodostettu polku.', 'instruction-manual'),
+        __('SSL', 'instruction-manual') => __('Suojaustekniikka, joka mahdollistaa HTTPS-yhteyden sivustolle.', 'instruction-manual'),
+        __('Synkronoitu malli', 'instruction-manual') => __('Uudelleenkäytettävä lohkokokonaisuus, jonka muutokset päivittyvät kaikkiin sen käyttökohteisiin.', 'instruction-manual'),
+        __('Taksonomia', 'instruction-manual') => __('Sisällön ryhmittelytapa, kuten kategoriat ja avainsanat.', 'instruction-manual'),
+        __('Taulukko', 'instruction-manual') => __('Lohko, jolla esitetään tietoa riveinä ja sarakkeina.', 'instruction-manual'),
+        __('Teeman mukauttaja', 'instruction-manual') => __('Ulkoasun asetusten näkymä, jossa joitakin teeman valintoja voidaan muuttaa esikatselun kanssa.', 'instruction-manual'),
+        __('Tekstieditori', 'instruction-manual') => __('Muokkaustila, jossa sisältöä voidaan käsitellä teknisempänä tekstinä tai HTML:nä.', 'instruction-manual'),
+        __('Tietokanta', 'instruction-manual') => __('Paikka, johon WordPress tallentaa sisällöt, asetukset, käyttäjät ja monet lisäosien tiedot.', 'instruction-manual'),
+        __('Tilaaja', 'instruction-manual') => __('Käyttäjärooli, jolla on yleensä vain omaan profiiliin liittyviä oikeuksia.', 'instruction-manual'),
+        __('Toimittaja', 'instruction-manual') => __('Käyttäjärooli, joka voi yleensä muokata ja julkaista useiden käyttäjien sisältöjä.', 'instruction-manual'),
+        __('Turvallisuus', 'instruction-manual') => __('Käytännöt ja asetukset, joilla sivustoa suojataan väärinkäytöltä ja teknisiltä riskeiltä.', 'instruction-manual'),
+        __('Tyylit', 'instruction-manual') => __('Ulkoasun asetukset, kuten värit, typografia, välit ja lohkojen esitystapa.', 'instruction-manual'),
+        __('Ulkoinen linkki', 'instruction-manual') => __('Linkki toiselle sivustolle.', 'instruction-manual'),
+        __('Upotus', 'instruction-manual') => __('Sisältö, joka näytetään toisesta palvelusta, kuten video tai kartta.', 'instruction-manual'),
+        __('URL', 'instruction-manual') => __('Verkko-osoite, joka kertoo selaimelle mistä sivu tai tiedosto löytyy.', 'instruction-manual'),
+        __('Valikko', 'instruction-manual') => __('Kokoelma linkkejä, joita käytetään sivuston navigaatiossa.', 'instruction-manual'),
+        __('Varmuuskopio', 'instruction-manual') => __('Kopio sivuston tiedostoista ja tietokannasta palautusta varten.', 'instruction-manual'),
+        __('Verkkotunnus', 'instruction-manual') => __('Sivuston domain-nimi, kuten esimerkki.fi.', 'instruction-manual'),
+        __('Virhe 404', 'instruction-manual') => __('Tilanne, jossa pyydettyä sivua tai tiedostoa ei löydy annetusta osoitteesta.', 'instruction-manual'),
+        __('Visuaalinen editori', 'instruction-manual') => __('Muokkaustila, jossa sisältö näyttää mahdollisimman lähellä lopullista ulkoasua.', 'instruction-manual'),
+        __('Widget', 'instruction-manual') => __('Pieni sisältö- tai toimintoalue, jota käytetään esimerkiksi sivupalkissa tai alatunnisteessa.', 'instruction-manual'),
+        __('WordPress-hallinta', 'instruction-manual') => __('Kirjautumisen takana oleva alue, jossa sivustoa ylläpidetään ja sisältöä muokataan.', 'instruction-manual'),
+        __('Yleiset asetukset', 'instruction-manual') => __('Asetussivu, jossa määritetään muun muassa sivuston nimi, kuvaus, osoite ja aikavyöhyke.', 'instruction-manual'),
+        __('Yksityinen', 'instruction-manual') => __('Julkaisutila, jossa sisältö ei näy kaikille kävijöille.', 'instruction-manual'),
+        __('Ylätunniste', 'instruction-manual') => __('Sivuston yläosa, jossa on usein logo, päävalikko ja haku.', 'instruction-manual'),
     ];
 }
 

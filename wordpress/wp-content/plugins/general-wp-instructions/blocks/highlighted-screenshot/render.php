@@ -10,6 +10,10 @@ if (isset($content)) {
     }
 }
 
+$post_id = gwi_get_instruction_post_id_from_block($block ?? null);
+$language = ($post_id > 0 && function_exists('gwi_get_instruction_language'))
+    ? gwi_get_instruction_language($post_id)
+    : '';
 $image_url = isset($attributes['imageUrl']) ? (string) $attributes['imageUrl'] : '';
 $screenshot_id = isset($attributes['screenshotId']) ? sanitize_file_name((string) $attributes['screenshotId']) : '';
 
@@ -21,31 +25,22 @@ if ($screenshot_id === '' && isset($legacy_attributes['screenshotId'])) {
     $screenshot_id = sanitize_file_name((string) $legacy_attributes['screenshotId']);
 }
 
-if ($image_url === '' && $screenshot_id !== '') {
-    $upload_dir = wp_get_upload_dir();
-    $language = function_exists('gwi_get_instruction_language') ? gwi_get_instruction_language(get_the_ID()) : '';
-    $candidates = array_filter([
-        $language !== '' ? $screenshot_id . '-' . $language . '.png' : '',
-        $screenshot_id . '-fi.png',
-        $screenshot_id . '-en.png',
-        $screenshot_id . '.png',
-    ]);
+$context_url = '';
 
-    foreach (array_unique($candidates) as $filename) {
-        $path = trailingslashit($upload_dir['basedir']) . 'instruction-screenshots/' . $filename;
+if ($screenshot_id !== '') {
+    $resolved_url = gwi_get_instruction_screenshot_url($screenshot_id, $post_id, $image_url);
 
-        if (file_exists($path)) {
-            $image_url = trailingslashit($upload_dir['baseurl']) . 'instruction-screenshots/' . $filename;
-            break;
-        }
+    if ($resolved_url !== '') {
+        $image_url = $resolved_url;
     }
+
+    $context_url = gwi_get_instruction_screenshot_context_url($screenshot_id, $post_id, $language);
 }
 
 if ($image_url === '') {
     return;
 }
 
-$language = function_exists('gwi_get_instruction_language') ? gwi_get_instruction_language(get_the_ID()) : '';
 $alt = isset($attributes['alt']) ? (string) $attributes['alt'] : '';
 $caption = isset($attributes['caption']) ? (string) $attributes['caption'] : '';
 $label = isset($attributes['label']) ? (string) $attributes['label'] : '';
@@ -68,8 +63,9 @@ if ($alt === '' && $caption !== '') {
 
 $note_label = $language === 'fi' ? __('Kuvassa', 'general-wp-instructions') : __('Screenshot', 'general-wp-instructions');
 $note_hint = $language === 'fi'
-    ? __('Katso keltaisella korostettua kohtaa.', 'general-wp-instructions')
-    : __('Look for the yellow highlight.', 'general-wp-instructions');
+    ? __('Kohde on merkitty kehyksellä kuvassa.', 'general-wp-instructions')
+    : __('The target control is outlined in the image.', 'general-wp-instructions');
+$show_figcaption = $caption !== '' && $screenshot_id === '';
 
 $highlight_x = gwi_percent_attribute($attributes['highlightX'] ?? $legacy_attributes['highlightX'] ?? null, 62);
 $highlight_y = gwi_percent_attribute($attributes['highlightY'] ?? $legacy_attributes['highlightY'] ?? null, 18);
@@ -95,7 +91,17 @@ $style = sprintf(
         <span><?php echo esc_html($caption !== '' ? wp_strip_all_tags($caption) : $note_hint); ?></span>
     </div>
     <div class="gwi-highlighted-screenshot__frame">
-        <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($alt); ?>" loading="eager" decoding="async">
+        <?php
+        gwi_render_expandable_screenshot([
+            'detail_url' => $image_url,
+            'context_url' => $context_url,
+            'alt' => $alt,
+            'caption' => $caption,
+            'language' => $language,
+            'frame_class' => 'gwi-highlighted-screenshot__expand',
+            'loading' => 'eager',
+        ]);
+        ?>
         <?php if ($show_overlay) : ?>
             <span class="gwi-highlighted-screenshot__box" style="<?php echo esc_attr($style); ?>">
                 <?php if ($label !== '') : ?>
@@ -104,7 +110,7 @@ $style = sprintf(
             </span>
         <?php endif; ?>
     </div>
-    <?php if ($caption !== '') : ?>
+    <?php if ($show_figcaption) : ?>
         <figcaption><?php echo esc_html($note_hint); ?></figcaption>
     <?php endif; ?>
 </figure>
