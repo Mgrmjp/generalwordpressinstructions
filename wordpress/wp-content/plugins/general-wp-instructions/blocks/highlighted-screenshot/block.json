@@ -1,5 +1,5 @@
 {
-  "apiVersion": 2,
+  "apiVersion": 3,
   "name": "general-wp-instructions/highlighted-screenshot",
   "title": "Highlighted Screenshot",
   "category": "media",
@@ -29,7 +29,7 @@
     },
     "label": {
       "type": "string",
-      "default": "Click here"
+      "default": ""
     },
     "highlightX": {
       "type": "number",

@@ -39,7 +39,7 @@ Local WordPress training site for bilingual Finnish/English instructions, highli
 
 ## Instruction Library
 
-The plugin seeds 44 instruction posts (22 topics × 2 languages) organized into 5 categories:
+The plugin seeds 54 instruction posts (27 topics × 2 languages) organized into 5 categories:
 
 ### WordPress Fundamentals
 - Dashboard Overview
@@ -50,10 +50,10 @@ The plugin seeds 44 instruction posts (22 topics × 2 languages) organized into 
 - Managing Comments
 
 ### Site Configuration
-- Creating Menus
+- Navigation Menus
 - Managing Users
 - WordPress Settings
-- Theme Customizer
+- Theme Appearance and Fonts
 
 ### Block Editor
 - Block Editor Basics
@@ -61,7 +61,10 @@ The plugin seeds 44 instruction posts (22 topics × 2 languages) organized into 
 - Common Content Blocks
 - Media Blocks
 - Layout Blocks
-- Reusable Blocks and Patterns
+- Synced Patterns and Patterns
+- Preview and Publish Changes
+- Use List View
+- Add Images with Alt Text
 
 ### Classic Editor
 - Classic Editor Basics
@@ -104,11 +107,23 @@ ACF is optional. Native Gutenberg blocks and instruction posts work without it.
 
 If ACF Pro is installed, the plugin registers ACF Blocks and the `acf-json` field group exposes an older Flexible Content authoring model for instructions.
 
-Flexible Content rows render automatically on single instruction pages. If a page needs manual placement, add this shortcode in the content:
+Flexible Content rows render on single instruction pages (the theme prints a dedicated region after the main content when rows exist and no shortcode is present). If a page needs manual placement, add this shortcode in the content:
 
 ```text
 [gwi_flexible_content]
 ```
+
+### Flexible demo seed and screenshots
+
+Live FI/EN examples on the flexible-content guides use ACF rows seeded from the plugin manifest. Screenshot rows resolve in order: media attachment (by screenshot key), import from `uploads/instruction-screenshots/{id}-{lang}.png`, then URL; if none are available, the front end shows an unavailable state (row is never dropped).
+
+After capturing or copying PNGs into `uploads/instruction-screenshots/`, refresh examples:
+
+```sh
+lando wp gwi seed-flexible-examples --force --path=wordpress
+```
+
+`lando wp gwi resync-instructions --path=wordpress` updates post content from seed PHP but **does not** overwrite flexible example rows unless their seed version meta is outdated. Use `--force` on `seed-flexible-examples` when you change the manifest or screenshots.
 
 ## Verification
 

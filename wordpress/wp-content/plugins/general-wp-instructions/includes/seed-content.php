@@ -7,8 +7,10 @@ if (!defined('ABSPATH')) {
 require_once GWI_PLUGIN_DIR . 'includes/seed-fundamentals.php';
 require_once GWI_PLUGIN_DIR . 'includes/seed-site-config.php';
 require_once GWI_PLUGIN_DIR . 'includes/seed-block-editor.php';
+require_once GWI_PLUGIN_DIR . 'includes/seed-editor-workflows.php';
 require_once GWI_PLUGIN_DIR . 'includes/seed-classic-editor.php';
 require_once GWI_PLUGIN_DIR . 'includes/seed-advanced.php';
+require_once GWI_PLUGIN_DIR . 'includes/seed-flexible-examples.php';
 
 function gwi_seed_instruction_content(): void
 {
@@ -16,6 +18,7 @@ function gwi_seed_instruction_content(): void
         gwi_seed_fundamentals(),
         gwi_seed_site_config(),
         gwi_seed_block_editor(),
+        gwi_seed_editor_workflows(),
         gwi_seed_classic_editor(),
         gwi_seed_advanced()
     );
@@ -27,6 +30,8 @@ function gwi_seed_instruction_content(): void
     }
 
     gwi_assign_seed_categories();
+    gwi_seed_flexible_demo_pages();
+    gwi_seed_flexible_content_examples(false);
 }
 
 function gwi_resync_seed_instructions(): int
@@ -47,6 +52,8 @@ function gwi_create_seed_instruction(string $slug, string $title, string $langua
         $title = gwi_normalize_finnish_text($title);
         $content = gwi_normalize_finnish_text($content);
     }
+
+    $content = gwi_normalize_highlighted_screenshot_block_content($content);
 
     $existing = get_page_by_path($slug, OBJECT, 'wp_instruction');
 
@@ -126,6 +133,9 @@ function gwi_assign_seed_categories(): void
             'media-blocks-en', 'medialohkot-fi',
             'layout-blocks-en', 'asettelulohkot-fi',
             'reusable-blocks-en', 'uudelleenkaytettavat-lohkot-ja-mallit-fi',
+            'preview-publish-changes-en', 'esikatsele-ja-julkaise-muutokset-fi',
+            'use-list-view-en', 'listanakyman-kaytto-fi',
+            'add-images-with-alt-text-en', 'lisaa-kuvia-alt-tekstilla-fi',
         ],
         'classic-editor' => [
             'classic-editor-basics-en', 'perinteisen-editorin-perusteet-fi',
@@ -146,7 +156,7 @@ function gwi_assign_seed_categories(): void
             $post = get_page_by_path($slug, OBJECT, 'wp_instruction');
 
             if ($post instanceof WP_Post) {
-                wp_set_object_terms($post->ID, $category, 'instruction_category', true);
+                wp_set_object_terms($post->ID, $category, 'instruction_category', false);
             }
         }
     }

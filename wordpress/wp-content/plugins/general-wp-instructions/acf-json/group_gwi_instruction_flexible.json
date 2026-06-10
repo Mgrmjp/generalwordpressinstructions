@@ -1,13 +1,13 @@
 {
   "key": "group_gwi_instruction_flexible",
-  "title": "Instruction: Flexible Content",
+  "title": "Page sections (flexible content)",
   "fields": [
     {
       "key": "field_gwi_instruction_sections",
-      "label": "Instruction Sections",
+      "label": "Page sections",
       "name": "instruction_sections",
       "type": "flexible_content",
-      "instructions": "Older-style ACF authoring model for sites that still use Flexible Content instead of blocks.",
+      "instructions": "Build the page from ready-made sections here. Choose a type, fill in the boxes, drag to reorder, then click Update.",
       "layouts": {
         "layout_gwi_intro_text": {
           "key": "layout_gwi_intro_text",
@@ -39,6 +39,16 @@
           "label": "Screenshot step",
           "display": "block",
           "sub_fields": [
+            {
+              "key": "field_gwi_flexible_screenshot_id",
+              "label": "Screenshot id",
+              "name": "screenshot_id",
+              "type": "text",
+              "instructions": "Used to load the canonical instruction screenshot file (seeded automatically).",
+              "wrapper": {
+                "class": "acf-hidden"
+              }
+            },
             {
               "key": "field_gwi_flexible_image",
               "label": "Highlighted screenshot",
@@ -127,7 +137,7 @@
           ]
         }
       },
-      "button_label": "Add instruction section"
+      "button_label": "Add section"
     }
   ],
   "location": [
@@ -136,6 +146,13 @@
         "param": "post_type",
         "operator": "==",
         "value": "wp_instruction"
+      }
+    ],
+    [
+      {
+        "param": "post_type",
+        "operator": "==",
+        "value": "page"
       }
     ]
   ],

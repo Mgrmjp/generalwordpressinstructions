@@ -13,12 +13,7 @@ $manual_is_instruction_library = is_post_type_archive('wp_instruction')
     || is_tax('instruction_category')
     || (is_search() && get_query_var('post_type') === 'wp_instruction');
 $manual_is_glossary = manual_is_glossary_view();
-$manual_header_language = manual_instruction_sanitize_language(get_query_var('instruction_language'));
-
-if (is_singular('wp_instruction')) {
-    $manual_header_language = manual_instruction_language_code((int) get_queried_object_id());
-}
-
+$manual_header_language = manual_document_language_code();
 $manual_header_is_english = $manual_header_language === 'en';
 $manual_header_text = $manual_header_is_english
     ? [
@@ -33,7 +28,7 @@ $manual_header_text = $manual_header_is_english
         'search_placeholder' => __('Search guides...', 'instruction-manual'),
         'search_button' => __('Search', 'instruction-manual'),
         'switch_label' => __('Switch to Finnish', 'instruction-manual'),
-        'language' => __('EN', 'instruction-manual'),
+        'language' => __('FI', 'instruction-manual'),
         'switch_to' => 'fi',
         'skip' => __('Skip to content', 'instruction-manual'),
         'theme_dark' => __('Dark mode', 'instruction-manual'),
@@ -51,7 +46,7 @@ $manual_header_text = $manual_header_is_english
         'search_placeholder' => __('Hae ohjeista...', 'instruction-manual'),
         'search_button' => __('Hae', 'instruction-manual'),
         'switch_label' => __('Vaihda englanniksi', 'instruction-manual'),
-        'language' => __('FI', 'instruction-manual'),
+        'language' => __('EN', 'instruction-manual'),
         'switch_to' => 'en',
         'skip' => __('Siirry sisältöön', 'instruction-manual'),
         'theme_dark' => __('Tumma tila', 'instruction-manual'),
@@ -75,7 +70,7 @@ if (is_singular('wp_instruction')) {
         </a>
 
         <nav class="manual-nav manual-nav__links" aria-label="<?php echo esc_attr($manual_header_text['nav']); ?>">
-            <a href="<?php echo esc_url(home_url('/')); ?>"<?php echo is_front_page() ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['start']); ?></a>
+            <a href="<?php echo esc_url(home_url('/')); ?>"<?php echo is_front_page() && !$manual_is_glossary ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['start']); ?></a>
             <a href="<?php echo esc_url(manual_instruction_archive_url()); ?>"<?php echo $manual_is_instruction_library ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['guides']); ?></a>
             <a href="<?php echo esc_url(home_url('/#polut')); ?>"><?php echo esc_html($manual_header_text['paths']); ?></a>
             <a href="<?php echo esc_url(manual_glossary_url()); ?>"<?php echo $manual_is_glossary ? ' class="is-active"' : ''; ?>><?php echo esc_html($manual_header_text['glossary']); ?></a>

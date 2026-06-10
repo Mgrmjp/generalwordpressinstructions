@@ -112,6 +112,15 @@
                 <div class="manual-content">
                     <?php the_content(); ?>
                 </div>
+                <?php if (manual_instruction_should_render_flexible_sections($post_id)) : ?>
+                    <?php
+                    get_template_part(
+                        'template-parts/instruction/flexible',
+                        'sections',
+                        ['post_id' => $post_id]
+                    );
+                    ?>
+                <?php endif; ?>
             </section>
 
             <section id="check" class="manual-document-section">

@@ -3,6 +3,8 @@
 
     var config = window.manualApp || {};
     var labels = config.labels || {};
+    var MIN_SEARCH_LENGTH = 2;
+    var SEARCH_DEBOUNCE_MS = 200;
 
     function bySelector(selector, root) {
         return Array.prototype.slice.call((root || document).querySelectorAll(selector));
@@ -14,15 +16,52 @@
         return div.innerHTML;
     }
 
-    function debounce(fn, delay) {
-        var timeout;
-        return function () {
-            var args = arguments;
-            window.clearTimeout(timeout);
-            timeout = window.setTimeout(function () {
-                fn.apply(null, args);
-            }, delay);
+    function createSearchTask(delayMs) {
+        var timeoutId = 0;
+        var activeController = null;
+
+        return {
+            cancel: function () {
+                if (timeoutId) {
+                    window.clearTimeout(timeoutId);
+                    timeoutId = 0;
+                }
+
+                if (activeController) {
+                    activeController.abort();
+                    activeController = null;
+                }
+            },
+            run: function (callback) {
+                if (timeoutId) {
+                    window.clearTimeout(timeoutId);
+                }
+
+                if (activeController) {
+                    activeController.abort();
+                }
+
+                timeoutId = window.setTimeout(function () {
+                    timeoutId = 0;
+                    activeController = typeof AbortController === 'function' ? new AbortController() : null;
+                    callback(activeController ? activeController.signal : undefined);
+                }, delayMs);
+            },
         };
+    }
+
+    function searchQueryForRequest(value) {
+        var query = String(value == null ? '' : value).trim();
+
+        if (query === '') {
+            return '';
+        }
+
+        if (query.length < MIN_SEARCH_LENGTH) {
+            return null;
+        }
+
+        return query;
     }
 
     function normalizeSearchText(value) {
@@ -165,7 +204,7 @@
         var countNode = root.querySelector('[data-manual-results-count]');
         var searchInput = root.querySelector('[data-manual-library-search]');
         var clearButton = root.querySelector('[data-manual-library-clear]');
-        var abortController = null;
+        var searchTask = createSearchTask(SEARCH_DEBOUNCE_MS);
         var state = {
             language: root.getAttribute('data-language') || '',
             category: root.getAttribute('data-category') || '',
@@ -199,8 +238,10 @@
                 url.searchParams.set('instruction_language', 'all');
             }
 
-            if (state.search) {
-                url.searchParams.set('s', state.search);
+            var urlSearch = searchQueryForRequest(state.search);
+
+            if (urlSearch) {
+                url.searchParams.set('s', urlSearch);
                 url.searchParams.set('post_type', 'wp_instruction');
             } else {
                 url.searchParams.delete('s');
@@ -215,21 +256,21 @@
                 return;
             }
 
-            if (abortController) {
-                abortController.abort();
-            }
+            var requestSearch = searchQueryForRequest(state.search);
+            var apiSearch = requestSearch === null ? '' : requestSearch;
 
-            abortController = window.AbortController ? new AbortController() : null;
+            searchTask.cancel();
             root.classList.add('is-loading');
             updateActiveFilters();
             updateUrl(replaceUrl);
 
-            fetchInstructions({
-                language: state.language,
-                category: state.category,
-                search: state.search,
-                limit: 100,
-            }, abortController ? abortController.signal : undefined)
+            searchTask.run(function (signal) {
+                fetchInstructions({
+                    language: state.language,
+                    category: state.category,
+                    search: apiSearch,
+                    limit: 100,
+                }, signal)
                 .then(function (items) {
                     renderLibrary(resultsNode, items);
                     if (countNode) {
@@ -245,6 +286,7 @@
                 .finally(function () {
                     root.classList.remove('is-loading');
                 });
+            });
         }
 
         root.addEventListener('click', function (event) {
@@ -269,24 +311,33 @@
                 return;
             }
 
-            var hasQuery = searchInput.value.trim() !== '';
+            var query = searchInput.value.trim();
+            var requestSearch = searchQueryForRequest(query);
+            var hasQuery = query !== '';
+            var hasReadyQuery = requestSearch !== null && requestSearch !== '';
 
             if (clearButton) {
                 clearButton.hidden = !hasQuery;
             }
 
             if (countNode) {
-                countNode.hidden = !hasQuery;
+                countNode.hidden = !hasReadyQuery;
             }
+
+            searchInput.setAttribute(
+                'aria-invalid',
+                hasQuery && !hasReadyQuery ? 'true' : 'false'
+            );
         }
 
         if (searchInput) {
             syncSearchChrome();
-            searchInput.addEventListener('input', debounce(function () {
+            searchInput.setAttribute('minlength', String(MIN_SEARCH_LENGTH));
+            searchInput.addEventListener('input', function () {
                 state.search = searchInput.value.trim();
                 syncSearchChrome();
                 load(true);
-            }, 180));
+            });
         }
 
         if (clearButton) {
@@ -331,6 +382,7 @@
         var groups = bySelector('[data-manual-glossary-group]', root);
         var singular = root.getAttribute('data-count-singular') || 'term';
         var plural = root.getAttribute('data-count-plural') || 'terms';
+        var glossaryTask = createSearchTask(120);
 
         function searchableText(item) {
             return normalizeSearchText(item.getAttribute('data-glossary-text') || item.textContent || '');
@@ -340,9 +392,43 @@
             return count + ' ' + (count === 1 ? singular : plural);
         }
 
+        function glossaryQuery() {
+            if (!searchInput) {
+                return '';
+            }
+
+            var requestSearch = searchQueryForRequest(searchInput.value);
+
+            if (requestSearch === null) {
+                return null;
+            }
+
+            return normalizeSearchText(requestSearch);
+        }
+
         function filter() {
-            var query = searchInput ? normalizeSearchText(searchInput.value.trim()) : '';
+            var query = glossaryQuery();
             var visibleCount = 0;
+
+            if (query === null) {
+                items.forEach(function (item) {
+                    item.hidden = false;
+                    visibleCount += 1;
+                });
+                groups.forEach(function (group) {
+                    group.hidden = false;
+                });
+
+                if (countNode) {
+                    countNode.textContent = countText(items.length);
+                }
+
+                if (emptyNode) {
+                    emptyNode.hidden = true;
+                }
+
+                return;
+            }
 
             items.forEach(function (item) {
                 var isVisible = query === '' || searchableText(item).indexOf(query) !== -1;
@@ -369,15 +455,23 @@
         }
 
         if (searchInput) {
-            searchInput.addEventListener('input', filter);
+            searchInput.setAttribute('minlength', String(MIN_SEARCH_LENGTH));
+            searchInput.addEventListener('input', function () {
+                glossaryTask.run(function () {
+                    filter();
+                });
+            });
         }
 
         if (clearButton) {
             clearButton.addEventListener('click', function () {
+                glossaryTask.cancel();
+
                 if (searchInput) {
                     searchInput.value = '';
                     searchInput.focus();
                 }
+
                 filter();
             });
         }
@@ -394,7 +488,8 @@
             form.dataset.manualSuggestions = 'true';
             var panel = document.createElement('div');
             var panelId = 'manual-search-suggestions-' + index;
-            var abortController = null;
+            var searchTask = createSearchTask(SEARCH_DEBOUNCE_MS);
+            var activeIndex = -1;
             panel.className = 'manual-search-suggestions';
             panel.id = panelId;
             panel.setAttribute('role', 'listbox');
@@ -402,11 +497,38 @@
             panel.hidden = true;
             input.setAttribute('aria-controls', panelId);
             input.setAttribute('aria-expanded', 'false');
+            input.setAttribute('aria-autocomplete', 'list');
+            input.setAttribute('minlength', String(MIN_SEARCH_LENGTH));
             form.appendChild(panel);
 
+            function optionLinks() {
+                return bySelector('[role="option"]', panel);
+            }
+
+            function setActiveOption(nextIndex) {
+                var links = optionLinks();
+
+                if (!links.length) {
+                    activeIndex = -1;
+                    input.removeAttribute('aria-activedescendant');
+                    return;
+                }
+
+                activeIndex = Math.max(0, Math.min(nextIndex, links.length - 1));
+                links.forEach(function (link, linkIndex) {
+                    var isActive = linkIndex === activeIndex;
+                    link.classList.toggle('is-active', isActive);
+                    link.id = isActive ? panelId + '-option-' + linkIndex : '';
+                });
+                input.setAttribute('aria-activedescendant', links[activeIndex].id);
+            }
+
             function hide() {
+                searchTask.cancel();
                 panel.hidden = true;
+                activeIndex = -1;
                 input.setAttribute('aria-expanded', 'false');
+                input.removeAttribute('aria-activedescendant');
             }
 
             function show(items) {
@@ -417,42 +539,67 @@
 
                 panel.innerHTML = [
                     '<p>' + escapeHtml(labels.suggestions || 'Suggested guides') + '</p>',
-                    items.map(function (item) {
-                        return '<a role="option" href="' + escapeHtml(item.url) + '"><strong>' + escapeHtml(item.title) + '</strong><span>' + escapeHtml(item.purpose) + '</span></a>';
+                    items.map(function (item, itemIndex) {
+                        return '<a role="option" id="' + panelId + '-option-' + itemIndex + '" href="' + escapeHtml(item.url) + '"><strong>' + escapeHtml(item.title) + '</strong><span>' + escapeHtml(item.purpose) + '</span></a>';
                     }).join(''),
                 ].join('');
                 panel.hidden = false;
                 input.setAttribute('aria-expanded', 'true');
+                setActiveOption(0);
             }
 
-            input.addEventListener('input', debounce(function () {
-                var query = input.value.trim();
-                if (query.length < 2) {
+            function requestSuggestions() {
+                var query = searchQueryForRequest(input.value);
+
+                if (query === null) {
                     hide();
                     return;
                 }
 
-                if (abortController) {
-                    abortController.abort();
-                }
+                searchTask.run(function (signal) {
+                    fetchInstructions({
+                        search: query,
+                        language: config.currentLanguage || '',
+                        limit: 6,
+                    }, signal)
+                        .then(show)
+                        .catch(function (error) {
+                            if (!error || error.name !== 'AbortError') {
+                                hide();
+                            }
+                        });
+                });
+            }
 
-                abortController = window.AbortController ? new AbortController() : null;
-                fetchInstructions({
-                    search: query,
-                    language: config.currentLanguage || '',
-                    limit: 6,
-                }, abortController ? abortController.signal : undefined)
-                    .then(show)
-                    .catch(function (error) {
-                        if (!error || error.name !== 'AbortError') {
-                            hide();
-                        }
-                    });
-            }, 160));
+            input.addEventListener('input', requestSuggestions);
 
             input.addEventListener('keydown', function (event) {
+                var links = optionLinks();
+
                 if (event.key === 'Escape') {
                     hide();
+                    return;
+                }
+
+                if (!links.length || panel.hidden) {
+                    return;
+                }
+
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    setActiveOption(activeIndex + 1);
+                    return;
+                }
+
+                if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    setActiveOption(activeIndex - 1);
+                    return;
+                }
+
+                if (event.key === 'Enter' && activeIndex >= 0 && links[activeIndex]) {
+                    event.preventDefault();
+                    window.location.assign(links[activeIndex].href);
                 }
             });
 
@@ -509,8 +656,79 @@
         });
     }
 
+    function flexibleHeadingId(text, index) {
+        var slug = '';
+        var normalized = String(text || '').trim().toLowerCase();
+        var i;
+        var ch;
+        var lastWasDash = false;
+
+        for (i = 0; i < normalized.length; i += 1) {
+            ch = normalized.charAt(i);
+
+            if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')) {
+                slug += ch;
+                lastWasDash = false;
+            } else if ((ch === ' ' || ch === '-') && slug !== '' && !lastWasDash) {
+                slug += '-';
+                lastWasDash = true;
+            }
+        }
+
+        while (slug.charAt(0) === '-') {
+            slug = slug.slice(1);
+        }
+
+        while (slug.charAt(slug.length - 1) === '-') {
+            slug = slug.slice(0, -1);
+        }
+
+        return slug || 'flexible-section-' + index;
+    }
+
+    function enhanceFlexibleOnPageNav() {
+        var region = document.getElementById('flexible-sections');
+        var onPageNav = document.querySelector('.manual-on-page nav');
+
+        if (!region || !onPageNav) {
+            return;
+        }
+
+        var flexLink = document.createElement('a');
+        flexLink.href = '#flexible-sections';
+        flexLink.textContent = labels.flexibleSections || 'Flexible examples';
+        onPageNav.appendChild(flexLink);
+
+        bySelector('.gwi-flexible-intro h2, .gwi-step-list__title', region).forEach(function (heading, index) {
+            if (!heading.id) {
+                heading.id = flexibleHeadingId(heading.textContent, index);
+            }
+
+            var subLink = document.createElement('a');
+            subLink.href = '#' + heading.id;
+            subLink.textContent = heading.textContent.trim();
+            subLink.className = 'manual-on-page__flex-sub';
+            onPageNav.appendChild(subLink);
+        });
+    }
+
     function initOnPageState() {
+        enhanceFlexibleOnPageNav();
+
         var sections = bySelector('.manual-document-section[id]');
+        var flexRegion = document.getElementById('flexible-sections');
+
+        if (flexRegion) {
+            sections = sections.concat([flexRegion]);
+            bySelector('.gwi-flexible-intro h2, .gwi-step-list__title', flexRegion).forEach(function (heading, index) {
+                if (!heading.id) {
+                    heading.id = flexibleHeadingId(heading.textContent, index);
+                }
+
+                sections.push(heading);
+            });
+        }
+
         var links = bySelector(
             '.manual-on-page a[href^="#"], .manual-progress a[href^="#"], .manual-doc-contents a[href^="#"]'
         );
@@ -522,6 +740,10 @@
         }
 
         function sectionLabel(section) {
+            if (section.tagName === 'H2') {
+                return section.textContent.trim();
+            }
+
             var heading = section.querySelector('h2');
             return heading ? heading.textContent.trim() : section.id;
         }
@@ -641,13 +863,13 @@
             document.documentElement.classList.toggle('manual-theme-dark', isDark);
 
             toggles.forEach(function (toggle) {
-                var darkLabel = toggle.getAttribute('data-label-dark') || labels.darkModeOn || 'Dark mode';
-                var lightLabel = toggle.getAttribute('data-label-light') || labels.darkModeOff || 'Light mode';
+                var labelWhenDark = toggle.getAttribute('data-label-dark') || labels.darkModeOff || 'Light mode';
+                var labelWhenLight = toggle.getAttribute('data-label-light') || labels.darkModeOn || 'Dark mode';
                 var moonIcon = toggle.querySelector('.manual-theme-toggle__icon--moon');
                 var sunIcon = toggle.querySelector('.manual-theme-toggle__icon--sun');
 
                 toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-                toggle.setAttribute('aria-label', isDark ? lightLabel : darkLabel);
+                toggle.setAttribute('aria-label', isDark ? labelWhenDark : labelWhenLight);
 
                 if (moonIcon || sunIcon) {
                     if (moonIcon) {
@@ -658,8 +880,8 @@
                         sunIcon.hidden = !isDark;
                     }
                 } else {
-                    toggle.textContent = isDark ? lightLabel : darkLabel;
-                    toggle.setAttribute('aria-label', isDark ? lightLabel : darkLabel);
+                    toggle.textContent = isDark ? labelWhenDark : labelWhenLight;
+                    toggle.setAttribute('aria-label', isDark ? labelWhenDark : labelWhenLight);
                 }
             });
         }

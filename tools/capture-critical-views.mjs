@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { chromium } from '@playwright/test';
+import { execFileSync, execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
@@ -8,6 +9,11 @@ import { createScreenshotLogger } from './lib/screenshot-log.mjs';
 
 const DEFAULT_CONFIG = 'config/critical-views.json';
 const DEFAULT_OUTPUT = 'wordpress/wp-content/uploads/instruction-screenshots';
+const WP_CLI_PATH = process.env.WP_CLI_PATH || '/app/wordpress';
+const WORDPRESS_ADMIN_LOCALES = {
+    en: 'en_US',
+    fi: 'fi',
+};
 
 function loadEnvFile() {
     const envPath = resolve('.env');
@@ -39,6 +45,7 @@ function parseArgs(argv) {
         config: DEFAULT_CONFIG,
         output: process.env.WP_SCREENSHOT_OUTPUT || DEFAULT_OUTPUT,
         language: process.env.WP_SCREENSHOT_LANGUAGE || 'en',
+        only: process.env.GWI_CAPTURE_ONLY || '',
         headed: false,
         help: false,
     };
@@ -48,6 +55,9 @@ function parseArgs(argv) {
 
         if (arg === '--help' || arg === '-h') {
             args.help = true;
+        } else if (arg === '--only') {
+            args.only = argv[index + 1] || '';
+            index += 1;
         } else if (arg === '--headed') {
             args.headed = true;
         } else if (arg === '--config') {
@@ -70,8 +80,12 @@ function printHelp() {
 
 Required environment:
   WP_BASE_URL   Example: https://generalwordpressinstructions.lndo.site
-  WP_USER       WordPress username
-  WP_PASSWORD   WordPress password
+  WP_USER       WordPress username (default: maria.korhonen)
+  WP_PASSWORD   WordPress password (default: admin)
+
+Note:
+  The bootstrap "admin" account is demoted to subscriber for realistic Users screenshots.
+  Capture must use an administrator such as maria.korhonen (lando wp gwi ensure-screenshot-users).
 
 Options:
   --config <path>      JSON config path. Default: ${DEFAULT_CONFIG}
@@ -132,18 +146,171 @@ function adminUrl(baseUrl, path) {
     return `${normalizedBase}${normalizedPath}`;
 }
 
+function wpCli(args, options = {}) {
+    return execFileSync(
+        'lando',
+        ['wp', ...args, `--path=${WP_CLI_PATH}`],
+        {
+            cwd: process.cwd(),
+            encoding: 'utf8',
+            stdio: options.stdio || 'pipe',
+        },
+    );
+}
+
+function wordpressAdminLocale(language) {
+    return WORDPRESS_ADMIN_LOCALES[language] || WORDPRESS_ADMIN_LOCALES.en;
+}
+
+function ensureWordPressAdminLocale(locale, logger) {
+    if (locale === 'en_US') {
+        return;
+    }
+
+    try {
+        wpCli(['language', 'core', 'is-installed', locale]);
+    } catch {
+        logger.log('info', 'Installing WordPress admin language', { locale });
+        wpCli(['language', 'core', 'install', locale]);
+    }
+}
+
+function getUserLocale(username) {
+    try {
+        return wpCli(['user', 'meta', 'get', username, 'locale']).trim();
+    } catch {
+        return '';
+    }
+}
+
+function setUserLocale(username, locale) {
+    if (locale === '') {
+        try {
+            wpCli(['user', 'meta', 'delete', username, 'locale']);
+        } catch {
+            // No locale meta existed before this capture run.
+        }
+        return;
+    }
+
+    wpCli(['user', 'meta', 'update', username, 'locale', locale]);
+}
+
+function configureCaptureUserLocale(language, username, logger) {
+    const locale = wordpressAdminLocale(language);
+    const previousLocale = getUserLocale(username);
+
+    ensureWordPressAdminLocale(locale, logger);
+    setUserLocale(username, locale);
+
+    logger.log('info', 'Configured WordPress admin locale', {
+        user: username,
+        language,
+        locale,
+        previousLocale: previousLocale || '',
+    });
+
+    return () => {
+        setUserLocale(username, previousLocale);
+        logger.log('info', 'Restored WordPress admin locale', {
+            user: username,
+            locale: previousLocale || '',
+        });
+    };
+}
+
+function resolvePostEditUrl(view, language, postType, slugKey) {
+    const slugSource = view[slugKey];
+    const slug = typeof slugSource === 'string'
+        ? slugSource
+        : localized(slugSource, language);
+
+    if (!slug) {
+        return view.url;
+    }
+
+    try {
+        const escapedSlug = slug.replace(/'/g, `'\\''`);
+        const postId = execSync(
+            postType === 'page'
+                ? `lando wp eval 'echo (int) (get_page_by_path("${escapedSlug}", OBJECT, "page")->ID ?? 0);' --path=wordpress`
+                : `lando wp post list --post_type=${postType} --name=${slug} --field=ID --path=wordpress`,
+            { encoding: 'utf8', cwd: process.cwd() },
+        ).trim();
+
+        if (postId === '') {
+            return view.url;
+        }
+
+        const classic = slugKey === 'pageSlug' ? '&classic-editor' : '';
+
+        return `/wp-admin/post.php?post=${postId}&action=edit${classic}`;
+    } catch {
+        return view.url;
+    }
+}
+
+function resolveViewUrl(view, language) {
+    if (view.pageSlug) {
+        return resolvePostEditUrl(view, language, 'page', 'pageSlug');
+    }
+
+    if (view.instructionSlug) {
+        return resolvePostEditUrl(view, language, 'wp_instruction', 'instructionSlug');
+    }
+
+    return view.url;
+}
+
+function resolveScreenshotCredentials() {
+    const username = (process.env.WP_USER || 'maria.korhonen').trim();
+    const password = (process.env.WP_PASSWORD || 'admin').trim();
+
+    return { username, password };
+}
+
 async function login(page, baseUrl, username, password) {
-    await page.goto(adminUrl(baseUrl, '/wp-login.php'), { waitUntil: 'networkidle' });
+    await page.goto(adminUrl(baseUrl, '/wp-login.php'), { waitUntil: 'domcontentloaded' });
     await page.fill('#user_login', username);
     await page.fill('#user_pass', password);
     await Promise.all([
-        page.waitForNavigation({ waitUntil: 'networkidle' }).catch(() => null),
+        page.waitForURL((url) => !url.toString().includes('wp-login.php'), { timeout: 20000 }).catch(() => null),
         page.click('#wp-submit'),
     ]);
 
     if (page.url().includes('wp-login.php')) {
         throw new Error('WordPress login failed. Check WP_USER and WP_PASSWORD.');
     }
+}
+
+async function verifyAdminSession(page, baseUrl, username) {
+    await page.goto(adminUrl(baseUrl, '/wp-admin/edit.php'), { waitUntil: 'domcontentloaded' });
+
+    if (page.url().includes('wp-login.php')) {
+        throw new Error('WordPress session is not authenticated after login.');
+    }
+
+    const wpbody = await findFirstVisibleLocator(page, '#wpbody, #wpcontent', 15000);
+
+    if (wpbody) {
+        return;
+    }
+
+    const denied = await page
+        .locator('body')
+        .getByText(/sorry, you are not allowed|you do not have permission/i)
+        .first()
+        .isVisible()
+        .catch(() => false);
+
+    if (denied || username === 'admin') {
+        throw new Error(
+            `WP_USER "${username}" cannot access wp-admin list screens. `
+            + 'Use WP_USER=maria.korhonen and run: lando wp gwi ensure-screenshot-users --path=wordpress',
+        );
+    }
+
+    throw new Error('wp-admin did not finish loading (#wpbody missing). Check WP_USER and WP_PASSWORD.');
 }
 
 function isBlockEditorUrl(url) {
@@ -291,6 +458,59 @@ async function findFirstVisibleLocator(page, selector, timeout = 2000) {
     }
 
     return null;
+}
+
+/**
+ * Percent positions for CSS overlay on element-cropped screenshots (container-relative).
+ */
+async function measureHighlightPercents(page, containerSelector, highlightSelector, padding = 6) {
+    return page.evaluate(({ containerSelector: containerSelectors, highlightSelector: highlightSelectors, padding }) => {
+        const pickFirst = (root, selectors) => {
+            for (const selector of selectors) {
+                const node = root.querySelector(selector) || document.querySelector(selector);
+
+                if (node) {
+                    return node;
+                }
+            }
+
+            return null;
+        };
+
+        const container = pickFirst(document, containerSelectors.split(',').map((value) => value.trim()));
+
+        if (!container) {
+            return null;
+        }
+
+        const target = pickFirst(container, highlightSelectors.split(',').map((value) => value.trim()));
+
+        if (!target) {
+            return null;
+        }
+
+        const containerRect = container.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        const left = targetRect.left - containerRect.left - padding;
+        const top = targetRect.top - containerRect.top - padding;
+        const width = targetRect.width + padding * 2;
+        const height = targetRect.height + padding * 2;
+
+        if (containerRect.width <= 0 || containerRect.height <= 0) {
+            return null;
+        }
+
+        return {
+            highlightX: Number(((left / containerRect.width) * 100).toFixed(2)),
+            highlightY: Number(((top / containerRect.height) * 100).toFixed(2)),
+            highlightWidth: Number(((width / containerRect.width) * 100).toFixed(2)),
+            highlightHeight: Number(((height / containerRect.height) * 100).toFixed(2)),
+        };
+    }, {
+        containerSelector,
+        highlightSelector,
+        padding,
+    });
 }
 
 async function applyHighlight(page, highlight, language, captureMode, logger) {
@@ -446,15 +666,21 @@ async function captureView(page, baseUrl, view, language, outputDir, logger) {
     const startedMs = Date.now();
     const captureMode = view.capture || 'viewport';
 
+    const targetUrl = resolveViewUrl(view, language);
+
     logger.log('info', 'Capturing view', {
         screenshotId: view.id,
         language,
         title,
-        url: view.url,
+        url: targetUrl,
         captureMode,
     });
 
-    await page.goto(adminUrl(baseUrl, view.url), { waitUntil: 'domcontentloaded' });
+    await page.goto(adminUrl(baseUrl, targetUrl), { waitUntil: 'domcontentloaded' });
+
+    if (page.url().includes('wp-login.php')) {
+        throw new Error('Redirected to wp-login.php — admin session was lost.');
+    }
 
     if (view.waitFor) {
         const readyLocator = await findFirstVisibleLocator(page, view.waitFor, 15000);
@@ -464,7 +690,45 @@ async function captureView(page, baseUrl, view, language, outputDir, logger) {
         }
     }
 
-    await prepareAdminPage(page, view.url);
+    await prepareAdminPage(page, targetUrl);
+
+    if (view.instructionSlug || view.pageSlug) {
+        await page.evaluate(() => {
+            const field = document.querySelector(
+                '[data-key="field_gwi_instruction_sections"], [data-name="instruction_sections"]',
+            );
+
+            if (!field) {
+                return;
+            }
+
+            const postbox = field.closest('.postbox, .acf-postbox, .acf-fields');
+
+            if (postbox) {
+                postbox.classList.remove('closed');
+                postbox.style.display = 'block';
+            }
+
+            const group = document.querySelector('#acf-group_group_gwi_instruction_flexible');
+
+            if (group) {
+                group.classList.remove('closed');
+                group.style.display = 'block';
+            }
+
+            field.style.display = 'block';
+            field.style.minHeight = '320px';
+            field.scrollIntoView({ block: 'center' });
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+        await page.waitForTimeout(1200);
+
+        const metaBoxesButton = page.locator('button[aria-label="Meta Boxes"], button[aria-label="Metalaatikot"]').first();
+        if (await metaBoxesButton.isVisible({ timeout: 800 }).catch(() => false)) {
+            await metaBoxesButton.click().catch(() => null);
+            await page.waitForTimeout(600);
+        }
+    }
 
     const invalidPostType = await page
         .locator('#wpbody-content')
@@ -478,18 +742,22 @@ async function captureView(page, baseUrl, view, language, outputDir, logger) {
         );
     }
 
-    await injectHighlightStyles(page);
-
     const highlightRects = [];
+    const skipCaptureHighlights = captureMode === 'element';
 
-    for (const highlight of view.highlights || []) {
-        const highlightRect = await applyHighlight(page, highlight, language, captureMode, logger);
-        if (highlightRect) {
-            highlightRects.push(highlightRect);
+    if (!skipCaptureHighlights) {
+        await injectHighlightStyles(page);
+
+        for (const highlight of view.highlights || []) {
+            const highlightRect = await applyHighlight(page, highlight, language, captureMode, logger);
+
+            if (highlightRect) {
+                highlightRects.push(highlightRect);
+            }
         }
-    }
 
-    await page.waitForTimeout(400);
+        await page.waitForTimeout(400);
+    }
 
     const outputPath = resolve(outputDir, `${view.id}-${language}.png`);
 
@@ -499,7 +767,43 @@ async function captureView(page, baseUrl, view, language, outputDir, logger) {
 
     if (captureMode === 'element' && view.captureSelector) {
         const el = page.locator(view.captureSelector).first();
-        await el.screenshot({ path: outputPath });
+        await el.waitFor({ state: 'attached', timeout: 15000 });
+        await el.scrollIntoViewIfNeeded().catch(() => null);
+
+        const metaboxToggle = page.locator(
+            '#acf-group_group_gwi_instruction_flexible .postbox-header, #acf-group_group_gwi_instruction_flexible .hndle',
+        ).first();
+        if (await metaboxToggle.isVisible().catch(() => false)) {
+            await metaboxToggle.click().catch(() => null);
+            await page.waitForTimeout(400);
+        }
+
+        if (view.highlights?.length) {
+            const highlight = view.highlights[0];
+            const percents = await measureHighlightPercents(
+                page,
+                view.captureSelector,
+                highlight.selector,
+                Number.isFinite(highlight.padding) ? highlight.padding : 6,
+            );
+
+            if (percents) {
+                logger.log('info', 'Element highlight percents (use in gwi_screenshot_highlight_config)', {
+                    screenshotId: view.id,
+                    language,
+                    ...percents,
+                });
+            } else {
+                logger.log('warn', 'Could not measure element highlight percents', {
+                    screenshotId: view.id,
+                    language,
+                    selector: highlight.selector,
+                });
+                logger.bumpCount('warnings');
+            }
+        }
+
+        await el.screenshot({ path: outputPath, force: true, timeout: 60000 });
     } else if (captureMode === 'focus') {
         const clip = await focusedClip(page, highlightRects, view);
 
@@ -563,9 +867,16 @@ async function main() {
     }
 
     const baseUrl = requiredEnv('WP_BASE_URL');
-    const username = requiredEnv('WP_USER');
-    const password = requiredEnv('WP_PASSWORD');
-    const views = readConfig(args.config);
+    const { username, password } = resolveScreenshotCredentials();
+    const allViews = readConfig(args.config);
+    const views = args.only
+        ? allViews.filter((view) => view.id === args.only)
+        : allViews;
+
+    if (args.only && views.length === 0) {
+        throw new Error(`No view with id "${args.only}" in config.`);
+    }
+
     const outputDir = resolve(args.output);
     const logger = createScreenshotLogger({
         step: `capture-${args.language}`,
@@ -577,53 +888,67 @@ async function main() {
     logger.log('info', 'Capture run started', {
         baseUrl,
         language: args.language,
+        user: username,
         config: resolve(args.config),
         outputDir,
         viewCount: views.length,
         jsonlPath: logger.jsonlPath,
     });
 
-    const browser = await chromium.launch({ headless: !args.headed });
-    const context = await browser.newContext({
-        ignoreHTTPSErrors: true,
-        viewport: { width: 1920, height: 1080 },
-        deviceScaleFactor: 2,
-    });
+    if (username === 'admin') {
+        logger.log('warn', 'WP_USER=admin is usually demoted to subscriber after ensure-screenshot-users; prefer maria.korhonen', {
+            user: username,
+        });
+        logger.bumpCount('warnings');
+    }
 
-    await context.addInitScript(() => {
-        try {
-            for (let index = localStorage.length - 1; index >= 0; index -= 1) {
-                const key = localStorage.key(index);
-
-                if (!key || !key.startsWith('WP_PREFERENCES_USER_')) {
-                    continue;
-                }
-
-                const preferences = JSON.parse(localStorage.getItem(key) || '{}');
-
-                preferences.core = {
-                    ...(preferences.core || {}),
-                    welcomeGuide: false,
-                };
-                preferences['core/edit-post'] = {
-                    ...(preferences['core/edit-post'] || {}),
-                    welcomeGuide: false,
-                };
-
-                localStorage.setItem(key, JSON.stringify(preferences));
-            }
-        } catch {
-            // Ignore storage write failures in headless capture.
-        }
-    });
-
-    const page = await context.newPage();
+    const restoreUserLocale = configureCaptureUserLocale(args.language, username, logger);
+    let browser;
+    let page;
 
     let failedViews = 0;
 
     try {
+        browser = await chromium.launch({ headless: !args.headed });
+        const context = await browser.newContext({
+            ignoreHTTPSErrors: true,
+            viewport: { width: 1920, height: 1080 },
+            deviceScaleFactor: 2,
+        });
+
+        await context.addInitScript(() => {
+            try {
+                for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+                    const key = localStorage.key(index);
+
+                    if (!key || !key.startsWith('WP_PREFERENCES_USER_')) {
+                        continue;
+                    }
+
+                    const preferences = JSON.parse(localStorage.getItem(key) || '{}');
+
+                    preferences.core = {
+                        ...(preferences.core || {}),
+                        welcomeGuide: false,
+                    };
+                    preferences['core/edit-post'] = {
+                        ...(preferences['core/edit-post'] || {}),
+                        welcomeGuide: false,
+                    };
+
+                    localStorage.setItem(key, JSON.stringify(preferences));
+                }
+            } catch {
+                // Ignore storage write failures in headless capture.
+            }
+        });
+
+        page = await context.newPage();
+
         await login(page, baseUrl, username, password);
         logger.log('info', 'WordPress login succeeded', { baseUrl, user: username });
+        await verifyAdminSession(page, baseUrl, username);
+        logger.log('info', 'WordPress admin access verified', { baseUrl, user: username });
 
         for (const view of views) {
             try {
@@ -649,7 +974,10 @@ async function main() {
             }
         }
     } finally {
-        await browser.close();
+        if (browser) {
+            await browser.close();
+        }
+        restoreUserLocale();
     }
 
     const summary = logger.finish(failedViews > 0 ? 'failed' : 'success', {

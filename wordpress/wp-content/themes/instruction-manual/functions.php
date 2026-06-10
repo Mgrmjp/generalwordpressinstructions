@@ -7,6 +7,7 @@ if (!defined('ABSPATH')) {
 add_action('after_setup_theme', 'manual_setup');
 add_action('wp_enqueue_scripts', 'manual_enqueue_assets');
 add_action('enqueue_block_assets', 'manual_register_design_tokens');
+add_action('enqueue_block_editor_assets', 'manual_enqueue_block_editor_assets');
 add_action('wp_enqueue_scripts', 'manual_enqueue_surface_after_plugin', 100);
 add_action('init', 'manual_register_static_routes');
 add_action('init', 'manual_flush_static_routes_if_needed', 20);
@@ -17,6 +18,11 @@ add_filter('body_class', 'manual_static_body_classes');
 add_action('pre_get_posts', 'manual_filter_instruction_archive_by_language');
 add_filter('posts_search', 'manual_expand_instruction_search', 10, 2);
 add_filter('document_title_parts', 'manual_document_title_parts');
+add_filter('language_attributes', 'manual_language_attributes', 10, 2);
+add_filter('gwi_should_append_flexible_content', '__return_false');
+add_filter('gwi_show_flexible_layout_badges', 'manual_show_flexible_layout_badges', 10, 2);
+add_filter('gwi_flexible_content_wrapper', 'manual_wrap_flexible_content_html', 10, 2);
+add_shortcode('manual_flexible_legend', 'manual_flexible_legend_shortcode');
 
 function manual_static_routes_version(): string
 {
@@ -47,6 +53,44 @@ function manual_is_glossary_view(): bool
 function manual_glossary_url(): string
 {
     return home_url('/sanasto/');
+}
+
+/**
+ * Footer copy and nav labels aligned with the active instruction language.
+ *
+ * @return array<string, string>
+ */
+function manual_footer_context(): array
+{
+    $language = manual_instruction_sanitize_language(get_query_var('instruction_language'));
+
+    if (is_singular('wp_instruction')) {
+        $language = manual_instruction_language_code((int) get_queried_object_id());
+    }
+
+    if ($language === 'en') {
+        return [
+            'brand' => __('WordPress guides', 'instruction-manual'),
+            'tagline' => __('Practical guides for editors, content work, and everyday site maintenance.', 'instruction-manual'),
+            'nav_label' => __('Footer navigation', 'instruction-manual'),
+            'start' => __('Home', 'instruction-manual'),
+            'guides' => __('Guides', 'instruction-manual'),
+            'paths' => __('Paths', 'instruction-manual'),
+            'glossary' => __('Glossary', 'instruction-manual'),
+            'credit' => __('Built by', 'instruction-manual'),
+        ];
+    }
+
+    return [
+        'brand' => __('WordPress-ohjeet', 'instruction-manual'),
+        'tagline' => __('Käytännön ohjeet ylläpitoon, sisältöihin ja ongelmatilanteisiin.', 'instruction-manual'),
+        'nav_label' => __('Alatunnisteen navigaatio', 'instruction-manual'),
+        'start' => __('Aloitus', 'instruction-manual'),
+        'guides' => __('Ohjeet', 'instruction-manual'),
+        'paths' => __('Oppaat', 'instruction-manual'),
+        'glossary' => __('Sanasto', 'instruction-manual'),
+        'credit' => __('Tekijä', 'instruction-manual'),
+    ];
 }
 
 function manual_static_template_include(string $template): string
@@ -83,7 +127,12 @@ function manual_setup(): void
     add_theme_support('post-thumbnails');
     add_theme_support('responsive-embeds');
     add_theme_support('wp-block-styles');
-    add_editor_style('style.css');
+    add_theme_support('editor-styles');
+    add_editor_style([
+        'assets/css/fonts-mona-sans.css',
+        'assets/css/design-tokens.css',
+        'assets/css/editor.css',
+    ]);
     register_nav_menus([
         'primary' => __('Primary Menu', 'instruction-manual'),
     ]);
@@ -103,6 +152,40 @@ function manual_register_design_tokens(): void
         [],
         (string) filemtime($tokens_path)
     );
+}
+
+/**
+ * Mona Sans + tokens in the block editor (iframe canvas and editor chrome).
+ */
+function manual_enqueue_block_editor_assets(): void
+{
+    $fonts_path = get_template_directory() . '/assets/css/fonts-mona-sans.css';
+    $editor_path = get_template_directory() . '/assets/css/editor.css';
+    $dependencies = [];
+
+    if (file_exists($fonts_path)) {
+        wp_enqueue_style(
+            'instruction-manual-fonts',
+            get_template_directory_uri() . '/assets/css/fonts-mona-sans.css',
+            [],
+            (string) filemtime($fonts_path)
+        );
+        $dependencies[] = 'instruction-manual-fonts';
+    }
+
+    if (wp_style_is('instruction-manual-tokens', 'registered')) {
+        wp_enqueue_style('instruction-manual-tokens');
+        $dependencies[] = 'instruction-manual-tokens';
+    }
+
+    if (file_exists($editor_path)) {
+        wp_enqueue_style(
+            'instruction-manual-editor',
+            get_template_directory_uri() . '/assets/css/editor.css',
+            $dependencies,
+            (string) filemtime($editor_path)
+        );
+    }
 }
 
 function manual_enqueue_assets(): void
@@ -183,6 +266,19 @@ function manual_enqueue_surface_after_plugin(): void
         $dependencies,
         (string) filemtime($surface_path)
     );
+
+    if (is_singular('wp_instruction')) {
+        $flexible_css = get_template_directory() . '/assets/css/instruction-flexible.css';
+
+        if (file_exists($flexible_css)) {
+            wp_enqueue_style(
+                'instruction-manual-flexible',
+                get_template_directory_uri() . '/assets/css/instruction-flexible.css',
+                ['instruction-manual-surface'],
+                (string) filemtime($flexible_css)
+            );
+        }
+    }
 }
 
 function manual_app_config(): array
@@ -221,6 +317,7 @@ function manual_app_config(): array
             'codeCopied' => __('Copied', 'instruction-manual'),
             'darkModeOn' => __('Dark mode', 'instruction-manual'),
             'darkModeOff' => __('Light mode', 'instruction-manual'),
+            'flexibleSections' => __('Flexible examples', 'instruction-manual'),
         ]
         : [
             'results' => __('ohjetta', 'instruction-manual'),
@@ -237,6 +334,7 @@ function manual_app_config(): array
             'codeCopied' => __('Kopioitu', 'instruction-manual'),
             'darkModeOn' => __('Tumma tila', 'instruction-manual'),
             'darkModeOff' => __('Vaalea tila', 'instruction-manual'),
+            'flexibleSections' => __('Joustavat esimerkit', 'instruction-manual'),
         ];
 
     return [
@@ -308,12 +406,9 @@ function manual_rest_get_instructions(WP_REST_Request $request): WP_REST_Respons
     }
 
     $items = [];
+    $scored_posts = manual_query_scored_instructions($args, $search);
 
-    foreach (get_posts($args) as $post) {
-        if (!$post instanceof WP_Post || !manual_instruction_matches_search($post->ID, $search)) {
-            continue;
-        }
-
+    foreach ($scored_posts as $post) {
         $items[] = manual_instruction_response_item($post);
 
         if (count($items) >= $limit) {
@@ -324,6 +419,7 @@ function manual_rest_get_instructions(WP_REST_Request $request): WP_REST_Respons
     return rest_ensure_response([
         'items' => $items,
         'count' => count($items),
+        'query' => $search,
     ]);
 }
 
@@ -361,10 +457,20 @@ function manual_instruction_response_item(WP_Post $post): array
 
 function manual_instruction_matches_search(int $post_id, string $search): bool
 {
+    return manual_instruction_search_score($post_id, $search) > 0;
+}
+
+/**
+ * Normalized search terms including Finnish and English synonym expansion.
+ *
+ * @return list<string>
+ */
+function manual_search_terms(string $search): array
+{
     $search = trim($search);
 
     if ($search === '') {
-        return true;
+        return [];
     }
 
     $terms = array_merge(
@@ -373,16 +479,123 @@ function manual_instruction_matches_search(int $post_id, string $search): bool
         manual_expand_finnish_search($search),
         manual_expanded_search_terms($search)
     );
-    $terms = array_values(array_unique(array_filter(array_map('trim', $terms))));
+
+    return array_values(array_unique(array_filter(array_map(static function (string $term): string {
+        return trim($term);
+    }, $terms))));
+}
+
+function manual_instruction_search_score(int $post_id, string $search): int
+{
+    $search = trim($search);
+
+    if ($search === '') {
+        return 1;
+    }
+
+    $terms = manual_search_terms($search);
+
+    if ($terms === []) {
+        return 0;
+    }
+
+    $title = manual_lowercase(get_the_title($post_id));
+    $task_title = manual_lowercase(manual_instruction_task_title($post_id));
+    $purpose = manual_lowercase(manual_instruction_purpose($post_id));
+    $slug = manual_lowercase((string) get_post_field('post_name', $post_id));
+    $excerpt = manual_lowercase(manual_instruction_card_excerpt($post_id, 80));
     $haystack = manual_lowercase(manual_instruction_search_haystack($post_id));
+    $score = 0;
 
     foreach ($terms as $term) {
-        if ($term !== '' && str_contains($haystack, manual_lowercase($term))) {
-            return true;
+        $term = manual_lowercase($term);
+
+        if ($term === '') {
+            continue;
+        }
+
+        if ($title === $term) {
+            $score = max($score, 100);
+            continue;
+        }
+
+        if (str_starts_with($title, $term)) {
+            $score = max($score, 92);
+            continue;
+        }
+
+        if (str_contains($title, $term)) {
+            $score = max($score, 82);
+            continue;
+        }
+
+        if (str_contains($task_title, $term)) {
+            $score = max($score, 72);
+            continue;
+        }
+
+        if (str_contains($purpose, $term)) {
+            $score = max($score, 58);
+            continue;
+        }
+
+        if (str_contains($slug, $term)) {
+            $score = max($score, 48);
+            continue;
+        }
+
+        if (str_contains($excerpt, $term)) {
+            $score = max($score, 42);
+            continue;
+        }
+
+        if (str_contains($haystack, $term)) {
+            $score = max($score, 28);
         }
     }
 
-    return false;
+    return $score;
+}
+
+/**
+ * @param array<string, mixed> $query_args
+ * @return list<WP_Post>
+ */
+function manual_query_scored_instructions(array $query_args, string $search): array
+{
+    $posts = get_posts($query_args);
+    $scored = [];
+
+    foreach ($posts as $post) {
+        if (!$post instanceof WP_Post) {
+            continue;
+        }
+
+        $score = manual_instruction_search_score($post->ID, $search);
+
+        if ($score <= 0) {
+            continue;
+        }
+
+        $scored[] = [
+            'post' => $post,
+            'score' => $score,
+        ];
+    }
+
+    usort($scored, static function (array $left, array $right): int {
+        $score_compare = $right['score'] <=> $left['score'];
+
+        if ($score_compare !== 0) {
+            return $score_compare;
+        }
+
+        return strnatcasecmp($left['post']->post_title, $right['post']->post_title);
+    });
+
+    return array_map(static function (array $row): WP_Post {
+        return $row['post'];
+    }, $scored);
 }
 
 function manual_instruction_search_haystack(int $post_id): string
@@ -396,14 +609,21 @@ function manual_instruction_search_haystack(int $post_id): string
         }, $terms));
     }
 
-    return implode(' ', [
+    $content = wp_strip_all_tags((string) get_post_field('post_content', $post_id));
+
+    if ($content !== '') {
+        $content = wp_trim_words($content, 48, '');
+    }
+
+    return implode(' ', array_filter([
         get_the_title($post_id),
         get_post_field('post_name', $post_id),
         manual_instruction_task_title($post_id),
         manual_instruction_purpose($post_id),
         manual_instruction_card_excerpt($post_id, 80),
         $category_text,
-    ]);
+        $content,
+    ]));
 }
 
 function manual_lowercase(string $value): string
@@ -574,6 +794,29 @@ function manual_document_title_parts(array $title): array
     }
 
     return $title;
+}
+
+function manual_document_language_code(): string
+{
+    if (is_singular('wp_instruction')) {
+        return manual_instruction_language_code((int) get_queried_object_id());
+    }
+
+    $language = manual_instruction_sanitize_language(get_query_var('instruction_language'));
+
+    return $language !== '' ? $language : 'fi';
+}
+
+function manual_language_attributes(string $output, string $doctype = 'html'): string
+{
+    $language = manual_document_language_code() === 'en' ? 'en' : 'fi';
+    $lang_attribute = 'lang="' . esc_attr($language) . '"';
+
+    if (preg_match('/\blang="[^"]*"/', $output)) {
+        return preg_replace('/\blang="[^"]*"/', $lang_attribute, $output, 1) ?: $output;
+    }
+
+    return trim($lang_attribute . ' ' . $output);
 }
 
 function manual_instruction_language_label(int $post_id): string
@@ -964,7 +1207,9 @@ function manual_instruction_english_task_purposes(): array
         'custom-fields' => __('Use this when content is stored in fields outside the normal editor.', 'instruction-manual'),
         'media-library' => __('Use this when you want to add, replace, or organize pictures and files.', 'instruction-manual'),
         'creating-menus' => __('Use this when you want to change the navigation links visitors use.', 'instruction-manual'),
+        'theme-customizer' => __('Use this when you want to change theme appearance, fonts, or visual settings.', 'instruction-manual'),
         'seo-basics' => __('Use this when you want people and search engines to understand a page.', 'instruction-manual'),
+        'reusable-blocks' => __('Use this when the same saved pattern or section appears in more than one place.', 'instruction-manual'),
         'block' => __('Use this when you want to add or edit content sections in the WordPress editor.', 'instruction-manual'),
     ];
 }
@@ -1021,11 +1266,11 @@ function manual_instruction_task_copy(): array
             'purpose' => __('Käytä tätä ohjetta, kun haluat hyväksyä, poistaa tai vastata sivuston kommentteihin.', 'instruction-manual'),
         ],
         'creating-menus' => [
-            'title' => __('Muokkaa valikkoa', 'instruction-manual'),
+            'title' => __('Muokkaa navigaatiota', 'instruction-manual'),
             'purpose' => __('Käytä tätä ohjetta, kun haluat lisätä, poistaa tai järjestää sivuston navigaatiolinkkejä.', 'instruction-manual'),
         ],
         'valikkojen-luominen' => [
-            'title' => __('Muokkaa valikkoa', 'instruction-manual'),
+            'title' => __('Muokkaa navigaatiota', 'instruction-manual'),
             'purpose' => __('Käytä tätä ohjetta, kun haluat lisätä, poistaa tai järjestää sivuston navigaatiolinkkejä.', 'instruction-manual'),
         ],
         'managing-users' => [
@@ -1045,12 +1290,12 @@ function manual_instruction_task_copy(): array
             'purpose' => __('Käytä tätä ohjetta, kun haluat muuttaa koko sivustoon vaikuttavia perusasetuksia.', 'instruction-manual'),
         ],
         'theme-customizer' => [
-            'title' => __('Muokkaa teeman asetuksia', 'instruction-manual'),
-            'purpose' => __('Käytä tätä ohjetta, kun haluat muuttaa teeman tarjoamia ulkoasu- ja sivustoasetuksia.', 'instruction-manual'),
+            'title' => __('Muokkaa ulkoasua ja fontteja', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat muuttaa teeman ulkoasua, fontteja tai sivuston visuaalisia asetuksia.', 'instruction-manual'),
         ],
         'teeman-mukauttaja' => [
-            'title' => __('Muokkaa teeman asetuksia', 'instruction-manual'),
-            'purpose' => __('Käytä tätä ohjetta, kun haluat muuttaa teeman tarjoamia ulkoasu- ja sivustoasetuksia.', 'instruction-manual'),
+            'title' => __('Muokkaa ulkoasua ja fontteja', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat muuttaa teeman ulkoasua, fontteja tai sivuston visuaalisia asetuksia.', 'instruction-manual'),
         ],
         'block-editor-basics' => [
             'title' => __('Aloita lohkoeditorin käyttö', 'instruction-manual'),
@@ -1093,12 +1338,12 @@ function manual_instruction_task_copy(): array
             'purpose' => __('Käytä tätä ohjetta, kun haluat jakaa sisällön sarakkeisiin, ryhmiin tai selkeisiin osioihin.', 'instruction-manual'),
         ],
         'reusable-blocks' => [
-            'title' => __('Käytä uudelleenkäytettäviä lohkoja', 'instruction-manual'),
-            'purpose' => __('Käytä tätä ohjetta, kun sama sisältörakenne pitää lisätä usealle sivulle hallitusti.', 'instruction-manual'),
+            'title' => __('Käytä synkronoituja malleja', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun sama tallennettu sisältörakenne pitää lisätä usealle sivulle hallitusti.', 'instruction-manual'),
         ],
         'uudelleenkaytettavat-lohkot' => [
-            'title' => __('Käytä uudelleenkäytettäviä lohkoja', 'instruction-manual'),
-            'purpose' => __('Käytä tätä ohjetta, kun sama sisältörakenne pitää lisätä usealle sivulle hallitusti.', 'instruction-manual'),
+            'title' => __('Käytä synkronoituja malleja', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun sama tallennettu sisältörakenne pitää lisätä usealle sivulle hallitusti.', 'instruction-manual'),
         ],
         'classic-editor-basics' => [
             'title' => __('Muokkaa sisältöä perinteisessä editorissa', 'instruction-manual'),
@@ -1514,9 +1759,7 @@ function manual_expand_instruction_search(string $search, WP_Query $query): stri
     }
 
     $search_query = (string) $query->get('s');
-    $terms_fi = manual_expand_finnish_search($search_query);
-    $terms_en = manual_expanded_search_terms($search_query);
-    $terms = array_values(array_unique(array_merge($terms_fi, $terms_en)));
+    $terms = manual_search_terms($search_query);
 
     if (count($terms) < 2) {
         return $search;
@@ -1615,7 +1858,7 @@ function manual_instruction_common_mistakes(int $post_id): array
                 __('Älä muokkaa uudelleenkäytettäviä tai jaettuja kenttiä, ellei muutoksen kuulu näkyä kaikkialla.', 'instruction-manual'),
             ],
             'block-editor' => [
-                __('Älä muokkaa uudelleenkäytettäviä lohkoja, ellei muutoksen kuulu näkyä useassa paikassa.', 'instruction-manual'),
+                __('Älä muokkaa synkronoituja malleja, ellei muutoksen kuulu näkyä useassa paikassa.', 'instruction-manual'),
             ],
             'site-config' => [
                 __('Älä muuta valikoita, käyttäjiä tai asetuksia tarkistamatta ketä muutos koskee.', 'instruction-manual'),
@@ -1627,7 +1870,7 @@ function manual_instruction_common_mistakes(int $post_id): array
                 __('Do not edit reusable or shared fields unless the change should appear everywhere.', 'instruction-manual'),
             ],
             'block-editor' => [
-                __('Do not edit reusable blocks unless you want the change to appear in several places.', 'instruction-manual'),
+                __('Do not edit synced patterns unless you want the change to appear in several places.', 'instruction-manual'),
             ],
             'site-config' => [
                 __('Do not change menus, users, or settings without checking who else is affected.', 'instruction-manual'),
@@ -2238,4 +2481,161 @@ function manual_glossary_preview(int $limit = 4): array
     $all = manual_glossary_terms();
     $preview = array_slice($all, 0, $limit, true);
     return $preview;
+}
+
+/**
+ * @return list<string>
+ */
+function manual_flexible_content_demo_slugs(): array
+{
+    return ['joustavat-sisaltoasettelut-fi', 'flexible-content-en'];
+}
+
+function manual_instruction_is_flexible_demo(int $post_id): bool
+{
+    $post = get_post($post_id);
+
+    if (!$post instanceof WP_Post) {
+        return false;
+    }
+
+    return in_array($post->post_name, manual_flexible_content_demo_slugs(), true);
+}
+
+function manual_instruction_has_flexible_sections(int $post_id): bool
+{
+    if (!function_exists('have_rows')) {
+        return false;
+    }
+
+    return have_rows('instruction_sections', $post_id);
+}
+
+function manual_instruction_should_render_flexible_sections(int $post_id): bool
+{
+    if (!manual_instruction_has_flexible_sections($post_id)) {
+        return false;
+    }
+
+    $post = get_post($post_id);
+
+    if (!$post instanceof WP_Post) {
+        return false;
+    }
+
+    return !has_shortcode((string) $post->post_content, 'gwi_flexible_content');
+}
+
+function manual_render_flexible_sections(int $post_id): void
+{
+    if (!manual_instruction_should_render_flexible_sections($post_id)) {
+        return;
+    }
+
+    get_template_part(
+        'template-parts/instruction/flexible',
+        'sections',
+        ['post_id' => $post_id]
+    );
+}
+
+/**
+ * @return list<array{layout: string, label: string, fields: string, use_for: string, note?: string}>
+ */
+function manual_flexible_layout_legend(string $language): array
+{
+    $is_fi = $language === 'fi';
+
+    return [
+        [
+            'layout' => 'intro_text',
+            'label' => $is_fi ? 'Johdantoteksti' : 'Intro text',
+            'fields' => $is_fi ? 'Otsikko ja teksti' : 'Heading and text',
+            'use_for' => $is_fi
+                ? 'Lyhyt teksti ennen varsinaista sisältöä.'
+                : 'Short text before the main part of the section.',
+        ],
+        [
+            'layout' => 'screenshot_step',
+            'label' => $is_fi ? 'Kuva ja ohje' : 'Image and instructions',
+            'fields' => $is_fi
+                ? 'Kuva, mitä kuvassa korostetaan, ohjeteksti'
+                : 'Image, what to highlight in the image, instruction text',
+            'use_for' => $is_fi
+                ? 'Kun lukijan pitää nähdä, mitä painiketta tai kohtaa hallinnassa klikataan.'
+                : 'When readers need to see which button or area to use in WordPress.',
+        ],
+        [
+            'layout' => 'checklist',
+            'label' => $is_fi ? 'Tarkistuslista' : 'Checklist',
+            'fields' => $is_fi ? 'Otsikko ja lista vaiheista' : 'Heading and a list of steps',
+            'use_for' => $is_fi
+                ? 'Asiat, jotka tehdään peräkkäin.'
+                : 'Things to do one after another.',
+        ],
+        [
+            'layout' => 'callout',
+            'label' => $is_fi ? 'Huomio' : 'Highlighted note',
+            'fields' => $is_fi ? 'Tyyli (huomio / varoitus / onnistuminen) ja teksti' : 'Style (note / warning / success) and text',
+            'use_for' => $is_fi
+                ? 'Tärkeä varoitus tai vinkki, joka erottuu muusta tekstistä.'
+                : 'An important warning or tip that should stand out.',
+        ],
+    ];
+}
+
+function manual_show_flexible_layout_badges(bool $show, int $post_id): bool
+{
+    unset($post_id);
+
+    return false;
+}
+
+/**
+ * Layout reference cards for the flexible-content guide (use in post content).
+ */
+function manual_flexible_legend_shortcode(): string
+{
+    $post_id = get_the_ID();
+
+    if ($post_id <= 0 || !manual_instruction_is_flexible_demo($post_id)) {
+        return '';
+    }
+
+    ob_start();
+    manual_render_flexible_layout_legend($post_id);
+
+    return (string) ob_get_clean();
+}
+
+function manual_wrap_flexible_content_html(string $html, int $post_id): string
+{
+    if ($html === '') {
+        return '';
+    }
+
+    ob_start();
+    get_template_part(
+        'template-parts/instruction/flexible',
+        'sections',
+        [
+            'post_id' => $post_id,
+            'content' => $html,
+        ]
+    );
+
+    return (string) ob_get_clean();
+}
+
+function manual_render_flexible_layout_legend(int $post_id): void
+{
+    if (!manual_instruction_is_flexible_demo($post_id)) {
+        return;
+    }
+
+    get_template_part(
+        'template-parts/instruction/flexible',
+        'layout-legend',
+        ['language' => manual_instruction_language_code($post_id)]
+    );
 }

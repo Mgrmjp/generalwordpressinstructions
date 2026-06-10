@@ -69,17 +69,17 @@ Build the project in vertical slices: environment and docs first, then the WordP
   - Files: `includes/seed-fundamentals.php`.
 
 - [x] Task 11: Create seed content for Site Configuration (4 topics).
-  - Acceptance: 8 posts created (4 EN + 4 FI) covering Menus, Users, Settings, Customizer.
+  - Acceptance: 8 posts created (4 EN + 4 FI) covering Navigation, Users, Settings, Appearance and Fonts.
   - Verify: PHP lint and WP-CLI post count.
   - Files: `includes/seed-site-config.php`.
 
-- [x] Task 12: Create seed content for Block Editor (5 topics).
-  - Acceptance: 10 posts created (5 EN + 5 FI) covering Working with Blocks, Content Blocks, Media Blocks, Layout Blocks, Reusable Blocks.
+- [x] Task 12: Create seed content for Block Editor (6 topics).
+  - Acceptance: 12 posts created (6 EN + 6 FI) covering Block Editor Basics, Working with Blocks, Content Blocks, Media Blocks, Layout Blocks, Synced Patterns.
   - Verify: PHP lint and WP-CLI post count.
   - Files: `includes/seed-block-editor.php`.
 
-- [x] Task 13: Create seed content for Classic Editor (2 topics).
-  - Acceptance: 4 posts created (2 EN + 2 FI) covering Classic Formatting, Classic Media.
+- [x] Task 13: Create seed content for Classic Editor (3 topics).
+  - Acceptance: 6 posts created (3 EN + 3 FI) covering Classic Editor Basics, Classic Formatting, Classic Media.
   - Verify: PHP lint and WP-CLI post count.
   - Files: `includes/seed-classic-editor.php`.
 
@@ -105,7 +105,7 @@ Build the project in vertical slices: environment and docs first, then the WordP
   - Files: `docs/spec.md`, `docs/implementation-plan.md`, `README.md`.
 
 - [ ] Task 18: Verify full instruction library.
-  - Acceptance: 44 posts exist, taxonomy terms assigned, language switcher works, screenshots capture.
+  - Acceptance: 48 posts exist, taxonomy terms assigned, language switcher works, screenshots capture.
   - Verify: WP-CLI commands and Playwright run.
   - Files: N/A.
 

@@ -133,12 +133,22 @@
     text-decoration: line-through;
 }
 
+.gwi-flexible-content {
+    display: grid;
+    gap: 2.25rem;
+}
+
+.gwi-flexible-section {
+    position: relative;
+}
+
 .gwi-highlighted-screenshot,
 .gwi-acf-screenshot-step,
 .gwi-flexible-screenshot {
     margin: 2.75rem 0;
     max-width: none;
 }
+
 
 .gwi-highlighted-screenshot__note {
     background: var(--manual-accent-subtle, #dff2ee);

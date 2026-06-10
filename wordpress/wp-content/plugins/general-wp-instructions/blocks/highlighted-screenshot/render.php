@@ -16,6 +16,9 @@ $language = ($post_id > 0 && function_exists('gwi_get_instruction_language'))
     : '';
 $image_url = isset($attributes['imageUrl']) ? (string) $attributes['imageUrl'] : '';
 $screenshot_id = isset($attributes['screenshotId']) ? sanitize_file_name((string) $attributes['screenshotId']) : '';
+$alt = isset($attributes['alt']) ? (string) $attributes['alt'] : '';
+$caption = isset($attributes['caption']) ? (string) $attributes['caption'] : '';
+$label = isset($attributes['label']) ? (string) $attributes['label'] : '';
 
 if ($image_url === '' && isset($legacy_attributes['imageUrl'])) {
     $image_url = (string) $legacy_attributes['imageUrl'];
@@ -23,6 +26,18 @@ if ($image_url === '' && isset($legacy_attributes['imageUrl'])) {
 
 if ($screenshot_id === '' && isset($legacy_attributes['screenshotId'])) {
     $screenshot_id = sanitize_file_name((string) $legacy_attributes['screenshotId']);
+}
+
+if ($alt === '' && isset($legacy_attributes['alt'])) {
+    $alt = (string) $legacy_attributes['alt'];
+}
+
+if ($caption === '' && isset($legacy_attributes['caption'])) {
+    $caption = (string) $legacy_attributes['caption'];
+}
+
+if ($label === '' && isset($legacy_attributes['label'])) {
+    $label = (string) $legacy_attributes['label'];
 }
 
 $context_url = '';
@@ -60,48 +75,27 @@ if ($image_url === '') {
     return;
 }
 
-$alt = isset($attributes['alt']) ? (string) $attributes['alt'] : '';
-$caption = isset($attributes['caption']) ? (string) $attributes['caption'] : '';
-$label = isset($attributes['label']) ? (string) $attributes['label'] : '';
-
-if ($alt === '' && isset($legacy_attributes['alt'])) {
-    $alt = (string) $legacy_attributes['alt'];
-}
-
-if ($caption === '' && isset($legacy_attributes['caption'])) {
-    $caption = (string) $legacy_attributes['caption'];
-}
-
-if ($label === '' && isset($legacy_attributes['label'])) {
-    $label = (string) $legacy_attributes['label'];
-}
-
 if ($alt === '' && $caption !== '') {
     $alt = wp_strip_all_tags($caption);
 }
 
 $note_label = $language === 'fi' ? __('Kuvassa', 'general-wp-instructions') : __('Screenshot', 'general-wp-instructions');
+$highlight_config = $screenshot_id !== '' ? gwi_screenshot_highlight_config($screenshot_id) : ['showOverlay' => true];
+$show_overlay = ($highlight_config['showOverlay'] ?? true) === true;
+$show_figcaption = $caption !== '' && $screenshot_id === '';
+
 $note_hint = $language === 'fi'
     ? __('Kohde on merkitty kehyksellä kuvassa.', 'general-wp-instructions')
     : __('The target control is outlined in the image.', 'general-wp-instructions');
-$show_figcaption = $caption !== '' && $screenshot_id === '';
 
-$highlight_x = gwi_percent_attribute($attributes['highlightX'] ?? $legacy_attributes['highlightX'] ?? null, 62);
-$highlight_y = gwi_percent_attribute($attributes['highlightY'] ?? $legacy_attributes['highlightY'] ?? null, 18);
-$highlight_width = gwi_percent_attribute($attributes['highlightWidth'] ?? $legacy_attributes['highlightWidth'] ?? null, 20);
-$highlight_height = gwi_percent_attribute($attributes['highlightHeight'] ?? $legacy_attributes['highlightHeight'] ?? null, 10);
-$show_overlay = !isset($legacy_attributes['screenshotId'])
-    || isset($legacy_attributes['label'])
-    || isset($legacy_attributes['highlightX'])
-    || isset($legacy_attributes['highlightY'])
-    || isset($legacy_attributes['highlightWidth'])
-    || isset($legacy_attributes['highlightHeight']);
-$style = sprintf(
-    'left:%.2f%%;top:%.2f%%;width:%.2f%%;height:%.2f%%;',
-    $highlight_x,
-    $highlight_y,
-    $highlight_width,
-    $highlight_height
+if ($label === '' && $screenshot_id !== '') {
+    $label = gwi_screenshot_highlight_default_label($screenshot_id, $language);
+}
+
+$overlay_attributes = array_merge(
+    $legacy_attributes,
+    $attributes,
+    ['language' => $language]
 );
 ?>
 <figure <?php echo get_block_wrapper_attributes(['class' => 'gwi-highlighted-screenshot']); ?>>
@@ -122,11 +116,7 @@ $style = sprintf(
         ]);
         ?>
         <?php if ($show_overlay) : ?>
-            <span class="gwi-highlighted-screenshot__box" style="<?php echo esc_attr($style); ?>">
-                <?php if ($label !== '') : ?>
-                    <span class="gwi-highlighted-screenshot__label"><?php echo esc_html($label); ?></span>
-                <?php endif; ?>
-            </span>
+            <?php gwi_render_screenshot_highlight_overlay($overlay_attributes, $screenshot_id, $label); ?>
         <?php endif; ?>
     </div>
     <?php if ($show_figcaption) : ?>

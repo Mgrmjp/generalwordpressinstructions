@@ -161,6 +161,8 @@ html.manual-theme-dark {
 }
 
 html.manual-theme-dark body.single-wp_instruction {
+    --manual-paper: #0f1318;
+    --manual-canvas: #0a0d11;
     --manual-ink: #f3f6f9;
     --manual-muted: #b0bac4;
 }

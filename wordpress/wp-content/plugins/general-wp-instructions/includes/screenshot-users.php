@@ -4,6 +4,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+const GWI_SCREENSHOT_USER_AVATAR_META = 'gwi_screenshot_user_avatar';
+
 /**
  * Demo accounts used in admin screenshots (users list, profile bar, etc.).
  *
@@ -14,7 +16,8 @@ if (!defined('ABSPATH')) {
  *   last_name: string,
  *   display_name: string,
  *   role: string,
- *   description: string
+ *   description: string,
+ *   avatar?: string
  * }>
  */
 function gwi_screenshot_user_definitions(): array
@@ -46,6 +49,16 @@ function gwi_screenshot_user_definitions(): array
             'display_name' => 'Liisa Nieminen',
             'role' => 'author',
             'description' => 'Kirjoittaja',
+        ],
+        [
+            'user_login' => 'aino.laine',
+            'user_email' => 'aino.laine@yritys.example.fi',
+            'first_name' => 'Aino',
+            'last_name' => 'Laine',
+            'display_name' => 'Aino Laine',
+            'role' => 'editor',
+            'description' => 'Sisältösuunnittelija',
+            'avatar' => 'assets/images/users/aino-laine.png',
         ],
     ];
 }
@@ -99,6 +112,10 @@ function gwi_ensure_screenshot_users(string $password = 'admin'): array
             'role' => $definition['role'],
             'user_pass' => $password,
         ]);
+
+        if (isset($definition['avatar'])) {
+            update_user_meta((int) $user_id, GWI_SCREENSHOT_USER_AVATAR_META, $definition['avatar']);
+        }
     }
 
     gwi_demote_default_install_admin();
@@ -152,4 +169,103 @@ function gwi_hide_install_admin_from_users_screen(WP_User_Query $query): void
     global $wpdb;
 
     $query->query_where .= $wpdb->prepare(' AND user_login != %s', 'admin');
+}
+
+add_filter('pre_get_avatar_data', 'gwi_use_screenshot_user_avatar', 10, 2);
+
+/**
+ * Use project-owned avatar assets for screenshot demo users.
+ *
+ * @param array<string, mixed> $args
+ * @param mixed               $id_or_email
+ *
+ * @return array<string, mixed>
+ */
+function gwi_use_screenshot_user_avatar(array $args, $id_or_email): array
+{
+    if (!empty($args['force_default'])) {
+        return $args;
+    }
+
+    $user = gwi_get_user_from_avatar_identifier($id_or_email);
+
+    if (!$user instanceof WP_User) {
+        return $args;
+    }
+
+    $avatar = get_user_meta($user->ID, GWI_SCREENSHOT_USER_AVATAR_META, true);
+
+    if (!is_string($avatar) || $avatar === '') {
+        return $args;
+    }
+
+    $relative_path = ltrim($avatar, '/');
+
+    if (!str_starts_with($relative_path, 'assets/images/users/')) {
+        return $args;
+    }
+
+    if (!file_exists(GWI_PLUGIN_DIR . $relative_path)) {
+        return $args;
+    }
+
+    $args['url'] = GWI_PLUGIN_URL . gwi_rawurlencode_path($relative_path);
+    $args['found_avatar'] = true;
+
+    return $args;
+}
+
+/**
+ * @param mixed $id_or_email
+ */
+function gwi_get_user_from_avatar_identifier($id_or_email): ?WP_User
+{
+    if ($id_or_email instanceof WP_User) {
+        return $id_or_email;
+    }
+
+    if ($id_or_email instanceof WP_Post) {
+        return gwi_get_avatar_user_by('id', (int) $id_or_email->post_author);
+    }
+
+    if ($id_or_email instanceof WP_Comment) {
+        if ($id_or_email->user_id > 0) {
+            return gwi_get_avatar_user_by('id', (int) $id_or_email->user_id);
+        }
+
+        return gwi_get_avatar_user_by('email', $id_or_email->comment_author_email);
+    }
+
+    if (is_object($id_or_email) && isset($id_or_email->comment_ID)) {
+        $comment = get_comment($id_or_email);
+
+        if ($comment instanceof WP_Comment) {
+            return gwi_get_user_from_avatar_identifier($comment);
+        }
+    }
+
+    if (is_numeric($id_or_email)) {
+        return gwi_get_avatar_user_by('id', (int) $id_or_email);
+    }
+
+    if (is_string($id_or_email) && is_email($id_or_email)) {
+        return gwi_get_avatar_user_by('email', $id_or_email);
+    }
+
+    return null;
+}
+
+/**
+ * @param int|string $value
+ */
+function gwi_get_avatar_user_by(string $field, $value): ?WP_User
+{
+    $user = get_user_by($field, $value);
+
+    return $user instanceof WP_User ? $user : null;
+}
+
+function gwi_rawurlencode_path(string $path): string
+{
+    return implode('/', array_map('rawurlencode', explode('/', $path)));
 }

@@ -39,6 +39,35 @@ WP_CLI::add_command(
  *     wp gwi ensure-screenshot-users
  *     wp gwi ensure-screenshot-users --password=admin
  */
+/**
+ * Seed or refresh flexible content example rows on demo instruction posts.
+ *
+ * ## OPTIONS
+ *
+ * [--force]
+ * : Overwrite instruction_sections even when the seed version meta matches.
+ *
+ * ## EXAMPLES
+ *
+ *     wp gwi seed-flexible-examples
+ *     wp gwi seed-flexible-examples --force
+ */
+WP_CLI::add_command(
+    'gwi seed-flexible-examples',
+    static function (array $args, array $assoc_args): void {
+        require_once GWI_PLUGIN_DIR . 'includes/seed-flexible-examples.php';
+
+        $force = isset($assoc_args['force']);
+        gwi_seed_flexible_content_examples($force);
+
+        WP_CLI::success(
+            $force
+                ? 'Flexible content examples re-seeded (forced).'
+                : 'Flexible content examples seeded (skipped posts already at current version).'
+        );
+    }
+);
+
 WP_CLI::add_command(
     'gwi ensure-screenshot-users',
     static function (array $args, array $assoc_args): void {

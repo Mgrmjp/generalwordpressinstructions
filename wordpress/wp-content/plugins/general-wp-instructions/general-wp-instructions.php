@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 }
 
 define('GWI_VERSION', '0.1.3');
+define('GWI_FLEXIBLE_EXAMPLES_VERSION', '6');
 define('GWI_PLUGIN_FILE', __FILE__);
 define('GWI_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('GWI_PLUGIN_URL', plugin_dir_url(__FILE__));

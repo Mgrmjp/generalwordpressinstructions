@@ -308,8 +308,8 @@
     {
       "id": "customizer",
       "title": {
-        "en": "Theme Customizer",
-        "fi": "Teeman mukauttaja"
+        "en": "Appearance: Customizer",
+        "fi": "Ulkoasu: Mukauttaja"
       },
       "capture": "focus",
       "focusMaxWidth": 900,
@@ -319,7 +319,7 @@
         {
           "selector": "#customize-controls",
           "label": {
-            "en": "Customizer",
+            "en": "Classic Customizer",
             "fi": "Mukauttaja"
           }
         }
@@ -347,10 +347,63 @@
       ]
     },
     {
+      "id": "block-editor-publish-controls",
+      "title": {
+        "en": "Block Editor: Preview and publish",
+        "fi": "Lohkoeditori: Esikatsele ja julkaise"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/post-new.php",
+      "waitFor": ".edit-post-header, .edit-post-header__settings, #wpbody",
+      "focusPaddingX": 260,
+      "focusPaddingTop": 120,
+      "focusPaddingBottom": 180,
+      "highlights": [
+        {
+          "selector": ".editor-post-preview, .editor-preview-dropdown__toggle, .edit-post-header-preview__button, button[aria-label='Preview'], button[aria-label*='Preview'], button[aria-label*='Esikatsele']",
+          "label": {
+            "en": "Preview",
+            "fi": "Esikatsele"
+          },
+          "optional": true
+        },
+        {
+          "selector": ".editor-post-publish-button, .editor-post-publish-panel__toggle, button.editor-post-publish-button__button, button[aria-label='Publish'], button[aria-label*='Publish'], button[aria-label*='Update'], button[aria-label*='Julkaise'], button[aria-label*='Päivitä'], .edit-post-header__settings button.is-primary",
+          "label": {
+            "en": "Publish or update",
+            "fi": "Julkaise tai päivitä"
+          },
+          "optional": true
+        }
+      ]
+    },
+    {
+      "id": "block-editor-list-view",
+      "title": {
+        "en": "Block Editor: List View",
+        "fi": "Lohkoeditori: Listanäkymä"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/post-new.php",
+      "waitFor": ".edit-post-header-toolbar, .block-editor-editor, #wpbody",
+      "highlights": [
+        {
+          "selector": ".edit-post-header-toolbar__list-view-toggle, button[aria-label='Document Overview'], button[aria-label*='Document Overview'], button[aria-label='List View'], button[aria-label*='List View'], button[aria-label*='Listanäkymä'], button[aria-label*='Asiakirjan yleiskatsaus']",
+          "label": {
+            "en": "List View",
+            "fi": "Listanäkymä"
+          },
+          "optional": true
+        }
+      ]
+    },
+    {
       "id": "block-editor-reusable-list",
       "title": {
-        "en": "Reusable Blocks: List",
-        "fi": "Uudelleenkäytettävät lohkot: Lista"
+        "en": "Patterns: List",
+        "fi": "Mallit: Lista"
       },
       "capture": "focus",
       "url": "/wp-admin/edit.php?post_type=wp_block",
@@ -402,6 +455,32 @@
             "en": "ACF Field Groups",
             "fi": "ACF-kenttäryhmät"
           }
+        }
+      ]
+    },
+    {
+      "id": "page-flexible-sections",
+      "title": {
+        "en": "Page: Flexible sections",
+        "fi": "Sivu: Joustavat osiot"
+      },
+      "optional": true,
+      "capture": "element",
+      "captureSelector": "[data-key=\"field_gwi_instruction_sections\"], [data-name=\"instruction_sections\"]",
+      "waitFor": "[data-key=\"field_gwi_instruction_sections\"], [data-name=\"instruction_sections\"]",
+      "pageSlug": {
+        "en": "flexible-sections-demo-en",
+        "fi": "flexible-sections-demo-fi"
+      },
+      "url": "/wp-admin/post.php?post=0&action=edit",
+      "highlights": [
+        {
+          "selector": "[data-name=\"instruction_sections\"] .acf-actions .acf-button, [data-key=\"field_gwi_instruction_sections\"] .acf-actions a[data-name=\"add\"]",
+          "label": {
+            "en": "Add section",
+            "fi": "Lisää osio"
+          },
+          "optional": true
         }
       ]
     },

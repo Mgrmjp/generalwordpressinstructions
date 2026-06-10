@@ -47,14 +47,14 @@ Success means a developer can start the Lando site, activate the included plugin
 - `includes/acf.php` — optional ACF Blocks and Flexible Content
 - `includes/seed-content.php` — seed orchestrator
 - `includes/seed-fundamentals.php` — Dashboard, Posts, Categories, Pages, Media, Comments
-- `includes/seed-site-config.php` — Menus, Users, Settings, Customizer
+- `includes/seed-site-config.php` — Navigation, Users, Settings, Appearance and Fonts
 - `includes/seed-block-editor.php` — Block Editor deep dive
 - `includes/seed-classic-editor.php` — Classic Editor deep dive
 - `includes/seed-advanced.php` — ACF Fields, Flexible Content, ACF Blocks, SEO, Performance
 
 ## Instruction Library
 
-The plugin seeds 44 instruction posts (22 topics × 2 languages) organized into 5 categories:
+The plugin seeds 48 instruction posts (24 topics × 2 languages) organized into 5 categories:
 
 ### WordPress Fundamentals
 - Dashboard Overview
@@ -65,10 +65,10 @@ The plugin seeds 44 instruction posts (22 topics × 2 languages) organized into 
 - Managing Comments
 
 ### Site Configuration
-- Creating Menus
+- Navigation Menus
 - Managing Users
 - WordPress Settings
-- Theme Customizer
+- Theme Appearance and Fonts
 
 ### Block Editor
 - Block Editor Basics
@@ -76,7 +76,7 @@ The plugin seeds 44 instruction posts (22 topics × 2 languages) organized into 
 - Common Content Blocks
 - Media Blocks
 - Layout Blocks
-- Reusable Blocks and Patterns
+- Synced Patterns and Patterns
 
 ### Classic Editor
 - Classic Editor Basics
@@ -134,7 +134,7 @@ Conventions:
 - The plugin provides native Gutenberg blocks for instruction steps and highlighted screenshots.
 - The plugin registers ACF Blocks when ACF is active.
 - ACF JSON defines an older Flexible Content editing model for instruction sections.
-- The plugin seeds 44 instruction posts covering 22 topics in Finnish and English.
+- The plugin seeds 48 instruction posts covering 24 topics in Finnish and English.
 - Each instruction uses step-list and highlighted-screenshot blocks.
 - A screenshot script captures 22 critical admin views with strong outlines around configured buttons.
 

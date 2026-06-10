@@ -103,34 +103,34 @@ function gwi_seed_fundamentals(): array
 
 function gwi_seed_dashboard_overview_en(): string
 {
-    return '<!-- wp:paragraph --><p>The Dashboard is your WordPress home base. Use it to see site activity, quick links, and important updates at a glance.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Navigate the Dashboard","steps":[{"text":"Log in to WordPress and you will land on the Dashboard automatically."},{"text":"Use the left sidebar menu to access Posts, Pages, Media, and other sections."},{"text":"Check the At a Glance widget for a quick count of your published content."},{"text":"Review the Activity widget for recent posts and comments."},{"text":"Use the Screen Options tab to show or hide dashboard widgets."}]} /-->'
+    return '<!-- wp:paragraph --><p>The Dashboard is your WordPress home base. In WordPress 7.0 it has a refreshed admin style, smoother navigation, a Command Palette shortcut in the admin bar, and new entry points for fonts and supported service connections.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Navigate the Dashboard","steps":[{"text":"Log in to WordPress and you will land on the Dashboard automatically."},{"text":"Use the left sidebar menu to access Posts, Pages, Media, Appearance, Plugins, Users, Tools, and Settings."},{"text":"Use Ctrl+K or Cmd+K, or the Command Palette icon in the admin bar, to jump quickly to admin screens and editor actions."},{"text":"Check the At a Glance widget for a quick count of published content."},{"text":"Review the Activity widget for recent posts and comments."},{"text":"Use the Screen Options tab to show or hide dashboard widgets."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"dashboard-home","caption":"The WordPress Dashboard with key areas highlighted"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Tip: You can drag and drop dashboard widgets to rearrange them to suit your workflow.</p><!-- /wp:paragraph -->';
+        . '<!-- wp:paragraph --><p>Tip: Appearance > Fonts opens the WordPress 7.0 Font Library. Settings > Connectors appears when the site supports managed external service or AI-provider connections.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_dashboard_overview_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Hallintapaneeli on WordPressin kotisivu. Käytä sitä sivuston toiminnan, pikalinkkien ja tärkeiden päivitysten tarkasteluun.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Liiku hallintapaneelissa","steps":[{"text":"Kirjaudu sisään WordPressiin ja päädyt hallintapaneeliin automaattisesti."},{"text":"Käytä vasenta sivuvalikkoa päästäksesi artikkeleihin, sivuihin, mediaan ja muihin osioihin."},{"text":"Tarkista Yleiskatsaus-widget julkaistun sisällön nopeasta määrästä."},{"text":"Katso Toiminta-widgetistä viimeisimmät artikkelit ja kommentit."},{"text":"Käytä Näyttöasetukset-välilehteä hallintapaneelin widgettien näyttämiseen tai piilottamiseen."}]} /-->'
+    return '<!-- wp:paragraph --><p>Hallintapaneeli on WordPressin kotinäkymä. WordPress 7.0:ssa hallinnan ulkoasu on uudistettu, siirtymät ovat sulavampia, hallintapalkissa on komentopaletin pikakuvake ja fonteille sekä tuetuille palveluyhteyksille on uudet sisäänkäynnit.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Liiku hallintapaneelissa","steps":[{"text":"Kirjaudu sisään WordPressiin ja päädyt hallintapaneeliin automaattisesti."},{"text":"Käytä vasenta sivuvalikkoa päästäksesi artikkeleihin, sivuihin, mediaan, ulkoasuun, lisäosiin, käyttäjiin, työkaluihin ja asetuksiin."},{"text":"Käytä Ctrl+K- tai Cmd+K-pikanäppäintä tai hallintapalkin komentopaletin kuvaketta siirtyäksesi nopeasti näkymiin ja editorin toimintoihin."},{"text":"Tarkista Yleiskatsaus-widget julkaistun sisällön nopeasta määrästä."},{"text":"Katso Toiminta-widgetistä viimeisimmät artikkelit ja kommentit."},{"text":"Käytä Näyttöasetukset-välilehteä hallintapaneelin widgettien näyttämiseen tai piilottamiseen."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"dashboard-home","caption":"WordPress-hallintapaneeli keskeisalueet korostettuna"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: Voit vetää ja pudottaa hallintapaneelin widgettejä järjestääksesi ne työskentelytapasi mukaan.</p><!-- /wp:paragraph -->';
+        . '<!-- wp:paragraph --><p>Vinkki: Ulkoasu > Fontit avaa WordPress 7.0:n Fonttikirjaston. Asetukset > Connectors näkyy, kun sivusto tukee hallittuja ulkoisia palvelu- tai AI-palveluyhteyksiä.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_creating_posts_en(): string
 {
     return '<!-- wp:paragraph --><p>Posts are time-based content entries, typically used for blog articles, news, and updates. They appear in reverse chronological order on your site.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Create a new post","steps":[{"text":"Go to Posts and click Add New."},{"text":"Write a clear, descriptive title in the title field."},{"text":"Add your content using blocks in the editor below the title."},{"text":"Assign a category from the Categories panel on the right."},{"text":"Add relevant tags in the Tags panel."},{"text":"Set a featured image using the Featured Image panel."},{"text":"Click Publish when your post is ready."}]} /-->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Create a new post","steps":[{"text":"Go to Posts and click Add New."},{"text":"Write a clear, descriptive title in the title field."},{"text":"Add content using blocks, media, and patterns in the editor below the title."},{"text":"Assign a category from the Categories panel on the right."},{"text":"Add relevant tags in the Tags panel."},{"text":"Set a featured image using the Featured Image panel and review its alt text in the Media Library."},{"text":"Preview the post, then click Publish when it is ready."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"posts-list","caption":"The Posts list with Add New button highlighted"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Tip: Use the Preview button to check how your post looks before publishing.</p><!-- /wp:paragraph -->';
+        . '<!-- wp:paragraph --><p>Tip: WordPress 7.0 includes visual revisions, so you can compare saved versions more clearly before restoring an older draft or published version.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_creating_posts_fi(): string
 {
     return '<!-- wp:paragraph --><p>Artikkelit ovat aikaperusteisia sisältöjulkaisuja, joita käytetään tyypillisesti blogikirjoituksiin, uutisiin ja päivityksiin. Ne näkyvät sivustollasi uusimmasta vanhimpaan järjestettyinä.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Luo uusi artikkeli","steps":[{"text":"Mene Artikkelit-valikkoon ja klikkaa Lisää uusi."},{"text":"Kirjoita selkeä ja kuvaava otsikko otsikkokenttään."},{"text":"Lisää sisältöäsi käyttämällä lohkoja editorissa otsikon alla."},{"text":"Valitse kategoria Kategoriat-paneelista oikealla."},{"text":"Lisää sopivat asiasanat Asiasanat-paneelissa."},{"text":"Aseta artikkelikuva Artikkelikuva-paneelista."},{"text":"Klikkaa Julkaise kun artikkelisi on valmis."}]} /-->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Luo uusi artikkeli","steps":[{"text":"Mene Artikkelit-valikkoon ja klikkaa Lisää uusi."},{"text":"Kirjoita selkeä ja kuvaava otsikko otsikkokenttään."},{"text":"Lisää sisältöä lohkoilla, medialla ja malleilla otsikon alla olevassa editorissa."},{"text":"Valitse kategoria Kategoriat-paneelista oikealla."},{"text":"Lisää sopivat asiasanat Asiasanat-paneelissa."},{"text":"Aseta artikkelikuva Artikkelikuva-paneelista ja tarkista sen vaihtoehtoinen teksti Mediakirjastossa."},{"text":"Esikatsele artikkeli ja klikkaa Julkaise, kun se on valmis."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"posts-list","caption":"Artikkelit-lista Lisää uusi -painike korostettuna"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: Käytä Esikatsele-painiketta tarkistaaksesi artikkelin ulkoasu ennen julkaisua.</p><!-- /wp:paragraph -->';
+        . '<!-- wp:paragraph --><p>Vinkki: WordPress 7.0 sisältää visuaaliset versiot, joiden avulla tallennettuja versioita voi vertailla selkeämmin ennen vanhemman luonnoksen tai julkaistun version palauttamista.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_categories_tags_en(): string
@@ -152,33 +152,33 @@ function gwi_seed_categories_tags_fi(): string
 function gwi_seed_creating_pages_en(): string
 {
     return '<!-- wp:paragraph --><p>Pages are static content that is not time-dependent. Use them for About, Contact, Services, and other permanent sections of your site.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Create a new page","steps":[{"text":"Go to Pages and click Add New."},{"text":"Write a clear title for your page."},{"text":"Add content using blocks in the editor."},{"text":"Set a parent page in the Page Attributes panel if you want a hierarchy."},{"text":"Choose a template if your theme offers page templates."},{"text":"Click Publish when your page is ready."}]} /-->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Create a new page","steps":[{"text":"Go to Pages and click Add New."},{"text":"Write a clear title for your page."},{"text":"Add content using blocks, media, and patterns in the editor."},{"text":"Use List View before publishing to check heading order, nested groups, and pattern structure."},{"text":"Set a parent page in the Page Attributes panel if you want a hierarchy."},{"text":"Choose a template if your theme offers page templates, then preview and publish."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"pages-list-add-new","caption":"Pages list with Add New button highlighted"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Tip: Pages can use different templates provided by your theme, such as full-width or sidebar layouts.</p><!-- /wp:paragraph -->';
+        . '<!-- wp:paragraph --><p>Tip: In WordPress 7.0, patterns can act as a single editable unit. If you only need text or image changes, edit the available fields first before detaching or restructuring the pattern.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_creating_pages_fi(): string
 {
     return '<!-- wp:paragraph --><p>Sivut ovat staattista sisältöä, joka ei ole aikariippuvaista. Käytä niitä Tietoa, Yhteystiedot, Palvelut ja muihin sivustosi pysyviin osioihin.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Luo uusi sivu","steps":[{"text":"Mene Sivut-valikkoon ja klikkaa Lisää uusi."},{"text":"Kirjoita selkeä otsikko sivullesi."},{"text":"Lisää sisältöä käyttämällä lohkoja editorissa."},{"text":"Aseta yläsivu Sivun asetukset -paneelissa jos haluat hierarkian."},{"text":"Valitse sivupohja, jos teemasi tarjoaa sivupohjia."},{"text":"Klikkaa Julkaise kun sivusi on valmis."}]} /-->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Luo uusi sivu","steps":[{"text":"Mene Sivut-valikkoon ja klikkaa Lisää uusi."},{"text":"Kirjoita selkeä otsikko sivullesi."},{"text":"Lisää sisältöä lohkoilla, medialla ja malleilla editorissa."},{"text":"Käytä Listanäkymää ennen julkaisua tarkistaaksesi otsikkotasot, sisäkkäiset ryhmät ja mallirakenteen."},{"text":"Aseta yläsivu Sivun asetukset -paneelissa, jos haluat hierarkian."},{"text":"Valitse sivupohja, jos teemasi tarjoaa sivupohjia, esikatsele ja julkaise."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"pages-list-add-new","caption":"Sivulista Lisää uusi -painike korostettuna"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: Sivut voivat käyttää eri malleja, joita teemasi tarjoaa, kuten täyslevyisiä tai sivupalkillisia asetteluja.</p><!-- /wp:paragraph -->';
+        . '<!-- wp:paragraph --><p>Vinkki: WordPress 7.0:ssa mallit voivat toimia yhtenä muokattavana kokonaisuutena. Jos tarvitset vain teksti- tai kuvamuutoksia, muokkaa ensin tarjolla olevia kenttiä ennen mallin irrottamista tai rakenteen muuttamista.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_media_library_en(): string
 {
     return '<!-- wp:paragraph --><p>The Media Library stores all your uploaded images, documents, videos, and audio files. You can manage, edit, and reuse media from this central location.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Use the Media Library","steps":[{"text":"Go to Media to see all uploaded files."},{"text":"Click Add New to upload new files by dragging and dropping or selecting files."},{"text":"Click any file to view its details, edit alt text, and get the file URL."},{"text":"Use the list or grid view toggle to switch between display modes."},{"text":"Filter by media type using the dropdown above the media grid."}]} /-->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Use the Media Library","steps":[{"text":"Go to Media to see all uploaded files."},{"text":"Click Add New to upload new files by dragging and dropping or selecting files."},{"text":"Click any file to view its details, edit alt text, copy the file URL, or replace metadata."},{"text":"Use the list or grid view toggle to switch between display modes."},{"text":"Filter by media type using the dropdown above the media grid."},{"text":"Review alt text even when WordPress imports it from image metadata."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"media-library-add-new","caption":"Media Library with Add New button highlighted"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Tip: Always add descriptive alt text to images for accessibility and SEO purposes.</p><!-- /wp:paragraph -->';
+        . '<!-- wp:paragraph --><p>Tip: Use galleries when several images belong together. WordPress 7.0 galleries can use an enlarged lightbox/slideshow experience when configured from the Gallery block.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_media_library_fi(): string
 {
-    return '<!-- wp:paragraph --><p>Mediakirjasto tallentaa kaikki ladattujen kuviesi, dokumenttiesi, videosi ja äänitiedostosi. Voit hallinnoida, muokata ja käyttää uudelleen mediaa tästä keskitetystä sijainnista.</p><!-- /wp:paragraph -->'
-        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä mediakirjastoa","steps":[{"text":"Siirry Media-valikkoon nähdäksesi kaikki ladatut tiedostot."},{"text":"Klikkaa Lisää uusi ladataksesi uusia tiedostoja vetämällä ja pudottamalla tai valitsemalla tiedostoja."},{"text":"Klikkaa mitä tahansa tiedostoa nähdäksesi sen tiedot, muokataksesi vaihtoehtoista tekstiä ja saadaksesi tiedoston URL-osoitteen."},{"text":"Käytä lista- tai ruudukkonäkymän vaihtoa vaihtaaksesi näyttötiloja."},{"text":"Suodata mediatyypin mukaan käyttämällä pudotusvalikkoa mediaruudukon yläpuolella."}]} /-->'
+    return '<!-- wp:paragraph --><p>Mediakirjasto tallentaa kaikki ladatut kuvat, dokumentit, videot ja äänitiedostot. Voit hallinnoida, muokata ja käyttää mediaa uudelleen tästä keskitetystä sijainnista.</p><!-- /wp:paragraph -->'
+        . '<!-- wp:general-wp-instructions/step-list {"title":"Käytä mediakirjastoa","steps":[{"text":"Siirry Media-valikkoon nähdäksesi kaikki ladatut tiedostot."},{"text":"Klikkaa Lisää uusi ladataksesi uusia tiedostoja vetämällä ja pudottamalla tai valitsemalla tiedostoja."},{"text":"Klikkaa tiedostoa nähdäksesi sen tiedot, muokataksesi vaihtoehtoista tekstiä, kopioidaksesi URL-osoitteen tai korjataksesi metatietoja."},{"text":"Käytä lista- tai ruudukkonäkymän vaihtoa vaihtaaksesi näyttötiloja."},{"text":"Suodata mediatyypin mukaan käyttämällä pudotusvalikkoa mediaruudukon yläpuolella."},{"text":"Tarkista vaihtoehtoinen teksti myös silloin, kun WordPress tuo sen kuvan metadatasta."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"media-library-add-new","caption":"Mediakirjasto Lisää uusi -painike korostettuna"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
-        . '<!-- wp:paragraph --><p>Vinkki: Lisää aina kuvaileva vaihtoehtoinen teksti kuviin saavutettavuuden ja SEO:n parantamiseksi.</p><!-- /wp:paragraph -->';
+        . '<!-- wp:paragraph --><p>Vinkki: Käytä gallerioita, kun useat kuvat kuuluvat yhteen. WordPress 7.0:n gallerioissa voi käyttää suurennettua valolaatikko- tai diaesityskokemusta, kun se määritetään Galleria-lohkosta.</p><!-- /wp:paragraph -->';
 }
 
 function gwi_seed_managing_comments_en(): string

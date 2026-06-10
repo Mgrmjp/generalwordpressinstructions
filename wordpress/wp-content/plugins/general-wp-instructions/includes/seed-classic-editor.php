@@ -10,6 +10,21 @@ function gwi_seed_classic_editor(): array
 
     $pairs[] = [
         'en' => gwi_create_seed_instruction(
+            'classic-editor-basics-en',
+            'Classic Editor Basics',
+            'en',
+            gwi_seed_classic_editor_basics_en()
+        ),
+        'fi' => gwi_create_seed_instruction(
+            'perinteisen-editorin-perusteet-fi',
+            'Perinteisen editorin perusteet',
+            'fi',
+            gwi_seed_classic_editor_basics_fi()
+        ),
+    ];
+
+    $pairs[] = [
+        'en' => gwi_create_seed_instruction(
             'classic-formatting-en',
             'Classic Editor Formatting',
             'en',
@@ -39,6 +54,40 @@ function gwi_seed_classic_editor(): array
     ];
 
     return $pairs;
+}
+
+function gwi_seed_classic_editor_basics_en(): string
+{
+    return <<<'BLOCKS'
+<!-- wp:paragraph -->
+<p>Use this instruction when a site still uses the Classic Editor, an older editing workflow, or custom fields that sit below a simple text editor. WordPress 7.0 still supports these workflows, but most new editing features live in the Block Editor and Site Editor.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:general-wp-instructions/step-list {"title":"Edit classic content safely","steps":[{"text":"Open Pages or Posts and choose the item you need to edit."},{"text":"Use the Visual tab for normal text changes and avoid the Text tab unless you need HTML."},{"text":"Use Add Media for images and documents."},{"text":"Check the permalink, featured image, page attributes, categories, and custom fields before saving."},{"text":"Choose Preview if available, then click Update or Publish."}]} /-->
+
+<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"classic-editor-publish","caption":"Classic Editor publish and update controls"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->
+
+<!-- wp:paragraph -->
+<p>Tip: Older ACF Flexible Content pages should be edited row by row. Add, remove, or reorder sections only when the page structure needs to change.</p>
+<!-- /wp:paragraph -->
+BLOCKS;
+}
+
+function gwi_seed_classic_editor_basics_fi(): string
+{
+    return <<<'BLOCKS'
+<!-- wp:paragraph -->
+<p>Käytä tätä ohjetta, kun sivusto käyttää edelleen perinteistä editoria, vanhempaa muokkaustapaa tai mukautettuja kenttiä yksinkertaisen tekstieditorin alla. WordPress 7.0 tukee näitä työnkulkuja edelleen, mutta useimmat uudet muokkausominaisuudet ovat lohkoeditorissa ja sivustoeditorissa.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:general-wp-instructions/step-list {"title":"Muokkaa perinteistä sisältöä turvallisesti","steps":[{"text":"Avaa Sivut tai Artikkelit ja valitse muokattava sisältö."},{"text":"Käytä Visuaalinen-välilehteä tavallisiin tekstimuutoksiin ja vältä Teksti-välilehteä, ellei HTML-muokkaus ole tarpeen."},{"text":"Lisää kuvia ja tiedostoja Lisää media -painikkeella."},{"text":"Tarkista osoite, artikkelikuva, sivun asetukset, kategoriat ja mukautetut kentät ennen tallennusta."},{"text":"Valitse Esikatsele, jos se on käytettävissä, ja klikkaa sitten Päivitä tai Julkaise."}]} /-->
+
+<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"classic-editor-publish","caption":"Perinteisen editorin julkaisu- ja päivityspainikkeet"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->
+
+<!-- wp:paragraph -->
+<p>Vinkki: Vanhoja ACF Flexible Content -sivuja kannattaa muokata rivi kerrallaan. Lisää, poista tai järjestä osioita vain silloin, kun sivun rakenne oikeasti muuttuu.</p>
+<!-- /wp:paragraph -->
+BLOCKS;
 }
 
 function gwi_seed_classic_formatting_en(): string
