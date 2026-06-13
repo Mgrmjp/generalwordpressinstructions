@@ -2309,6 +2309,44 @@ html.manual-theme-dark .manual-glossary-term dt {
     color: #f3f4f6;
 }
 
+html.manual-theme-dark body.single-wp_instruction .manual-check-box,
+html.manual-theme-dark body.single-wp_instruction .manual-mistakes-box {
+    background: #111923;
+    border-color: #334153;
+    color: #eef2f6;
+}
+
+html.manual-theme-dark body.single-wp_instruction .manual-check-box {
+    border-left-color: #22c55e;
+}
+
+html.manual-theme-dark body.single-wp_instruction .manual-mistakes-box {
+    border-left-color: #f97316;
+}
+
+html.manual-theme-dark body.single-wp_instruction .manual-check-box h2 {
+    color: #86efac;
+}
+
+html.manual-theme-dark body.single-wp_instruction .manual-mistakes-box h2 {
+    color: #fdba74;
+}
+
+html.manual-theme-dark body.single-wp_instruction .manual-check-box .manual-check-list li,
+html.manual-theme-dark body.single-wp_instruction .manual-mistakes-box .manual-check-list li {
+    background: #172230;
+    border-color: #334153;
+    color: #eef2f6;
+}
+
+html.manual-theme-dark body.single-wp_instruction .manual-check-box .manual-check-list li::before {
+    background: #22c55e;
+}
+
+html.manual-theme-dark body.single-wp_instruction .manual-mistakes-box .manual-check-list li::before {
+    background: #f97316;
+}
+
 html.manual-theme-dark .manual-site-footer {
     background: linear-gradient(180deg, #151a20 0%, #12161c 100%);
     border-top-color: #2a323c;

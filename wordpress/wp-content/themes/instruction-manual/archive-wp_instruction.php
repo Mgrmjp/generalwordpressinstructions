@@ -15,16 +15,46 @@ if (is_search()) {
     $archive_title = __('Kaikki ohjeet', 'instruction-manual');
 }
 
-$instructions = [];
+$instruction_query_args = [
+    'post_type' => 'wp_instruction',
+    'post_status' => 'publish',
+    'posts_per_page' => -1,
+    'orderby' => 'title',
+    'order' => 'ASC',
+    'suppress_filters' => true,
+];
 
-if (have_posts()) {
-    while (have_posts()) {
-        the_post();
-        $instructions[] = get_post();
-    }
-
-    wp_reset_postdata();
+if (!$is_all_languages && $current_language !== '') {
+    $instruction_query_args['meta_query'] = [
+        [
+            'key' => '_gwi_language',
+            'value' => $current_language,
+            'compare' => '=',
+        ],
+    ];
 }
+
+$is_category_archive = is_tax('instruction_category');
+$active_category_slug = '';
+
+if ($is_category_archive) {
+    $active_term = get_queried_object();
+
+    if ($active_term instanceof WP_Term) {
+        $active_category_slug = $active_term->slug;
+        $instruction_query_args['tax_query'] = [
+            [
+                'taxonomy' => 'instruction_category',
+                'field' => 'term_id',
+                'terms' => [(int) $active_term->term_id],
+            ],
+        ];
+    }
+}
+
+$instructions = is_search()
+    ? manual_query_scored_instructions($instruction_query_args, get_search_query())
+    : manual_query_instruction_posts($instruction_query_args);
 
 $groups = manual_instruction_library_groups();
 $grouped_instructions = array_fill_keys(array_keys($groups), []);
@@ -32,17 +62,6 @@ $grouped_instructions = array_fill_keys(array_keys($groups), []);
 foreach ($instructions as $instruction) {
     if ($instruction instanceof WP_Post) {
         $grouped_instructions[manual_instruction_group_key($instruction->ID)][] = $instruction;
-    }
-}
-
-$active_category_slug = '';
-$is_category_archive = is_tax('instruction_category');
-
-if ($is_category_archive) {
-    $active_term = get_queried_object();
-
-    if ($active_term instanceof WP_Term) {
-        $active_category_slug = $active_term->slug;
     }
 }
 

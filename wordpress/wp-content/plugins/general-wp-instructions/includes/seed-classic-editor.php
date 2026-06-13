@@ -25,6 +25,21 @@ function gwi_seed_classic_editor(): array
 
     $pairs[] = [
         'en' => gwi_create_seed_instruction(
+            'switch-between-editors-en',
+            'Switch Between Block and Classic Editors',
+            'en',
+            gwi_seed_switch_between_editors_en()
+        ),
+        'fi' => gwi_create_seed_instruction(
+            'editorien-vaihto-fi',
+            'Vaihda lohkoeditorin ja perinteisen editorin välillä',
+            'fi',
+            gwi_seed_switch_between_editors_fi()
+        ),
+    ];
+
+    $pairs[] = [
+        'en' => gwi_create_seed_instruction(
             'classic-formatting-en',
             'Classic Editor Formatting',
             'en',
@@ -88,6 +103,68 @@ function gwi_seed_classic_editor_basics_fi(): string
 <p>Vinkki: Vanhoja ACF Flexible Content -sivuja kannattaa muokata rivi kerrallaan. Lisää, poista tai järjestä osioita vain silloin, kun sivun rakenne oikeasti muuttuu.</p>
 <!-- /wp:paragraph -->
 BLOCKS;
+}
+
+function gwi_seed_switch_between_editors_en(): string
+{
+    return <<<'GUIDE'
+<!-- wp:paragraph -->
+<p>Use this when the Classic Editor plugin is installed and you need to decide which editor opens by default. Administrators control the site default in Settings > Writing, and each user can choose a personal default in Profile when switching is allowed.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:general-wp-instructions/step-list {"title":"Set editor defaults and switch when needed","steps":[{"text":"As an administrator, go to Settings > Writing."},{"text":"Under Default editor for all users, choose Block editor or Classic editor."},{"text":"Set Allow users to switch editors to Yes, then click Save Changes."},{"text":"Each user can open Profile from the top-right account menu or the Users menu."},{"text":"In Default Editor, choose Block editor or Classic editor, then click Update Profile."},{"text":"On Posts or Pages, use the edit links for block editor or classic editor when you need to open a specific editor for one item."}]} /-->
+
+<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"classic-editor-writing-settings","caption":"Classic Editor settings on the Writing Settings screen"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->
+
+<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"user-profile-default-editor","caption":"Default Editor setting on the user Profile screen"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->
+
+<!-- wp:heading -->
+<h2>How to check it worked</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Create a test draft from Posts or Pages. It should open in your selected profile default unless you used a specific block-editor or classic-editor edit link.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Common mistakes</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul><li>Do not set the whole site to Classic Editor if most users should keep using blocks.</li><li>If the Default Editor field is missing from Profile, an administrator must allow users to switch editors in Settings > Writing.</li><li>When switching is allowed, a post may remember the last editor used for that post. Use the explicit edit link when you need the other editor.</li></ul>
+<!-- /wp:list -->
+GUIDE;
+}
+
+function gwi_seed_switch_between_editors_fi(): string
+{
+    return <<<'GUIDE'
+<!-- wp:paragraph -->
+<p>Käytä tätä ohjetta, kun Classic Editor -lisäosa on asennettu ja haluat päättää, mikä editori avautuu oletuksena. Pääkäyttäjä hallitsee sivuston oletusta kohdassa Asetukset > Kirjoittaminen, ja jokainen käyttäjä voi valita oman oletuksensa profiilissa, jos editorien vaihtaminen on sallittu.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:general-wp-instructions/step-list {"title":"Aseta editorien oletukset ja vaihda tarvittaessa","steps":[{"text":"Mene pääkäyttäjänä kohtaan Asetukset > Kirjoittaminen."},{"text":"Valitse kohdassa Default editor for all users joko Block editor tai Classic editor."},{"text":"Aseta Allow users to switch editors kohtaan Yes ja klikkaa Tallenna muutokset."},{"text":"Jokainen käyttäjä voi avata Profiili-näkymän oikean yläkulman käyttäjävalikosta tai Käyttäjät-valikosta."},{"text":"Valitse kohdassa Default Editor joko Block editor tai Classic editor ja klikkaa Päivitä profiili."},{"text":"Käytä Artikkelit- tai Sivut-listalla lohkoeditorin tai perinteisen editorin muokkauslinkkiä, kun haluat avata tietyn sisällön tietyssä editorissa."}]} /-->
+
+<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"classic-editor-writing-settings","caption":"Classic Editor -asetukset Kirjoittamisen asetuksissa"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->
+
+<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"user-profile-default-editor","caption":"Default Editor -asetus käyttäjän profiilissa"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->
+
+<!-- wp:heading -->
+<h2>Miten tarkistaa että se toimii</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Luo testi-luonnos Artikkelit- tai Sivut-näkymästä. Sen pitäisi avautua profiilissa valitussa oletuseditorissa, ellet käyttänyt erillistä lohkoeditorin tai perinteisen editorin muokkauslinkkiä.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Yleiset virheet</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul><li>Älä muuta koko sivuston oletukseksi perinteistä editoria, jos useimpien käyttäjien pitää jatkaa lohkoeditorilla.</li><li>Jos Default Editor -kenttä puuttuu profiilista, pääkäyttäjän pitää sallia editorien vaihtaminen kohdassa Asetukset > Kirjoittaminen.</li><li>Kun vaihtaminen on sallittu, artikkeli tai sivu voi muistaa viimeksi käytetyn editorin. Käytä erillistä muokkauslinkkiä, kun tarvitset toisen editorin.</li></ul>
+<!-- /wp:list -->
+GUIDE;
 }
 
 function gwi_seed_classic_formatting_en(): string

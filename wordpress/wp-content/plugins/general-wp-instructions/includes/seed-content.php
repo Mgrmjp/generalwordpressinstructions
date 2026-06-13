@@ -9,6 +9,8 @@ require_once GWI_PLUGIN_DIR . 'includes/seed-site-config.php';
 require_once GWI_PLUGIN_DIR . 'includes/seed-block-editor.php';
 require_once GWI_PLUGIN_DIR . 'includes/seed-editor-workflows.php';
 require_once GWI_PLUGIN_DIR . 'includes/seed-classic-editor.php';
+require_once GWI_PLUGIN_DIR . 'includes/seed-polylang.php';
+require_once GWI_PLUGIN_DIR . 'includes/seed-wpml.php';
 require_once GWI_PLUGIN_DIR . 'includes/seed-advanced.php';
 require_once GWI_PLUGIN_DIR . 'includes/seed-flexible-examples.php';
 
@@ -20,6 +22,8 @@ function gwi_seed_instruction_content(): void
         gwi_seed_block_editor(),
         gwi_seed_editor_workflows(),
         gwi_seed_classic_editor(),
+        gwi_seed_polylang(),
+        gwi_seed_wpml(),
         gwi_seed_advanced()
     );
 
@@ -123,6 +127,7 @@ function gwi_assign_seed_categories(): void
         'site-config' => [
             'creating-menus-en', 'valikkojen-luominen-fi',
             'managing-users-en', 'kayttajien-hallinta-fi',
+            'profile-admin-color-scheme-en', 'hallintapaneelin-variteeman-vaihto-fi',
             'wordpress-settings-en', 'wordpress-asetukset-fi',
             'theme-customizer-en', 'teeman-mukauttaja-fi',
         ],
@@ -139,8 +144,20 @@ function gwi_assign_seed_categories(): void
         ],
         'classic-editor' => [
             'classic-editor-basics-en', 'perinteisen-editorin-perusteet-fi',
+            'switch-between-editors-en', 'editorien-vaihto-fi',
             'classic-formatting-en', 'perinteisen-editorin-muotoilu-fi',
             'classic-media-en', 'perinteisen-editorin-media-fi',
+        ],
+        'multilingual' => [
+            'polylang-languages-en', 'polylang-kielten-maaritys-fi',
+            'polylang-translate-content-en', 'sisallon-kaantaminen-polylangilla-fi',
+            'polylang-media-translations-en', 'median-kaannokset-polylangilla-fi',
+            'polylang-language-switcher-en', 'kielenvaihtajan-lisaaminen-polylangilla-fi',
+            'wpml-languages-en', 'wpml-kielten-maaritys-fi',
+            'wpml-translate-content-en', 'wpml-sisallon-kaantaminen-fi',
+            'wpml-media-translation-en', 'wpml-median-kaantaminen-fi',
+            'wpml-language-switcher-en', 'wpml-kielenvaihtajan-lisaaminen-fi',
+            'wpml-string-translation-en', 'wpml-merkkijonojen-kaantaminen-fi',
         ],
         'advanced' => [
             'custom-fields-acf-en', 'mukautetut-kentat-acf-fi',

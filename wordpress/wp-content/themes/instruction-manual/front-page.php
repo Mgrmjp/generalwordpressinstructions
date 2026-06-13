@@ -1,7 +1,7 @@
 <?php get_header(); ?>
 
 <?php
-$fi_tutorials = get_posts([
+$fi_tutorials = manual_query_instruction_posts([
     'post_type' => 'wp_instruction',
     'post_status' => 'publish',
     'posts_per_page' => -1,
@@ -9,6 +9,7 @@ $fi_tutorials = get_posts([
     'meta_value' => 'fi',
     'orderby' => 'title',
     'order' => 'ASC',
+    'suppress_filters' => true,
 ]);
 
 $intent_categories = manual_intent_categories_with_popular($fi_tutorials);

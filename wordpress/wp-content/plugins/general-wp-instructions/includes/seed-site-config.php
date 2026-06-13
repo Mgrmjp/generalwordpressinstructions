@@ -40,6 +40,21 @@ function gwi_seed_site_config(): array
 
     $pairs[] = [
         'en' => gwi_create_seed_instruction(
+            'profile-admin-color-scheme-en',
+            'Change Your Admin Color Scheme',
+            'en',
+            gwi_seed_profile_admin_color_scheme_en()
+        ),
+        'fi' => gwi_create_seed_instruction(
+            'hallintapaneelin-variteeman-vaihto-fi',
+            'Vaihda hallintapaneelin väriteema',
+            'fi',
+            gwi_seed_profile_admin_color_scheme_fi()
+        ),
+    ];
+
+    $pairs[] = [
+        'en' => gwi_create_seed_instruction(
             'wordpress-settings-en',
             'WordPress Settings',
             'en',
@@ -101,6 +116,64 @@ function gwi_seed_managing_users_fi(): string
         . '<!-- wp:general-wp-instructions/step-list {"title":"Hallinnoi käyttäjiä","steps":[{"text":"Mene Käyttäjät-näkymään nähdäksesi kaikki rekisteröityneet käyttäjät."},{"text":"Klikkaa Lisää uusi luodaksesi uuden käyttäjätilin."},{"text":"Syötä käyttäjänimi, sähköposti ja salasana uudelle käyttäjälle."},{"text":"Valitse pienin rooli, joka antaa henkilölle riittävät oikeudet."},{"text":"Klikkaa Lisää uusi käyttäjä tallentaaksesi tilin."},{"text":"Vie hiiri käyttäjän päälle muokataksesi tai poistaaksesi tilin."}]} /-->'
         . '<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"users-list","caption":"Käyttäjälista: Lisää uusi -painike korostettuna"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->'
         . '<!-- wp:paragraph --><p>Vinkki: Anna käyttäjille pienin tarvittava rooli. WordPress 7.0 suojaa myös sivuston oletusrooliasetusta pitämällä Pääkäyttäjä- ja Toimittaja-roolit poissa oletusroolin valitsimesta.</p><!-- /wp:paragraph -->';
+}
+
+function gwi_seed_profile_admin_color_scheme_en(): string
+{
+    return <<<'GUIDE'
+<!-- wp:paragraph -->
+<p>Use this when the WordPress admin interface uses the Default WordPress 7 look and you prefer an older or calmer dashboard color scheme. This changes only your own admin screens; it does not change the public website theme or affect other users.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:general-wp-instructions/step-list {"title":"Choose your dashboard color scheme","steps":[{"text":"Open Profile from the top-right account menu, or go to Users > Profile."},{"text":"Find Personal Options near the top of the page."},{"text":"Under Administration Color Scheme, choose Fresh for the older WordPress look or choose another scheme you prefer."},{"text":"Use the color swatches to compare the menu and toolbar colors before saving."},{"text":"Scroll to the bottom and click Update Profile."},{"text":"Return to any admin screen and confirm the left menu and top toolbar use the selected colors."}]} /-->
+
+<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"user-profile-admin-color-scheme","caption":"Administration Color Scheme options on the Profile screen"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->
+
+<!-- wp:heading -->
+<h2>How to check it worked</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>After saving, the admin menu and toolbar should use the selected color scheme. Visit the public site to confirm that the visible website design did not change.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Common mistakes</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul><li>Do not use Appearance > Themes for this task. That changes the public site theme, not your admin colors.</li><li>Do not expect this to change other users. Each user has their own profile preference.</li><li>Do not forget to click Update Profile after selecting the color scheme.</li></ul>
+<!-- /wp:list -->
+GUIDE;
+}
+
+function gwi_seed_profile_admin_color_scheme_fi(): string
+{
+    return <<<'GUIDE'
+<!-- wp:paragraph -->
+<p>Käytä tätä ohjetta, kun WordPressin hallintapaneeli käyttää WordPress 7:n oletusulkoasua ja haluat vanhemman tai rauhallisemman väriteeman. Muutos koskee vain omia hallintanäkymiäsi; se ei muuta julkisen sivuston teemaa eikä vaikuta muihin käyttäjiin.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:general-wp-instructions/step-list {"title":"Valitse hallintapaneelin väriteema","steps":[{"text":"Avaa Profiili oikean yläkulman käyttäjävalikosta tai mene kohtaan Käyttäjät > Profiili."},{"text":"Etsi sivun yläosasta Omat asetukset tai Personal Options."},{"text":"Valitse kohdassa Administration Color Scheme Fresh, jos haluat vanhemman WordPress-ilmeen, tai valitse jokin muu sinulle sopiva teema."},{"text":"Vertaa valikon ja työkalupalkin värejä värimallien avulla ennen tallennusta."},{"text":"Vieritä sivun alaosaan ja klikkaa Päivitä profiili."},{"text":"Palaa mihin tahansa hallintanäkymään ja varmista, että vasen valikko ja ylätyökalupalkki käyttävät valittuja värejä."}]} /-->
+
+<!-- wp:general-wp-instructions/highlighted-screenshot -->{"screenshotId":"user-profile-admin-color-scheme","caption":"Administration Color Scheme -valinnat profiilinäkymässä"}<!-- /wp:general-wp-instructions/highlighted-screenshot -->
+
+<!-- wp:heading -->
+<h2>Miten tarkistaa että se toimii</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Tallennuksen jälkeen hallintavalikon ja työkalupalkin pitäisi käyttää valittua väriteemaa. Avaa julkinen sivusto ja varmista, että sivuston näkyvä ulkoasu ei muuttunut.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Yleiset virheet</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul><li>Älä käytä tähän kohtaa Ulkoasu > Teemat. Se vaihtaa julkisen sivuston teeman, ei hallintapaneelin värejä.</li><li>Älä odota muutoksen vaikuttavan muihin käyttäjiin. Jokaisella käyttäjällä on oma profiiliasetuksensa.</li><li>Älä unohda klikata Päivitä profiili väriteeman valinnan jälkeen.</li></ul>
+<!-- /wp:list -->
+GUIDE;
 }
 
 function gwi_seed_wordpress_settings_en(): string

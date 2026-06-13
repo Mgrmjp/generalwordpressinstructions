@@ -35,6 +35,12 @@ fi
 
 wp option update blogname "${SITE_TITLE}" --path="${WP_PATH}"
 wp option update blogdescription "${SITE_TAGLINE}" --path="${WP_PATH}"
+if ! wp plugin is-installed classic-editor --path="${WP_PATH}" >/dev/null 2>&1; then
+    wp plugin install classic-editor --path="${WP_PATH}"
+fi
+wp plugin activate classic-editor --path="${WP_PATH}"
+wp option update classic-editor-replace block --path="${WP_PATH}"
+wp option update classic-editor-allow-users allow --path="${WP_PATH}"
 wp plugin activate general-wp-instructions --path="${WP_PATH}"
 wp theme activate instruction-manual --path="${WP_PATH}"
 wp rewrite structure '/%postname%/' --path="${WP_PATH}"

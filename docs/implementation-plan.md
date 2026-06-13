@@ -59,7 +59,7 @@ Build the project in vertical slices: environment and docs first, then the WordP
 
 ### Phase 6: Comprehensive Instruction Library
 - [x] Task 9: Add instruction_category taxonomy.
-  - Acceptance: `instruction_category` taxonomy registered with 5 default terms: fundamentals, site-config, block-editor, classic-editor, advanced.
+  - Acceptance: `instruction_category` taxonomy registered with 6 default terms: fundamentals, site-config, block-editor, classic-editor, multilingual, advanced.
   - Verify: `lando wp taxonomy list --path=/app/wordpress` shows taxonomy.
   - Files: `includes/post-type.php`.
 
@@ -68,8 +68,8 @@ Build the project in vertical slices: environment and docs first, then the WordP
   - Verify: PHP lint and WP-CLI post count.
   - Files: `includes/seed-fundamentals.php`.
 
-- [x] Task 11: Create seed content for Site Configuration (4 topics).
-  - Acceptance: 8 posts created (4 EN + 4 FI) covering Navigation, Users, Settings, Appearance and Fonts.
+- [x] Task 11: Create seed content for Site Configuration (5 topics).
+  - Acceptance: 10 posts created (5 EN + 5 FI) covering Navigation, Users, Profile Admin Color Scheme, Settings, Appearance and Fonts.
   - Verify: PHP lint and WP-CLI post count.
   - Files: `includes/seed-site-config.php`.
 
@@ -78,10 +78,20 @@ Build the project in vertical slices: environment and docs first, then the WordP
   - Verify: PHP lint and WP-CLI post count.
   - Files: `includes/seed-block-editor.php`.
 
-- [x] Task 13: Create seed content for Classic Editor (3 topics).
-  - Acceptance: 6 posts created (3 EN + 3 FI) covering Classic Editor Basics, Classic Formatting, Classic Media.
+- [x] Task 13: Create seed content for Classic Editor (4 topics).
+  - Acceptance: 8 posts created (4 EN + 4 FI) covering Classic Editor Basics, Editor Switching, Classic Formatting, Classic Media.
   - Verify: PHP lint and WP-CLI post count.
   - Files: `includes/seed-classic-editor.php`.
+
+- [x] Task 13a: Create seed content for Multilingual/Polylang (4 topics).
+  - Acceptance: 8 posts created (4 EN + 4 FI) covering language setup, content translation, media translations, and language switchers.
+  - Verify: PHP lint and WP-CLI post count.
+  - Files: `includes/seed-polylang.php`.
+
+- [x] Task 13b: Create seed content for Multilingual/WPML (5 topics).
+  - Acceptance: 10 posts created (5 EN + 5 FI) covering language setup, content translation, media translation, language switchers, and String Translation.
+  - Verify: PHP lint and WP-CLI post count.
+  - Files: `includes/seed-wpml.php`.
 
 - [x] Task 14: Create seed content for Advanced Features (5 topics).
   - Acceptance: 10 posts created (5 EN + 5 FI) covering ACF Fields, Flexible Content, ACF Blocks, SEO, Performance.
@@ -94,18 +104,18 @@ Build the project in vertical slices: environment and docs first, then the WordP
   - Files: `includes/seed-content.php`.
 
 - [x] Task 16: Expand critical-views.json with new screenshot views.
-  - Acceptance: 22 total views with bilingual labels covering all instruction topics.
+  - Acceptance: 38 total views with bilingual labels covering all instruction topics.
   - Verify: JSON parses and Playwright script accepts config.
   - Files: `config/critical-views.json`.
 
 ### Phase 7: Documentation and Verification
-- [ ] Task 17: Update documentation.
+- [x] Task 17: Update documentation.
   - Acceptance: spec.md, implementation-plan.md, and README.md reflect full instruction library.
   - Verify: Documentation matches implementation.
   - Files: `docs/spec.md`, `docs/implementation-plan.md`, `README.md`.
 
-- [ ] Task 18: Verify full instruction library.
-  - Acceptance: 48 posts exist, taxonomy terms assigned, language switcher works, screenshots capture.
+- [x] Task 18: Verify full instruction library.
+  - Acceptance: 76 posts exist, taxonomy terms assigned, language switcher works, screenshots capture.
   - Verify: WP-CLI commands and Playwright run.
   - Files: N/A.
 

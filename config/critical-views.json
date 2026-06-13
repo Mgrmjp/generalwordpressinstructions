@@ -268,6 +268,68 @@
       ]
     },
     {
+      "id": "classic-editor-writing-settings",
+      "title": {
+        "en": "Writing Settings: Editor defaults",
+        "fi": "Kirjoittamisen asetukset: Editorien oletukset"
+      },
+      "capture": "focus",
+      "url": "/wp-admin/options-writing.php",
+      "waitFor": "#wpbody, #wpcontent",
+      "focusPaddingBottom": 220,
+      "highlights": [
+        {
+          "selector": ".classic-editor-options, input[name=\"classic-editor-replace\"], input[name=\"classic-editor-allow-users\"]",
+          "label": {
+            "en": "Classic Editor settings",
+            "fi": "Classic Editor -asetukset"
+          }
+        }
+      ]
+    },
+    {
+      "id": "user-profile-default-editor",
+      "title": {
+        "en": "Profile: Default Editor",
+        "fi": "Profiili: Oletuseditori"
+      },
+      "capture": "focus",
+      "url": "/wp-admin/profile.php",
+      "waitFor": "#profile-page, #your-profile",
+      "focusPaddingTop": 120,
+      "focusPaddingBottom": 180,
+      "highlights": [
+        {
+          "selector": "tr.classic-editor-user-options, .classic-editor-user-options, input[name=\"classic-editor-replace\"]",
+          "label": {
+            "en": "Default Editor",
+            "fi": "Oletuseditori"
+          }
+        }
+      ]
+    },
+    {
+      "id": "user-profile-admin-color-scheme",
+      "title": {
+        "en": "Profile: Administration Color Scheme",
+        "fi": "Profiili: Hallintapaneelin väriteema"
+      },
+      "capture": "focus",
+      "url": "/wp-admin/profile.php",
+      "waitFor": "#profile-page, #your-profile",
+      "focusPaddingTop": 120,
+      "focusPaddingBottom": 180,
+      "highlights": [
+        {
+          "selector": ".user-admin-color-wrap, #color-picker, input[name=\"admin_color\"]",
+          "label": {
+            "en": "Administration Color Scheme",
+            "fi": "Hallintapaneelin väriteema"
+          }
+        }
+      ]
+    },
+    {
       "id": "settings-reading",
       "title": {
         "en": "Settings: Reading",
@@ -481,6 +543,217 @@
             "fi": "Lisää osio"
           },
           "optional": true
+        }
+      ]
+    },
+    {
+      "id": "polylang-languages",
+      "title": {
+        "en": "Polylang: Languages",
+        "fi": "Polylang: Kielet"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/admin.php?page=mlang",
+      "waitFor": "#add-lang, #col-container, #wpbody",
+      "focusPaddingBottom": 220,
+      "highlights": [
+        {
+          "selector": "#add-lang, #lang_list, #lang_name, .wp-list-table",
+          "label": {
+            "en": "Languages",
+            "fi": "Kielet"
+          }
+        }
+      ]
+    },
+    {
+      "id": "polylang-page-language-panel",
+      "title": {
+        "en": "Polylang: Page Language Panel",
+        "fi": "Polylang: Sivun kielipaneeli"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/post-new.php?post_type=page",
+      "waitFor": "#ml_box, select[name=\"post_lang_choice\"], body.block-editor-page, #wpbody",
+      "focusPaddingTop": 160,
+      "focusPaddingBottom": 220,
+      "highlights": [
+        {
+          "selector": "#ml_box, select[name=\"post_lang_choice\"], .post_lang_choice, #post-translations",
+          "label": {
+            "en": "Language panel",
+            "fi": "Kielipaneeli"
+          }
+        }
+      ]
+    },
+    {
+      "id": "polylang-content-language-columns",
+      "title": {
+        "en": "Polylang: Content Language Columns",
+        "fi": "Polylang: Sisällön kielisarakkeet"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/edit.php?post_type=page",
+      "waitFor": "#wpbody",
+      "focusPaddingBottom": 180,
+      "highlights": [
+        {
+          "selector": "th[id^=\"language_\"], td[class*=\"language_\"], .column-language_en, .column-language_fi",
+          "label": {
+            "en": "Language columns",
+            "fi": "Kielisarakkeet"
+          }
+        }
+      ]
+    },
+    {
+      "id": "polylang-media-settings",
+      "title": {
+        "en": "Polylang: Media Settings",
+        "fi": "Polylang: Media-asetukset"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/admin.php?page=mlang_settings",
+      "waitFor": "#pll-module-media, #wpbody",
+      "focusPaddingBottom": 220,
+      "highlights": [
+        {
+          "selector": "#pll-module-media, tr#pll-module-media",
+          "label": {
+            "en": "Media module",
+            "fi": "Media-moduuli"
+          }
+        }
+      ]
+    },
+    {
+      "id": "polylang-language-switcher-menu",
+      "title": {
+        "en": "Polylang: Menu Language Switcher",
+        "fi": "Polylang: Valikon kielenvaihtaja"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/nav-menus.php",
+      "waitFor": "#nav-menus-frame, #wpbody",
+      "focusPaddingBottom": 220,
+      "highlights": [
+        {
+          "selector": "#pll_lang_switch_box, #posttype-lang-switch, #submit-posttype-lang-switch",
+          "label": {
+            "en": "Language switcher",
+            "fi": "Kielenvaihtaja"
+          }
+        }
+      ]
+    },
+    {
+      "id": "wpml-languages",
+      "title": {
+        "en": "WPML: Languages",
+        "fi": "WPML: Kielet"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/admin.php?page=sitepress-multilingual-cms/menu/languages.php",
+      "waitFor": "#lang-sec-1, .wpml-settings-container, #wpbody",
+      "focusPaddingBottom": 220,
+      "highlights": [
+        {
+          "selector": "#lang-sec-1, #icl_add_remove_button, #icl_change_default_button",
+          "label": {
+            "en": "Site Languages",
+            "fi": "Sivuston kielet"
+          }
+        }
+      ]
+    },
+    {
+      "id": "wpml-translation-dashboard",
+      "title": {
+        "en": "WPML: Translation Dashboard",
+        "fi": "WPML: Translation Dashboard"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/admin.php?page=tm/menu/main.php",
+      "waitFor": "#wpbody",
+      "focusPaddingBottom": 220,
+      "highlights": [
+        {
+          "selector": ".wpml-tm-dashboard, .wpml-translation-dashboard, #translation-dashboard, .wpml-dashboard, #wpbody-content .wrap > h1",
+          "label": {
+            "en": "Translation Dashboard",
+            "fi": "Translation Dashboard"
+          }
+        }
+      ]
+    },
+    {
+      "id": "wpml-media-settings",
+      "title": {
+        "en": "WPML: Media Settings",
+        "fi": "WPML: Media-asetukset"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/admin.php?page=tm/menu/settings&sm=mcsetup#ml-content-setup-sec-media",
+      "waitFor": "#ml-content-setup-sec-media, #wpbody",
+      "focusPaddingBottom": 220,
+      "highlights": [
+        {
+          "selector": "#ml-content-setup-sec-media, [data-testid=\"wpml-media-translation-should-handle-media-auto\"], .wpml-media-new-content-settings",
+          "label": {
+            "en": "Media Translation",
+            "fi": "Median käännös"
+          }
+        }
+      ]
+    },
+    {
+      "id": "wpml-language-switcher-settings",
+      "title": {
+        "en": "WPML: Language Switcher Settings",
+        "fi": "WPML: Kielenvaihtajan asetukset"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/admin.php?page=sitepress-multilingual-cms/menu/languages.php#wpml-ls-settings-form",
+      "waitFor": "#wpml-ls-settings-form, #wpbody",
+      "focusPaddingBottom": 220,
+      "highlights": [
+        {
+          "selector": "#wpml-ls-settings-form, .js-wpml-ls-section, .wpml-ls-section",
+          "label": {
+            "en": "Language switcher options",
+            "fi": "Kielenvaihtajan asetukset"
+          }
+        }
+      ]
+    },
+    {
+      "id": "wpml-string-translation",
+      "title": {
+        "en": "WPML: String Translation",
+        "fi": "WPML: Merkkijonojen käännös"
+      },
+      "optional": true,
+      "capture": "focus",
+      "url": "/wp-admin/admin.php?page=wpml-string-translation/menu/string-translation.php",
+      "waitFor": ".wpml-string-translation-filter, #icl_st_filter_search, #wpbody",
+      "focusPaddingBottom": 220,
+      "highlights": [
+        {
+          "selector": ".wpml-string-translation-filter, #icl_st_filter_search, #icl_strings_table, .wpml-st-table",
+          "label": {
+            "en": "String Translation",
+            "fi": "Merkkijonojen käännös"
+          }
         }
       ]
     },

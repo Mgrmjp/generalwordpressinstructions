@@ -8,7 +8,7 @@
 - The instruction library covers common WordPress tasks comprehensively for training new users.
 
 ## Objective
-Build a WordPress-based instruction system for general WordPress use. Editors can publish bilingual instruction pages for Finnish and English readers, including guidance for the Block Editor, Classic Editor, ACF Blocks, native Gutenberg blocks, and older ACF Flexible Content layouts.
+Build a WordPress-based instruction system for general WordPress use. Editors can publish bilingual instruction pages for Finnish and English readers, including guidance for the Block Editor, Classic Editor, Polylang and WPML multilingual workflows, ACF Blocks, native Gutenberg blocks, and older ACF Flexible Content layouts.
 
 Success means a developer can start the Lando site, activate the included plugin/theme, seed example instructions, capture highlighted admin screenshots, and view readable bilingual instruction pages on the front end.
 
@@ -16,6 +16,8 @@ Success means a developer can start the Lando site, activate the included plugin
 - Local environment: Lando WordPress recipe.
 - Runtime: WordPress, PHP 8.2, MariaDB.
 - Plugin: `general-wp-instructions`, plain PHP with no Composer dependency.
+- Runtime plugin dependency: Classic Editor is installed from WordPress.org during local setup and is not vendored into Git.
+- Optional runtime plugins: Polylang and WPML can be installed separately for multilingual admin examples; this repo does not install, activate, or vendor them.
 - Theme: `instruction-manual`, classic PHP theme for instruction pages.
 - Blocks: one native Gutenberg dynamic block and one native highlighted screenshot block.
 - ACF: optional runtime integration for ACF Blocks and ACF Pro Flexible Content.
@@ -26,6 +28,8 @@ Success means a developer can start the Lando site, activate the included plugin
 - Download WordPress core: `lando wp core download --path=/app/wordpress --force`
 - Create config: `lando wp config create --path=/app/wordpress --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --dbhost=database --skip-check`
 - Install WordPress: `lando wp core install --path=/app/wordpress --url=https://generalwordpressinstructions.lndo.site --title="WordPress-ohjeet" --admin_user=admin --admin_password=admin --admin_email=admin@example.com`
+- Install Classic Editor: `lando wp plugin install classic-editor --activate --path=/app/wordpress`
+- Keep Block Editor as the site default while allowing user profile defaults: `lando wp option update classic-editor-replace block --path=/app/wordpress && lando wp option update classic-editor-allow-users allow --path=/app/wordpress`
 - Activate plugin: `lando wp plugin activate general-wp-instructions --path=/app/wordpress`
 - Activate theme: `lando wp theme activate instruction-manual --path=/app/wordpress`
 - Install screenshot tooling: `npm install`
@@ -49,12 +53,15 @@ Success means a developer can start the Lando site, activate the included plugin
 - `includes/seed-fundamentals.php` — Dashboard, Posts, Categories, Pages, Media, Comments
 - `includes/seed-site-config.php` — Navigation, Users, Settings, Appearance and Fonts
 - `includes/seed-block-editor.php` — Block Editor deep dive
+- `includes/seed-editor-workflows.php` — Preview/publish, List View, image alt text
 - `includes/seed-classic-editor.php` — Classic Editor deep dive
+- `includes/seed-polylang.php` — Polylang multilingual essentials
+- `includes/seed-wpml.php` — WPML multilingual essentials
 - `includes/seed-advanced.php` — ACF Fields, Flexible Content, ACF Blocks, SEO, Performance
 
 ## Instruction Library
 
-The plugin seeds 48 instruction posts (24 topics × 2 languages) organized into 5 categories:
+The plugin seeds 76 instruction posts (38 topics × 2 languages) organized into 6 categories:
 
 ### WordPress Fundamentals
 - Dashboard Overview
@@ -67,6 +74,7 @@ The plugin seeds 48 instruction posts (24 topics × 2 languages) organized into 
 ### Site Configuration
 - Navigation Menus
 - Managing Users
+- Change Your Admin Color Scheme
 - WordPress Settings
 - Theme Appearance and Fonts
 
@@ -77,11 +85,26 @@ The plugin seeds 48 instruction posts (24 topics × 2 languages) organized into 
 - Media Blocks
 - Layout Blocks
 - Synced Patterns and Patterns
+- Preview and Publish Changes
+- Use List View
+- Add Images with Alt Text
 
 ### Classic Editor
 - Classic Editor Basics
+- Switch Between Block and Classic Editors
 - Classic Editor Formatting
 - Classic Editor Media
+
+### Multilingual
+- Configure Languages with Polylang
+- Translate Content with Polylang
+- Polylang Media Translations
+- Add a Polylang Language Switcher
+- Configure Languages with WPML
+- Translate Content with WPML
+- WPML Media Translation
+- Add a WPML Language Switcher
+- WPML String Translation
 
 ### Advanced Features
 - Custom Fields with ACF
@@ -121,6 +144,7 @@ Conventions:
 ## Boundaries
 - Always: keep ACF optional, make all public output escaped, keep Finnish/English labels available.
 - Always: make screenshot highlight outlines visually obvious in generated screenshots.
+- Always: keep Polylang and WPML guides instructional only unless a later change explicitly replaces the lightweight translation pairing model.
 - Ask first: adding paid plugins, adding external services, changing from Lando to another dev stack.
 - Ask first: replacing the bilingual pairing model with Polylang/WPML.
 - Never: bundle ACF Pro or any commercial plugin.
@@ -129,14 +153,14 @@ Conventions:
 ## Success Criteria
 - A Lando WordPress project can be started from the repo.
 - The plugin registers an `Instruction` post type with Finnish/English metadata and translation links.
-- The plugin registers an `instruction_category` taxonomy with 5 default terms.
+- The plugin registers an `instruction_category` taxonomy with 6 default terms.
 - The front end shows a Finnish/English language switcher when translations are linked.
 - The plugin provides native Gutenberg blocks for instruction steps and highlighted screenshots.
 - The plugin registers ACF Blocks when ACF is active.
 - ACF JSON defines an older Flexible Content editing model for instruction sections.
-- The plugin seeds 48 instruction posts covering 24 topics in Finnish and English.
+- The plugin seeds 76 instruction posts covering 38 topics in Finnish and English.
 - Each instruction uses step-list and highlighted-screenshot blocks.
-- A screenshot script captures 22 critical admin views with strong outlines around configured buttons.
+- A screenshot script captures 38 critical admin views with strong outlines around configured buttons.
 
 ## Open Questions
 - Should production translation management later use Polylang/WPML instead of lightweight post meta?

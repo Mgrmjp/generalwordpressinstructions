@@ -1,6 +1,6 @@
 # General WordPress Instructions
 
-Local WordPress training site for bilingual Finnish/English instructions, highlighted admin screenshots, Block Editor and Classic Editor examples, native Gutenberg blocks, ACF Blocks, and older ACF Flexible Content layouts.
+Local WordPress training site for bilingual Finnish/English instructions, highlighted admin screenshots, Block Editor and Classic Editor examples, Polylang and WPML guidance, native Gutenberg blocks, ACF Blocks, and older ACF Flexible Content layouts.
 
 ## Local Setup
 
@@ -16,6 +16,8 @@ Local WordPress training site for bilingual Finnish/English instructions, highli
    lando setup-wp
    ```
 
+   This installs Classic Editor from WordPress.org, so the setup command needs network access.
+
    Or run the setup manually:
 
    ```sh
@@ -24,9 +26,12 @@ Local WordPress training site for bilingual Finnish/English instructions, highli
    lando wp core install --path=/app/wordpress --url=https://generalwordpressinstructions.lndo.site --title="WordPress-ohjeet" --admin_user=admin --admin_password=admin --admin_email=admin@example.com
    ```
 
-3. If you used the manual setup path, activate the included plugin and theme:
+3. If you used the manual setup path, install Classic Editor, configure editor defaults, and activate the included plugin and theme:
 
    ```sh
+   lando wp plugin install classic-editor --activate --path=/app/wordpress
+   lando wp option update classic-editor-replace block --path=/app/wordpress
+   lando wp option update classic-editor-allow-users allow --path=/app/wordpress
    lando wp plugin activate general-wp-instructions --path=/app/wordpress
    lando wp theme activate instruction-manual --path=/app/wordpress
    ```
@@ -39,7 +44,7 @@ Local WordPress training site for bilingual Finnish/English instructions, highli
 
 ## Instruction Library
 
-The plugin seeds 54 instruction posts (27 topics × 2 languages) organized into 5 categories:
+The plugin seeds 76 instruction posts (38 topics × 2 languages) organized into 6 categories:
 
 ### WordPress Fundamentals
 - Dashboard Overview
@@ -52,6 +57,7 @@ The plugin seeds 54 instruction posts (27 topics × 2 languages) organized into 
 ### Site Configuration
 - Navigation Menus
 - Managing Users
+- Change Your Admin Color Scheme
 - WordPress Settings
 - Theme Appearance and Fonts
 
@@ -68,8 +74,20 @@ The plugin seeds 54 instruction posts (27 topics × 2 languages) organized into 
 
 ### Classic Editor
 - Classic Editor Basics
+- Switch Between Block and Classic Editors
 - Classic Editor Formatting
 - Classic Editor Media
+
+### Multilingual
+- Configure Languages with Polylang
+- Translate Content with Polylang
+- Polylang Media Translations
+- Add a Polylang Language Switcher
+- Configure Languages with WPML
+- Translate Content with WPML
+- WPML Media Translation
+- Add a WPML Language Switcher
+- WPML String Translation
 
 ### Advanced Features
 - Custom Fields with ACF
@@ -104,6 +122,8 @@ Critical views and selectors live in `config/critical-views.json`. The script ap
 ## ACF Notes
 
 ACF is optional. Native Gutenberg blocks and instruction posts work without it.
+
+Polylang and WPML are optional and are not installed or activated by this repo. The multilingual instruction guides and optional screenshot views are available for local environments where those plugins have been set up separately.
 
 If ACF Pro is installed, the plugin registers ACF Blocks and the `acf-json` field group exposes an older Flexible Content authoring model for instructions.
 

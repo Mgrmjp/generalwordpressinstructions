@@ -538,6 +538,10 @@ function gwi_register_instruction_taxonomy(): void
             'en' => 'Classic Editor',
             'fi' => 'Perinteinen editori',
         ],
+        'multilingual' => [
+            'en' => 'Multilingual',
+            'fi' => 'Monikielisyys',
+        ],
         'advanced' => [
             'en' => 'Advanced Features',
             'fi' => 'Edistyneet ominaisuudet',

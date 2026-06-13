@@ -383,6 +383,7 @@ function manual_rest_get_instructions(WP_REST_Request $request): WP_REST_Respons
         'posts_per_page' => -1,
         'orderby' => 'title',
         'order' => 'ASC',
+        'suppress_filters' => true,
     ];
 
     if ($language !== '') {
@@ -563,7 +564,7 @@ function manual_instruction_search_score(int $post_id, string $search): int
  */
 function manual_query_scored_instructions(array $query_args, string $search): array
 {
-    $posts = get_posts($query_args);
+    $posts = manual_query_instruction_posts($query_args);
     $scored = [];
 
     foreach ($posts as $post) {
@@ -876,6 +877,150 @@ function manual_instruction_current_language(): string
     return $language !== '' ? $language : 'fi';
 }
 
+function manual_instruction_query_args(array $args): array
+{
+    $args['suppress_filters'] = true;
+
+    return $args;
+}
+
+/**
+ * Query instruction posts without third-party language joins.
+ *
+ * The instruction library has its own lightweight language meta. WPML can be
+ * active for the guides about WPML itself, so list views must not depend on
+ * WPML's icl_translations rows for this custom post type.
+ *
+ * @param array<string, mixed> $query_args
+ * @return list<WP_Post>
+ */
+function manual_query_instruction_posts(array $query_args): array
+{
+    if (($query_args['post_type'] ?? '') !== 'wp_instruction') {
+        return get_posts(manual_instruction_query_args($query_args));
+    }
+
+    global $wpdb;
+
+    $joins = [];
+    $where = ['p.post_type = %s'];
+    $params = ['wp_instruction'];
+
+    $statuses = $query_args['post_status'] ?? 'publish';
+    $statuses = is_array($statuses) ? $statuses : [$statuses];
+    $statuses = array_values(array_filter(array_map('sanitize_key', $statuses)));
+
+    if ($statuses === []) {
+        $statuses = ['publish'];
+    }
+
+    $where[] = 'p.post_status IN (' . implode(', ', array_fill(0, count($statuses), '%s')) . ')';
+    array_push($params, ...$statuses);
+
+    $language = manual_instruction_query_language($query_args);
+    if ($language !== '') {
+        $joins[] = "INNER JOIN {$wpdb->postmeta} pm_language ON pm_language.post_id = p.ID AND pm_language.meta_key = '_gwi_language'";
+        $where[] = 'pm_language.meta_value = %s';
+        $params[] = $language;
+    }
+
+    $name = isset($query_args['name']) ? sanitize_title((string) $query_args['name']) : '';
+    if ($name !== '') {
+        $where[] = 'p.post_name = %s';
+        $params[] = $name;
+    }
+
+    $excluded = array_filter(array_map('absint', (array) ($query_args['post__not_in'] ?? [])));
+    if ($excluded !== []) {
+        $where[] = 'p.ID NOT IN (' . implode(', ', array_fill(0, count($excluded), '%d')) . ')';
+        array_push($params, ...$excluded);
+    }
+
+    $tax_index = 0;
+    foreach ((array) ($query_args['tax_query'] ?? []) as $clause) {
+        if (!is_array($clause) || ($clause['taxonomy'] ?? '') !== 'instruction_category') {
+            continue;
+        }
+
+        $terms = array_values(array_filter((array) ($clause['terms'] ?? []), static fn($term): bool => $term !== ''));
+        if ($terms === []) {
+            continue;
+        }
+
+        $tax_index++;
+        $relationships_alias = 'tr_instruction_' . $tax_index;
+        $taxonomy_alias = 'tt_instruction_' . $tax_index;
+
+        $joins[] = "INNER JOIN {$wpdb->term_relationships} {$relationships_alias} ON {$relationships_alias}.object_id = p.ID";
+        $joins[] = "INNER JOIN {$wpdb->term_taxonomy} {$taxonomy_alias} ON {$taxonomy_alias}.term_taxonomy_id = {$relationships_alias}.term_taxonomy_id AND {$taxonomy_alias}.taxonomy = 'instruction_category'";
+
+        $field = (string) ($clause['field'] ?? 'term_id');
+        if ($field === 'slug') {
+            $terms_alias = 't_instruction_' . $tax_index;
+            $slugs = array_map('sanitize_title', $terms);
+            $joins[] = "INNER JOIN {$wpdb->terms} {$terms_alias} ON {$terms_alias}.term_id = {$taxonomy_alias}.term_id";
+            $where[] = "{$terms_alias}.slug IN (" . implode(', ', array_fill(0, count($slugs), '%s')) . ')';
+            array_push($params, ...$slugs);
+            continue;
+        }
+
+        $term_ids = array_filter(array_map('absint', $terms));
+        if ($term_ids === []) {
+            continue;
+        }
+
+        $column = $field === 'term_taxonomy_id' ? 'term_taxonomy_id' : 'term_id';
+        $where[] = "{$taxonomy_alias}.{$column} IN (" . implode(', ', array_fill(0, count($term_ids), '%d')) . ')';
+        array_push($params, ...$term_ids);
+    }
+
+    $orderby = ($query_args['orderby'] ?? 'title') === 'title' ? 'p.post_title' : 'p.ID';
+    $order = strtoupper((string) ($query_args['order'] ?? 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+    $limit = (int) ($query_args['posts_per_page'] ?? -1);
+
+    $sql = "SELECT DISTINCT p.ID FROM {$wpdb->posts} p "
+        . implode(' ', $joins)
+        . ' WHERE ' . implode(' AND ', $where)
+        . " ORDER BY {$orderby} {$order}";
+
+    if ($limit > 0) {
+        $sql .= ' LIMIT %d';
+        $params[] = $limit;
+    }
+
+    $ids = $wpdb->get_col($wpdb->prepare($sql, $params));
+    $posts = [];
+
+    foreach ($ids as $id) {
+        $post = get_post((int) $id);
+        if ($post instanceof WP_Post) {
+            $posts[] = $post;
+        }
+    }
+
+    return $posts;
+}
+
+/**
+ * @param array<string, mixed> $query_args
+ */
+function manual_instruction_query_language(array $query_args): string
+{
+    if (($query_args['meta_key'] ?? '') === '_gwi_language') {
+        return manual_instruction_sanitize_language((string) ($query_args['meta_value'] ?? ''));
+    }
+
+    foreach ((array) ($query_args['meta_query'] ?? []) as $clause) {
+        if (!is_array($clause) || ($clause['key'] ?? '') !== '_gwi_language') {
+            continue;
+        }
+
+        return manual_instruction_sanitize_language((string) ($clause['value'] ?? ''));
+    }
+
+    return '';
+}
+
 function manual_filter_instruction_archive_by_language(WP_Query $query): void
 {
     if (is_admin() || !$query->is_main_query()) {
@@ -894,6 +1039,7 @@ function manual_filter_instruction_archive_by_language(WP_Query $query): void
         $query->set('posts_per_page', -1);
         $query->set('orderby', 'title');
         $query->set('order', 'ASC');
+        $query->set('suppress_filters', true);
     }
 
     $raw_language = $query->get('instruction_language');
@@ -957,6 +1103,7 @@ function manual_instruction_category_label(WP_Term $term): string
         'site-config' => __('Sivuston asetukset', 'instruction-manual'),
         'block-editor' => __('Lohkoeditori', 'instruction-manual'),
         'classic-editor' => __('Perinteinen editori', 'instruction-manual'),
+        'multilingual' => __('Monikielisyys', 'instruction-manual'),
         'advanced' => __('Edistyneet ominaisuudet', 'instruction-manual'),
     ];
 
@@ -1018,9 +1165,7 @@ function manual_instruction_category_count(WP_Term $term, string $language = '')
         ];
     }
 
-    $query = new WP_Query($query_args);
-
-    return (int) $query->found_posts;
+    return count(manual_query_instruction_posts($query_args));
 }
 
 function manual_instruction_card_excerpt(int $post_id, int $word_limit = 24): string
@@ -1110,6 +1255,11 @@ function manual_instruction_library_groups(): array
             'title' => __('Sivuston asetukset', 'instruction-manual'),
             'description' => __('Ohjeet valikoihin, käyttäjiin, sivuston asetuksiin ja julkaisun hallintaan.', 'instruction-manual'),
             'terms' => ['site-config'],
+        ],
+        'multilingual' => [
+            'title' => __('Monikielisyys', 'instruction-manual'),
+            'description' => __('Ohjeet kielten määrittämiseen, käännöksiin ja kielenvaihtajiin.', 'instruction-manual'),
+            'terms' => ['multilingual'],
         ],
         'advanced' => [
             'title' => __('Edistyneet', 'instruction-manual'),
@@ -1281,6 +1431,14 @@ function manual_instruction_task_copy(): array
             'title' => __('Lisää tai hallitse käyttäjiä', 'instruction-manual'),
             'purpose' => __('Käytä tätä ohjetta, kun haluat antaa käyttäjälle oikeudet tai tarkistaa olemassa olevan käyttäjän roolin.', 'instruction-manual'),
         ],
+        'profile-admin-color-scheme' => [
+            'title' => __('Vaihda hallintapaneelin väriteema', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat muuttaa WordPressin hallintanäkymän värejä omassa profiilissasi.', 'instruction-manual'),
+        ],
+        'hallintapaneelin-variteeman-vaihto' => [
+            'title' => __('Vaihda hallintapaneelin väriteema', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat muuttaa WordPressin hallintanäkymän värejä omassa profiilissasi.', 'instruction-manual'),
+        ],
         'wordpress-settings' => [
             'title' => __('Tarkista WordPress-asetukset', 'instruction-manual'),
             'purpose' => __('Käytä tätä ohjetta, kun haluat muuttaa koko sivustoon vaikuttavia perusasetuksia.', 'instruction-manual'),
@@ -1353,6 +1511,14 @@ function manual_instruction_task_copy(): array
             'title' => __('Muokkaa sisältöä perinteisessä editorissa', 'instruction-manual'),
             'purpose' => __('Käytä tätä ohjetta, kun sivusto käyttää vanhempaa WordPress-editoria lohkoeditorin sijaan.', 'instruction-manual'),
         ],
+        'switch-between-editors' => [
+            'title' => __('Vaihda lohkoeditorin ja perinteisen editorin välillä', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat valita oman oletuseditorin tai avata yksittäisen sivun eri editorissa.', 'instruction-manual'),
+        ],
+        'editorien-vaihto' => [
+            'title' => __('Vaihda lohkoeditorin ja perinteisen editorin välillä', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat valita oman oletuseditorin tai avata yksittäisen sivun eri editorissa.', 'instruction-manual'),
+        ],
         'classic-formatting' => [
             'title' => __('Muotoile tekstiä perinteisessä editorissa', 'instruction-manual'),
             'purpose' => __('Käytä tätä ohjetta, kun haluat lisätä otsikoita, listoja, linkkejä ja perusmuotoiluja vanhassa editorissa.', 'instruction-manual'),
@@ -1368,6 +1534,78 @@ function manual_instruction_task_copy(): array
         'perinteisen-editorin-media' => [
             'title' => __('Lisää mediaa perinteisessä editorissa', 'instruction-manual'),
             'purpose' => __('Käytä tätä ohjetta, kun haluat lisätä kuvia tai tiedostoja vanhemman editorin sisältöalueelle.', 'instruction-manual'),
+        ],
+        'polylang-languages' => [
+            'title' => __('Määritä sivuston kielet', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat lisätä tai tarkistaa Polylangin kielet, localet, kielikoodit ja oletuskielen.', 'instruction-manual'),
+        ],
+        'polylang-kielten-maaritys' => [
+            'title' => __('Määritä sivuston kielet', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat lisätä tai tarkistaa Polylangin kielet, localet, kielikoodit ja oletuskielen.', 'instruction-manual'),
+        ],
+        'polylang-translate-content' => [
+            'title' => __('Käännä sivuja ja artikkeleita', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat luoda, yhdistää tai tarkistaa Polylang-käännöksiä sisällölle.', 'instruction-manual'),
+        ],
+        'sisallon-kaantaminen-polylangilla' => [
+            'title' => __('Käännä sivuja ja artikkeleita', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat luoda, yhdistää tai tarkistaa Polylang-käännöksiä sisällölle.', 'instruction-manual'),
+        ],
+        'polylang-media-translations' => [
+            'title' => __('Päätä miten media käännetään', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat päättää, tarvitseeko mediatiedostojen otsikot, kuvatekstit ja alt-tekstit kääntää.', 'instruction-manual'),
+        ],
+        'median-kaannokset-polylangilla' => [
+            'title' => __('Päätä miten media käännetään', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat päättää, tarvitseeko mediatiedostojen otsikot, kuvatekstit ja alt-tekstit kääntää.', 'instruction-manual'),
+        ],
+        'polylang-language-switcher' => [
+            'title' => __('Lisää kielenvaihtaja valikkoon', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat antaa kävijöille tavan siirtyä saman sisällön kieliversioiden välillä.', 'instruction-manual'),
+        ],
+        'kielenvaihtajan-lisaaminen-polylangilla' => [
+            'title' => __('Lisää kielenvaihtaja valikkoon', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat antaa kävijöille tavan siirtyä saman sisällön kieliversioiden välillä.', 'instruction-manual'),
+        ],
+        'wpml-languages' => [
+            'title' => __('Määritä sivuston kielet WPML:llä', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat tarkistaa WPML:n kielet, oletuskielen, URL-muodon ja kielenvaihtajan perusasetukset.', 'instruction-manual'),
+        ],
+        'wpml-kielten-maaritys' => [
+            'title' => __('Määritä sivuston kielet WPML:llä', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat tarkistaa WPML:n kielet, oletuskielen, URL-muodon ja kielenvaihtajan perusasetukset.', 'instruction-manual'),
+        ],
+        'wpml-translate-content' => [
+            'title' => __('Käännä sisältöä WPML:llä', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat lähettää sivuja, artikkeleita tai taksonomioita käännettäväksi WPML:n Translation Dashboardista.', 'instruction-manual'),
+        ],
+        'wpml-sisallon-kaantaminen' => [
+            'title' => __('Käännä sisältöä WPML:llä', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat lähettää sivuja, artikkeleita tai taksonomioita käännettäväksi WPML:n Translation Dashboardista.', 'instruction-manual'),
+        ],
+        'wpml-media-translation' => [
+            'title' => __('Käännä median tekstit WPML:llä', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun kuvien otsikot, kuvatekstit ja alt-tekstit pitää kääntää sisällön mukana.', 'instruction-manual'),
+        ],
+        'wpml-median-kaantaminen' => [
+            'title' => __('Käännä median tekstit WPML:llä', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun kuvien otsikot, kuvatekstit ja alt-tekstit pitää kääntää sisällön mukana.', 'instruction-manual'),
+        ],
+        'wpml-language-switcher' => [
+            'title' => __('Lisää WPML-kielenvaihtaja', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat näyttää kävijöille kielenvaihtajan valikossa, widgetissä, alatunnisteessa tai mallissa.', 'instruction-manual'),
+        ],
+        'wpml-kielenvaihtajan-lisaaminen' => [
+            'title' => __('Lisää WPML-kielenvaihtaja', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun haluat näyttää kävijöille kielenvaihtajan valikossa, widgetissä, alatunnisteessa tai mallissa.', 'instruction-manual'),
+        ],
+        'wpml-string-translation' => [
+            'title' => __('Käännä merkkijonoja WPML:llä', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun teksti kuuluu sivuston rakenteeseen, widgetteihin, teemaan, lisäosiin tai hallinta-asetuksiin.', 'instruction-manual'),
+        ],
+        'wpml-merkkijonojen-kaantaminen' => [
+            'title' => __('Käännä merkkijonoja WPML:llä', 'instruction-manual'),
+            'purpose' => __('Käytä tätä ohjetta, kun teksti kuuluu sivuston rakenteeseen, widgetteihin, teemaan, lisäosiin tai hallinta-asetuksiin.', 'instruction-manual'),
         ],
         'custom-fields' => [
             'title' => __('Muokkaa mukautettuja kenttiä', 'instruction-manual'),
@@ -1913,6 +2151,7 @@ function manual_related_instructions(int $post_id, int $limit = 3): array
         'post__not_in' => [$post_id],
         'orderby' => 'title',
         'order' => 'ASC',
+        'suppress_filters' => true,
     ];
 
     if ($category instanceof WP_Term) {
@@ -1935,7 +2174,7 @@ function manual_related_instructions(int $post_id, int $limit = 3): array
         ];
     }
 
-    return get_posts($args);
+    return manual_query_instruction_posts($args);
 }
 
 function manual_finnish_search_synonyms(): array
@@ -1985,7 +2224,7 @@ function manual_featured_tutorials(int $limit = 8): array
         'acf-blocks', 'acf-lohkot',
     ];
 
-    $posts = get_posts([
+    $posts = manual_query_instruction_posts([
         'post_type' => 'wp_instruction',
         'post_status' => 'publish',
         'posts_per_page' => $limit,
@@ -1993,6 +2232,7 @@ function manual_featured_tutorials(int $limit = 8): array
         'meta_value' => 'fi',
         'orderby' => 'title',
         'order' => 'ASC',
+        'suppress_filters' => true,
     ]);
 
     if (count($posts) >= $limit) {
@@ -2001,11 +2241,12 @@ function manual_featured_tutorials(int $limit = 8): array
 
     $featured = [];
     foreach ($slugs as $slug) {
-        $found = get_posts([
+        $found = manual_query_instruction_posts([
             'post_type' => 'wp_instruction',
             'post_status' => 'publish',
             'posts_per_page' => 1,
             'name' => $slug,
+            'suppress_filters' => true,
         ]);
         if (!empty($found)) {
             $featured[] = $found[0];
@@ -2016,7 +2257,7 @@ function manual_featured_tutorials(int $limit = 8): array
     }
 
     if (count($featured) < $limit) {
-        $rest = get_posts([
+        $rest = manual_query_instruction_posts([
             'post_type' => 'wp_instruction',
             'post_status' => 'publish',
             'posts_per_page' => $limit - count($featured),
@@ -2025,6 +2266,7 @@ function manual_featured_tutorials(int $limit = 8): array
             'post__not_in' => wp_list_pluck($featured, 'ID'),
             'orderby' => 'title',
             'order' => 'ASC',
+            'suppress_filters' => true,
         ]);
         $featured = array_merge($featured, $rest);
     }
@@ -2239,6 +2481,7 @@ function manual_get_translation_pair(int $post_id): int
         'meta_key' => '_gwi_translation_id',
         'meta_value' => $post_id,
         'exclude' => [$post_id],
+        'suppress_filters' => true,
     ]);
 
     return !empty($reverse) ? absint($reverse[0]) : 0;
